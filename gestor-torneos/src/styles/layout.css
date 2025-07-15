@@ -9,7 +9,7 @@ footer {
 }
 
 nav {
-  background-color: rgb(30, 35, 105);
+  background-color: rgb(20, 44, 80);
   margin-bottom: 20px;
 }
 nav ul {
@@ -20,15 +20,7 @@ nav ul {
 }
 nav ul li {
   flex-grow: 1;
-}
-
-nav ul li a {
   color: white;
-  text-decoration: none;
-  padding: 3px 6px;
   display: block;
   text-align: center;
-}
-nav ul li a:hover {
-  background-color: rgb(14, 29, 82);
 }
