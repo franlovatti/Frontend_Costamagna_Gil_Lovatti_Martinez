@@ -1,12 +1,13 @@
 import './App.css';
 import Layout from './components/layout/layout.tsx';
+import Home from './home.tsx';
+
 
 function App() {
   return (
     <div>
       <Layout>
-        {' '}
-        <h1>hola</h1>
+        <Home />
       </Layout>
     </div>
   );
