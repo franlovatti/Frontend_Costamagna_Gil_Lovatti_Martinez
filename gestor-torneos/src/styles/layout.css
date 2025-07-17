@@ -1,6 +1,8 @@
 .nav-link{
   color: var(--text);
   text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
 .nav-link:hover{

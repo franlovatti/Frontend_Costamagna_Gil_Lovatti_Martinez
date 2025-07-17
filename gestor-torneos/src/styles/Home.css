@@ -1,5 +1,6 @@
 h1{
   margin: 18px;
+  font-weight: bold;
 }
 .home-container{
   display: flex;

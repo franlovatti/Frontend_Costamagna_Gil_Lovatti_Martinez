@@ -15,9 +15,9 @@ export default function Layout({ children }: LayoutProps) {
         <Navbar.Toggle aria-controls="basic-navbar-nav"/>
         <Navbar.Collapse id="basic-navbar-nav" >
           <Nav className="ms-auto">
-            <Nav.Link href="#" className='mx-2'>Torneos</Nav.Link>
-            <Nav.Link href="#" className='mx-2'>Tablon</Nav.Link>
-            <Nav.Link href="#" className='mx-2'>Perfil</Nav.Link>
+            <Nav.Link href="#" className='mx-2 p-3'>Torneos</Nav.Link>
+            <Nav.Link href="#" className='mx-2 p-3'>Tablon</Nav.Link>
+            <Nav.Link href="#" className='mx-2 p-3'>Perfil</Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>
