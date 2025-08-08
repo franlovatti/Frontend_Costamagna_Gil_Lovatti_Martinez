@@ -11,7 +11,7 @@ export default function ForgottenPassword() {
     e.preventDefault();
     setLoading(true);
     try{
-    const response = await fetch("http://localhost:5173/Login", {
+    const response = await fetch("http://localhost:5173/ForgottenPassword", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -39,7 +39,7 @@ export default function ForgottenPassword() {
     e.preventDefault();
     setLoading(true);
     try{
-    const response = await fetch("http://localhost:5173/Login", {
+    const response = await fetch("http://localhost:5173/ForgottenPassword", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

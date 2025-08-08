@@ -5,8 +5,9 @@ import Torneos from './pages/Torneos.tsx';
 import Noticias from './pages/Noticias.tsx';
 import Perfil from './pages/Perfil.tsx';
 import Login from './pages/Login.tsx';
-import Registro from "./pages/Registro.tsx"
-import ForgottenPassword from "./pages/ForgottenPassword.tsx"
+import Registro from "./pages/Registro.tsx";
+import ForgottenPassword from "./pages/ForgottenPassword.tsx";
+import ChangePassword from './pages/ChangePassword.tsx';
 
 function App() {
   /*falta agregar logica de logeo esta route "/" tendria que ser en realidad protegia por loggin y ser " home"
@@ -35,6 +36,7 @@ function App() {
           <Route path="Login" element={<Login/>} />
           <Route path="Registro" element={<Registro/>}></Route>
           <Route path = "ForgottenPassword" element={<ForgottenPassword/>}></Route>
+          <Route path = "ChangePassword" element = {<ChangePassword/>}></Route>
         </Route>
       </Routes>
       </div>
