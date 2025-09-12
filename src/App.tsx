@@ -1,10 +1,12 @@
 import MainLayout from './components/layout/MainLayout.tsx';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainHome from './pages/MainHome.tsx';
 import Torneos from './pages/Torneos.tsx';
 import Noticias from './pages/Noticias.tsx';
 import Perfil from './pages/Perfil.tsx';
-
+import Listanoticias from './pages/Listanoticias.tsx';
+import Crearnoticia from './pages/Crearnoticia.tsx';
+import Editarnoticia from './pages/Editarnoticia.tsx';
 
 function App() {
   /*falta agregar logica de logeo esta route "/" tendria que ser en realidad protegia por loggin y ser " home"
@@ -24,14 +26,18 @@ function App() {
   return (
     <BrowserRouter>
       <div className="App">
-      <Routes>
-        <Route path='/' element={<MainLayout/>}>
-          <Route index element={<MainHome />} />
-          <Route path="torneos" element={<Torneos />} />
-          <Route path="noticias" element={<Noticias />} />
-          <Route path="perfil" element={<Perfil />} />
-        </Route>
-      </Routes>
+        <Routes>
+          <Route path="/" element={<MainLayout />}>
+            <Route index element={<MainHome />} />
+            <Route path="listanoticias" element={<Listanoticias />} />
+            <Route path="crearnoticia" element={<Crearnoticia />} />
+            <Route path="editarnoticia/:id" element={<Editarnoticia />} />
+
+            <Route path="torneos" element={<Torneos />} />
+            <Route path="noticias" element={<Noticias />} />
+            <Route path="perfil" element={<Perfil />} />
+          </Route>
+        </Routes>
       </div>
     </BrowserRouter>
   );

@@ -1,10 +1,8 @@
-import { Outlet } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import { NavLink } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 export default function MainLayout() {
-  /**Con logica de logeo <Navbar.Brand href="/">React-Bootstrap</Navbar.Brand> tendria el href="/home" */
   return (
     <div className="bg-dark d-flex flex-column min-vh-100">
       <Navbar expand="lg" fixed="top" bg="dark" data-bs-theme="dark">
@@ -13,21 +11,7 @@ export default function MainLayout() {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto fw-bold">
-              <Nav.Link as={NavLink} to="/torneos">
-                Torneos
-              </Nav.Link>
-              <Nav.Link as={NavLink} to="/noticias">
-                Noticias
-              </Nav.Link>
-              <Nav.Link as={NavLink} to="/perfil">
-                Perfil
-              </Nav.Link>
-              <Nav.Link as={NavLink} to="/crearnoticia">
-                Crear noticia
-              </Nav.Link>
-              <Nav.Link as={NavLink} to="/listanoticias">
-                Lista noticias
-              </Nav.Link>
+              <Nav.Link href="crearnoticia">crear noticia</Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>
