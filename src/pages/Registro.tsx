@@ -7,7 +7,7 @@ export default function Registro() {
   const [nombre, setNombre] = useState<string>("");
   const [fechaNacimiento, setFechaNacimiento] = useState<string>("")
   const [usuario, setUsuario] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [contraseña, setContraseña] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
   const [tipoFecha, setTipoFecha] = useState<"text"|"date">("text");  
@@ -16,12 +16,12 @@ export default function Registro() {
     e.preventDefault();
     setLoading(true);
     try{
-      const response = await fetch("http://localhost:5173/Registro", {
+      const response = await fetch("http://localhost:3000/api/usuarios", {
         method: "POST",
         headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ nombre, apellido, usuario, password, fechaNacimiento, email}),
+      body: JSON.stringify({ nombre, apellido, usuario, contraseña, fechaNacimiento, email, esAdmin: false, participations: [] }),
       });
 
       if(!response.ok){
@@ -42,8 +42,8 @@ export default function Registro() {
     setUsuario(e.target.value);
   }
 
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
+  const handleContraseñaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setContraseña(e.target.value);
   }
 
     const handleNombreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,8 +108,8 @@ export default function Registro() {
                 <InputField
                   type="password"
                   placeholder="Contraseña"
-                  value={password}
-                  onChange={handlePasswordChange}
+                  value={contraseña}
+                  onChange={handleContraseñaChange}
                   required
                 />
               </div>
