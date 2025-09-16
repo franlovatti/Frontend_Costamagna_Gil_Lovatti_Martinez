@@ -1,8 +1,13 @@
 import {useState} from "react";
 import { InputField } from "../components/InputField.tsx";
 import {Button, Submit} from "../components/ButtonField.tsx";
+import { useAuth } from "../hooks/useAuth.tsx";
+import { useNavigate } from "react-router-dom";
 
 export default function Registro() {
+  const { registro } = useAuth();
+  const navigate = useNavigate();
+
   const [apellido, setApellido] = useState<string>("")
   const [nombre, setNombre] = useState<string>("");
   const [fechaNacimiento, setFechaNacimiento] = useState<string>("")
@@ -16,20 +21,12 @@ export default function Registro() {
     e.preventDefault();
     setLoading(true);
     try{
-      const response = await fetch("http://localhost:3000/api/usuarios", {
-        method: "POST",
-        headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ nombre, apellido, usuario, contraseña, fechaNacimiento, email, esAdmin: false, participations: [] }),
-      });
-
-      if(!response.ok){
+      const response = await registro(nombre, apellido, usuario, contraseña, fechaNacimiento, email);
+      if(!response){
         throw new Error("Error en la solicitud")
       }
-    const data = await response.json();
-    console.log("Respuesta del servidor:", data);
     alert("Registro exitoso");
+    navigate("/");
     } catch (error) {
     console.error("Error al Registrarse:", error)
     alert("Error al Registrarse");

@@ -1,20 +1,17 @@
-type InputProps = {
+import React from 'react';
+
+type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   type: string;
   placeholder: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  required?: boolean;
 };
 
-export function InputField({type, placeholder, value, onChange, required}: InputProps) {
+export function InputField({ type, placeholder, ...rest }: InputProps) {
   return (
     <input
-              type={type}
-              className="form-control"
-              placeholder={placeholder}
-              value={value}
-              onChange={onChange}
-              required={required}
-            />
-  )
+      type={type}
+      className="form-control"
+      placeholder={placeholder}
+      {...rest}
+    />
+  );
 }

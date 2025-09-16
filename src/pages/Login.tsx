@@ -1,69 +1,74 @@
 import { useState } from "react";
 import { InputField } from "../components/InputField.tsx";
-import {Button, Submit} from "../components/ButtonField.tsx"
+import {Button, Submit} from "../components/ButtonField.tsx";
+import { useForm } from "react-hook-form";
+import { useAuth } from "../hooks/useAuth.tsx";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-export default function Login() {
-  const [usuario, setUsuario] = useState<string>("");
-  const [contraseña, setContraseña] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+const Login = () => {
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try{
-    const response = await fetch("http://localhost:3000/api/usuarios/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ usuario, contraseña }),
-    });
-
-    if(!response.ok){
-      throw new Error("Error en la solicitud");
-    }
-
-    const data = await response.json();
-    console.log("Respuesta del servidor:", data);
-    alert("Inicio de sesión exitoso");
-  } catch (error) {
-    console.error("Error al iniciar sesion:", error)
-    alert("Error al iniciar sesión");
-  } finally{
-    setLoading(false);
-  }
+  type LoginFormFields = {
+    usuario: string;
+    contraseña: string;
+    remember?: boolean;
   };
 
-  const handleUsuarioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUsuario(e.target.value);
-  }
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<LoginFormFields>({
+    mode: 'onBlur'
+  });
 
-  const handleContraseñaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setContraseña(e.target.value);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  //Falta la logica del remember
+  const onSubmit = async (data: LoginFormFields) => {
+    setLoading(true);
+    try {
+    const success = await login(data.usuario, data.contraseña);
+    if (!success) {
+      throw new Error("Credenciales inválidas");
+    }
+    navigate("/");
+  } catch (error) {
+    console.error("Error al iniciar sesion:", error);
+    alert("Error al iniciar sesión");
+  } finally {
+    setLoading(false);
+  }
   };
 
   return (
       <div className="vh-100 d-flex justify-content-center align-items-center bg-light">
       <div className="bg-white p-4 rounded shadow w-50" style={{maxWidth: "400px" }}>
         <h2 className="text-center mb-4">Iniciar Sesión</h2>
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-3">
             <InputField
               type="text"
               placeholder="Usuario o Dirección de correo electrónico"
-              value={usuario}
-              onChange={handleUsuarioChange}
-              required
+              {...register("usuario", { required: true })}
             />
+            {errors.usuario && <span className="text-danger">Este campo es obligatorio</span>}
           </div>
           <div className="mb-3">
             <InputField
               type="password"
               placeholder="Contraseña"
-              value={contraseña}
-              onChange={handleContraseñaChange}
-              required
+              {...register("contraseña", { required: true })}
             />
+            {errors.contraseña && <span className="text-danger">Este campo es obligatorio</span>}
+          </div>
+          <div className="mb-3">
+              <label className="checkbox-label">
+                <input type="checkbox" {...register("remember")} />
+              <span>Recordarme</span>
+            </label>
           </div>
           <div className="d-flex justify-content-between">
             <Button className="btn btn-primary" onClick={() => window.location.href = '/Registro'}>
@@ -74,10 +79,12 @@ export default function Login() {
             </Submit>
           </div>
           <div className="text-center mt-3">
-            <a href="ForgottenContraseña">¿Olvidaste tu contraseña?</a>
+            <Link to="/ForgotPassword">¿Olvidaste tu contraseña?</Link>
           </div>
         </form>
       </div>
     </div>
   );
 }
+
+export default Login;
