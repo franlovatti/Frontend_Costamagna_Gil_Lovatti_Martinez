@@ -7,13 +7,13 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 const Login = () => {
-  const { login } = useAuth();
+  const { login, loading: cargandoAuth, error } = useAuth();
   const navigate = useNavigate();
 
   type LoginFormFields = {
     usuario: string;
     contraseña: string;
-    remember?: boolean;
+    remember: boolean;
   };
 
   const {
@@ -30,14 +30,13 @@ const Login = () => {
   const onSubmit = async (data: LoginFormFields) => {
     setLoading(true);
     try {
-    const success = await login(data.usuario, data.contraseña);
+    const success = await login(data.usuario, data.contraseña, data.remember);
     if (!success) {
       throw new Error("Credenciales inválidas");
     }
     navigate("/");
   } catch (error) {
     console.error("Error al iniciar sesion:", error);
-    alert("Error al iniciar sesión");
   } finally {
     setLoading(false);
   }
@@ -65,8 +64,8 @@ const Login = () => {
             {errors.contraseña && <span className="text-danger">Este campo es obligatorio</span>}
           </div>
           <div className="mb-3">
-              <label className="checkbox-label">
-                <input type="checkbox" {...register("remember")} />
+            <label className="checkbox-label">
+              <input type="checkbox" {...register("remember")} />
               <span>Recordarme</span>
             </label>
           </div>
@@ -78,6 +77,14 @@ const Login = () => {
               {loading ? "Enviando..." : "Aceptar"}
             </Submit>
           </div>
+          {cargandoAuth && (
+          <div className="d-flex justify-content-center my-3">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Cargando...</span>
+            </div>
+          </div>
+          )}
+          {error && <div className="alert alert-danger mt-3">{error}</div>}
           <div className="text-center mt-3">
             <Link to="/ForgotPassword">¿Olvidaste tu contraseña?</Link>
           </div>
