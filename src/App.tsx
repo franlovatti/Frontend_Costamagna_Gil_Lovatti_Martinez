@@ -19,6 +19,9 @@ import ChangePassword from './pages/ChangePassword.tsx';
 import Dashboard from './pages/Dashboard.tsx';
 import AuthLayout from './components/layout/AuthLayout.tsx';
 import CrearTorneo from './pages/CrearTorneo.tsx';
+import Listanoticias from './pages/Listanoticias.tsx';
+import Crearnoticia from './pages/Crearnoticia.tsx';
+import Editarnoticia from './pages/Editarnoticia.tsx';
 
 function App() {
   return (
@@ -44,6 +47,9 @@ function App() {
                 <Route path="torneos" element={<Torneos />} />
                 <Route path="crear-torneo" element={<CrearTorneo />} />
                 <Route path="noticias" element={<Noticias />} />
+                <Route path="listanoticias" element={<Listanoticias />} />
+                <Route path="crearnoticia" element={<Crearnoticia />} />
+                <Route path="editarnoticia/:id" element={<Editarnoticia />} />
                 <Route path="perfil" element={<Perfil />} />
               </Route>
             </Route>
