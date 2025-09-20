@@ -1,6 +1,7 @@
 import { Button, Col, Row, Form } from 'react-bootstrap';
 import { useState } from 'react';
 import CardTorneos from '../components/layout/CardTorneos';
+import { Link } from 'react-router-dom';
 
 /* CONSTANTES DE DESARROLLO */
 //Cambiar por fetch a la api cuando este lista
@@ -107,7 +108,9 @@ export default function Torneos() {
           <Button variant="outline-primary">Ingresar codigo</Button>
         </Col>
         <Col>
-          <Button href="crear-torneo">Crear torneo</Button>
+          <Link to="crear-torneo" className="btn btn-primary">
+            Crear Torneo
+          </Link>
         </Col>
         <Col>
           <Form.Select

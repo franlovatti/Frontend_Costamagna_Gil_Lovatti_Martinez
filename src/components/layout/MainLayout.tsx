@@ -3,6 +3,7 @@ import { useAuth } from '../../hooks/useAuth.tsx';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
+
 export default function MainLayout() {
   /**Con logica de logeo <Navbar.Brand href="/">React-Bootstrap</Navbar.Brand> tendria el href="/home" */
   const { isAuthenticated, logout, user } = useAuth();
@@ -16,7 +17,9 @@ export default function MainLayout() {
     <div className="bg-dark d-flex flex-column min-vh-100">
       <Navbar expand="lg" fixed="top" bg="dark" data-bs-theme="dark">
         <Container>
-          <Navbar.Brand href="/">React-Bootstrap</Navbar.Brand>
+          <Navbar.Brand as={Link} to={isAuthenticated ? '/home' : '/'}>
+            React-Bootstrap
+          </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto fw-bold">
@@ -25,7 +28,14 @@ export default function MainLayout() {
                   <Nav.Link as={Link} to="torneos">
                     Torneos
                   </Nav.Link>
-                  <Nav.Link as={Link} to="noticias">
+                  <Nav.Link
+                    as={Link}
+                    to={
+                      user?.role === 'Administrador'
+                        ? 'lista-noticias'
+                        : 'noticias'
+                    }
+                  >
                     Noticias
                   </Nav.Link>
                   <Nav.Link as={Link} to="perfil">

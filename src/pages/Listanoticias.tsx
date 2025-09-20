@@ -3,7 +3,7 @@ import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { PencilSquare, Trash } from 'react-bootstrap-icons';
 
-export default function Listanoticias() {
+export default function ListaNoticias() {
   const navigate = useNavigate();
   const { noticias, loading, error, setNoticias } = useNoticias();
 

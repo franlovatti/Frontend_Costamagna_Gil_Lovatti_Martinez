@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Form, Button, Container, Row, Col, Alert } from 'react-bootstrap';
 
-export default function Crearnoticia() {
+export default function CrearNoticia() {
   const [formData, setFormData] = useState({ titulo: '', descripcion: '' });
   const [mensaje, setMensaje] = useState('');
 

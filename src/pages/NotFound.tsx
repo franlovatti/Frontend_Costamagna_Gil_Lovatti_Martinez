@@ -1,7 +1,9 @@
-import { Link } from "react-router-dom";
-import "./NotFound.css";
+import { Link } from 'react-router-dom';
+import './NotFound.css';
+import { useAuth } from '../hooks/useAuth';
 
 const NotFound = () => {
+  const { isAuthenticated } = useAuth();
   return (
     <>
       <div className="nf__container">
@@ -12,7 +14,7 @@ const NotFound = () => {
             Parece que la página que estás buscando no existe o se ha movido.
             Por favor, verifica la URL o intenta volver a la página de inicio.
           </p>
-          <Link to="/" className="home-button">
+          <Link to={isAuthenticated ? '/home' : '/'} className="home-button">
             Ir a la página de inicio
           </Link>
         </div>

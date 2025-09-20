@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import useNoticia from '../hooks/useNoticia.ts';
 import { Form, Button, Container, Row, Col, Alert } from 'react-bootstrap';
 
-export default function Editarnoticia() {
+export default function EditarNoticia() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { noticia, loading, error } = useNoticia(id as unknown as BigInteger);

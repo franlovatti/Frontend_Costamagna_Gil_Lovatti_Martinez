@@ -19,9 +19,10 @@ import ChangePassword from './pages/ChangePassword.tsx';
 import Dashboard from './pages/Dashboard.tsx';
 import AuthLayout from './components/layout/AuthLayout.tsx';
 import CrearTorneo from './pages/CrearTorneo.tsx';
-import Listanoticias from './pages/Listanoticias.tsx';
-import Crearnoticia from './pages/Crearnoticia.tsx';
-import Editarnoticia from './pages/Editarnoticia.tsx';
+// import Listanoticias from './pages/Listanoticias.tsx';
+// import Crearnoticia from './pages/Crearnoticia.tsx';
+// import Editarnoticia from './pages/Editarnoticia.tsx';
+import NoLoggedHome from './pages/NoLoggedHome.tsx';
 
 function App() {
   return (
@@ -31,7 +32,7 @@ function App() {
           <Routes>
             {/*Rutas con el MainLayout*/}
             <Route path="/" element={<MainLayout />}>
-              <Route index element={<MainHome />} />
+              <Route index element={<NoLoggedHome />} />
               <Route path="Login" element={<Login />} />
               <Route path="Registro" element={<Registro />}></Route>
               <Route
@@ -39,28 +40,33 @@ function App() {
                 element={<ForgottenPassword />}
               ></Route>
               <Route path="ChangePassword" element={<ChangePassword />}></Route>
-              <Route
-                element={
-                  <ProtectedRoute allowedRoles={['Usuario', 'Administrador']} />
-                }
-              >
+            </Route>
+            <Route
+              element={
+                <ProtectedRoute allowedRoles={['Usuario', 'Administrador']} />
+              }
+            >
+              <Route path="home" element={<MainLayout />}>
+                <Route index element={<MainHome />} />
                 <Route path="torneos" element={<Torneos />} />
-                <Route path="crear-torneo" element={<CrearTorneo />} />
+                <Route path="torneos/crear-torneo" element={<CrearTorneo />} />
                 <Route path="noticias" element={<Noticias />} />
-                <Route path="listanoticias" element={<Listanoticias />} />
-                <Route path="crearnoticia" element={<Crearnoticia />} />
-                <Route path="editarnoticia/:id" element={<Editarnoticia />} />
+
                 <Route path="perfil" element={<Perfil />} />
               </Route>
             </Route>
+
             {/* Rutas con el AuthLayout - Area Protegida */}
             <Route
               element={<ProtectedRoute allowedRoles={['Administrador']} />}
             >
-              <Route path="/admin" element={<AuthLayout />}>
+              <Route path="home/admin" element={<AuthLayout />}>
                 <Route index element={<Dashboard />} />
                 {/* <Route path="usuarios" element={<Usuarios />} />
               <Route path="deportes" element={<Deportes />} /> */}
+                {/* <Route path="lista-noticias" element={<Listanoticias />} />
+                <Route path="crear-noticia" element={<Crearnoticia />} />
+                <Route path="editar-noticia/:id" element={<Editarnoticia />} /> */}
               </Route>
             </Route>
             <Route path="*" element={<NotFound />} />
