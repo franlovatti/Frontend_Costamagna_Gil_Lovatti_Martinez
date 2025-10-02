@@ -1,0 +1,39 @@
+/* Stat Cards */
+.stat-card {
+  background-color: #1a1a1a;
+  border: 1px solid rgba(0, 109, 226, 0.2);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.stat-icon {
+  font-size: 1.5rem;
+  opacity: 0.8;
+}
+
+.stat-title {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: rgba(229, 245, 247, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 300;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.stat-change {
+  font-size: 0.8rem;
+  color: rgba(229, 245, 247, 0.5);
+  font-weight: 300;
+}

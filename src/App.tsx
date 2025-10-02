@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 // Context and Providers
 import AuthProvider from './providers/AuthProvider.tsx';
+import DeportesProvider from "./providers/DeporteProvider.tsx";
 import ProtectedRoute from './components/ProtectedRoute.tsx';
 
 // Layouts and Components
@@ -18,38 +19,43 @@ import ForgottenPassword from "./pages/ForgottenPassword.tsx";
 import ChangePassword from './pages/ChangePassword.tsx';
 import Dashboard from './pages/Dashboard.tsx';
 import AuthLayout from "./components/layout/AuthLayout.tsx";
+import DeportesAdmin from "./pages/DeportesAdmin.tsx";
+import TorneosAdmin from "./pages/TorneosAdmin.tsx";
 
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <div className="App">
-        <Routes>
-          {/*Rutas con el MainLayout*/}
-          <Route path='/' element={<MainLayout/>}>
-            <Route index element={<MainHome />} />
-            <Route path="Login" element={<Login/>} />
-            <Route path="Registro" element={<Registro/>}></Route>
-            <Route path = "ForgottenPassword" element={<ForgottenPassword/>}></Route>
-            <Route path = "ChangePassword" element = {<ChangePassword/>}></Route>
-            <Route element={<ProtectedRoute allowedRoles={["Usuario", "Administrador"]} />}>
-              <Route path="torneos" element={<Torneos />} />
-              <Route path="noticias" element={<Noticias />} />
-              <Route path="perfil" element={<Perfil />} />
+      <DeportesProvider>
+        <BrowserRouter>
+          <div className="App">
+          <Routes>
+            {/*Rutas con el MainLayout*/}
+            <Route path='/' element={<MainLayout/>}>
+              <Route index element={<MainHome />} />
+              <Route path="Login" element={<Login/>} />
+              <Route path="Registro" element={<Registro/>}></Route>
+              <Route path = "ForgottenPassword" element={<ForgottenPassword/>}></Route>
+              <Route path = "ChangePassword" element = {<ChangePassword/>}></Route>
+              <Route element={<ProtectedRoute allowedRoles={["Usuario", "Administrador"]} />}>
+                <Route path="torneos" element={<Torneos />} />
+                <Route path="noticias" element={<Noticias />} />
+                <Route path="perfil" element={<Perfil />} />
+              </Route>
             </Route>
-          </Route>
-          {/* Rutas con el AuthLayout - Area Protegida */}
-          <Route element={<ProtectedRoute allowedRoles={["Administrador"]} />}>
-            <Route path='/admin' element={<AuthLayout />}>
-              <Route index element={<Dashboard />} />
-              {/* <Route path="usuarios" element={<Usuarios />} />
-              <Route path="deportes" element={<Deportes />} /> */}
+            {/* Rutas con el AuthLayout - Area Protegida */}
+            <Route element={<ProtectedRoute allowedRoles={["Administrador"]} />}>
+              <Route path='/admin' element={<AuthLayout />}>
+                <Route index element={<Dashboard />} />
+                {/* <Route path="/admin/usuarios" element={<UsuariosAdmin />} /> */}
+                <Route path="/admin/deportes" element={<DeportesProvider><DeportesAdmin /></DeportesProvider>} />
+                <Route path="/admin/torneos" element={<TorneosAdmin />} />
+              </Route>
             </Route>
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        </div>
-      </BrowserRouter>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          </div>
+        </BrowserRouter>
+      </DeportesProvider>
     </AuthProvider>
   );
 }

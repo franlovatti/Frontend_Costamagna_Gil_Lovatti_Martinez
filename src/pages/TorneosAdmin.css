@@ -1,0 +1,305 @@
+/* Variables de color */
+:root {
+  --text: #e5f5f7;
+  --background: #0f0f0f;
+  --primary: #006de2;
+  --secondary: #021666;
+  --accent: #2e2e8a;
+}
+
+/* Contenedor principal */
+.torneos-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: var(--background);
+  min-height: 100vh;
+  color: var(--text);
+}
+
+/* Header */
+.page-header {
+  border-bottom: 1px solid rgba(0, 109, 226, 0.1);
+}
+
+.page-header h1 {
+  font-size: 2rem;
+  font-weight: 300;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+
+.text-muted-custom {
+  color: rgba(229, 245, 247, 0.6) !important;
+  font-weight: 300;
+}
+
+/* Search Input */
+.search-input {
+  min-width: 250px;
+  background-color: #1a1a1a !important;
+  border: 1px solid rgba(0, 109, 226, 0.3) !important;
+  color: var(--text) !important;
+  font-weight: 300;
+}
+
+.search-input::placeholder {
+  color: rgba(229, 245, 247, 0.4);
+}
+
+.search-input:focus {
+  background-color: #1a1a1a !important;
+  border-color: var(--primary) !important;
+  color: var(--text) !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 109, 226, 0.15) !important;
+}
+
+/* Botón crear */
+.btn-primary-custom {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary);
+  color: var(--text);
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary-custom:hover {
+  background-color: #0052a3;
+  color: var(--text);
+}
+
+/* Cards de deportes */
+.deporte-card {
+  background-color: #1a1a1a;
+  border: 1px solid rgba(0, 109, 226, 0.2);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.deporte-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.deporte-nombre {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.deporte-info {
+  flex-grow: 1;
+}
+
+.info-icon {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.info-text {
+  color: rgba(229, 245, 247, 0.7);
+  font-size: 0.9rem;
+  font-weight: 300;
+}
+
+.deporte-descripcion {
+  color: rgba(229, 245, 247, 0.6);
+  font-size: 0.9rem;
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+/* Estado vacío */
+.empty-state {
+  background-color: #1a1a1a;
+  border: 1px solid rgba(0, 109, 226, 0.2);
+  border-radius: 8px;
+  padding: 3rem 1rem;
+}
+
+.empty-state p {
+  font-size: 0.95rem;
+}
+
+/* Badges */
+.badge-custom {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 400;
+  display: inline-block;
+}
+
+.badge-equipo {
+  background-color: rgba(0, 109, 226, 0.2);
+  color: var(--primary);
+}
+
+.badge-individual {
+  background-color: rgba(46, 46, 138, 0.2);
+  color: #7c7cdb;
+}
+
+/* Botones de acción */
+.btn-action {
+  padding: 0.4rem 0.8rem;
+  background-color: transparent;
+  border: 1px solid rgba(0, 109, 226, 0.3);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 300;
+}
+
+.btn-action:hover {
+  background-color: rgba(0, 109, 226, 0.1);
+  border-color: var(--primary);
+}
+
+.btn-delete {
+  border-color: rgba(231, 76, 60, 0.4);
+  color: #e74c3c;
+}
+
+.btn-delete:hover {
+  background-color: rgba(231, 76, 60, 0.1);
+  border-color: #e74c3c;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 1rem;
+}
+
+.modal-content-custom {
+  background-color: #1a1a1a;
+  border: 1px solid rgba(0, 109, 226, 0.3);
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 300;
+  color: var(--text);
+}
+
+/* Form */
+.form-label {
+  color: rgba(229, 245, 247, 0.8);
+  font-size: 0.9rem;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+}
+
+.custom-input {
+  background-color: #0f0f0f !important;
+  border: 1px solid rgba(0, 109, 226, 0.3) !important;
+  color: var(--text) !important;
+  font-weight: 300;
+}
+
+.custom-input::placeholder {
+  color: rgba(229, 245, 247, 0.4);
+}
+
+.custom-input:focus {
+  background-color: #0f0f0f !important;
+  border-color: var(--primary) !important;
+  color: var(--text) !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 109, 226, 0.15) !important;
+}
+
+/* Botones del modal */
+.btn-cancel-custom {
+  padding: 0.75rem;
+  background-color: transparent;
+  border: 1px solid rgba(0, 109, 226, 0.3);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 300;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel-custom:hover {
+  background-color: rgba(0, 109, 226, 0.1);
+  border-color: var(--primary);
+}
+
+.btn-save-custom {
+  padding: 0.75rem;
+  background-color: var(--primary);
+  border: none;
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-save-custom:hover {
+  background-color: #0052a3;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .deportes-page {
+    padding: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .search-input {
+    min-width: 100%;
+  }
+
+  .deporte-card {
+    padding: 1.25rem;
+  }
+
+  .deporte-nombre {
+    font-size: 1.1rem;
+  }
+
+  .btn-action {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .modal-content-custom {
+    padding: 1.5rem;
+  }
+
+  .modal-title {
+    font-size: 1.2rem;
+  }
+}

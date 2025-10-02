@@ -1,160 +1,57 @@
-.dashboardPage {
+/* Variables de color */
+:root {
+  --text: #e5f5f7;
+  --background: #0f0f0f;
+  --primary: #006de2;
+  --secondary: #021666;
+  --accent: #2e2e8a;
+}
+
+/* Estilos base del dashboard */
+.dashboard-page {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
-  background-color: #0f0f0f;
+  background-color: var(--background);
   min-height: 100vh;
-  color: #e5f5f7;
+  color: var(--text);
 }
 
-.dashboardHeader {
-  margin-bottom: 3rem;
+/* Header */
+.dashboard-header {
   border-bottom: 1px solid rgba(229, 245, 247, 0.1);
-  padding-bottom: 1.5rem;
 }
 
-.title {
+.dashboard-header h1 {
   font-size: 2.5rem;
   font-weight: 300;
-  color: #e5f5f7;
-  margin: 0 0 0.5rem 0;
+  color: var(--text);
   letter-spacing: -0.5px;
 }
 
-.subtitle {
-  color: rgba(229, 245, 247, 0.6);
-  font-size: 1rem;
-  margin: 0;
+.text-muted-custom {
+  color: rgba(229, 245, 247, 0.6) !important;
   font-weight: 300;
 }
 
-.dashboardStats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 3rem;
-}
-
-.statCard {
-  background-color: #1a1a1a;
-  border: 1px solid rgba(0, 109, 226, 0.2);
-  border-radius: 8px;
-  padding: 1.5rem;
-  transition: all 0.3s ease;
-}
-.statCard:hover {
-  border-color: #006de2;
-  transform: translateY(-2px);
-}
-
-.statHeader {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.statIcon {
-  font-size: 1.5rem;
-  opacity: 0.8;
-}
-
-.statTitle {
-  font-size: 0.85rem;
-  font-weight: 400;
-  color: rgba(229, 245, 247, 0.7);
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.statNumber {
-  font-size: 2rem;
-  font-weight: 300;
-  color: #006de2;
-  margin: 0.5rem 0;
-  line-height: 1;
-}
-
-.statChange {
-  font-size: 0.8rem;
-  color: rgba(229, 245, 247, 0.5);
-  font-weight: 300;
-}
-
-.dashboardContent {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 2rem;
-}
-
-.contentCard {
+/* Content Cards */
+.content-card {
   background-color: #1a1a1a;
   border: 1px solid rgba(0, 109, 226, 0.2);
   border-radius: 8px;
   padding: 2rem;
 }
 
-.contentTitle {
+.content-card h2 {
   font-size: 1.2rem;
-  color: #e5f5f7;
-  margin-bottom: 1.5rem;
+  color: var(--text);
   font-weight: 400;
-  margin: 0 0 1.5rem 0;
 }
 
-.activityList {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.activityItem {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  padding: 1rem;
-  background-color: rgba(0, 109, 226, 0.05);
-  border-radius: 6px;
-  border-left: 2px solid #006de2;
-  transition: all 0.2s ease;
-}
-.activityItem:hover {
-  background-color: rgba(0, 109, 226, 0.1);
-}
-
-.activityIcon {
-  font-size: 1.2rem;
-  opacity: 0.8;
-  margin-top: 0.2rem;
-}
-
-.activityContent {
-  flex: 1;
-}
-
-.activityText {
-  margin: 0 0 0.25rem 0;
-  color: #e5f5f7;
-  font-size: 0.95rem;
-  font-weight: 300;
-}
-
-.activityTime {
-  font-size: 0.8rem;
-  color: rgba(229, 245, 247, 0.5);
-  font-weight: 300;
-}
-
-.quickActions {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
-}
-
-.actionBtn {
+/* Action Buttons */
+.action-btn {
   background-color: transparent;
-  color: #e5f5f7;
+  color: var(--text);
   border: 1px solid rgba(0, 109, 226, 0.3);
   border-radius: 6px;
   padding: 1rem;
@@ -166,50 +63,49 @@
   align-items: center;
   gap: 0.75rem;
   text-align: left;
+  width: 100%;
 }
-.actionBtn:hover {
+
+.action-btn:hover {
   background-color: rgba(0, 109, 226, 0.1);
-  border-color: #006de2;
+  border-color: var(--primary);
 }
 
-@media (max-width: 900px) {
-  .dashboardContent {
-    grid-template-columns: 1fr;
-  }
+.action-btn span {
+  font-size: 1.2rem;
 }
 
+/* Responsive - Solo ajustes específicos */
 @media (max-width: 600px) {
-  .dashboardHeader {
-    padding: 1rem 0 0.5rem 0;
-    margin-bottom: 2rem;
-  }
-
-  .dashboardHeader h1 {
-    font-size: 2rem;
-  }
-
-  .dashboardStats {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .statCard {
-    padding: 1.25rem;
-  }
-
-  .statNumber {
-    font-size: 1.8rem;
-  }
-
-  .contentCard {
+  .dashboard-page {
     padding: 1rem;
   }
 
-  .activityItem {
+  .dashboard-header {
+    padding: 1rem 0 0.5rem 0;
+  }
+
+  .dashboard-header h1 {
+    font-size: 2rem;
+  }
+
+  .stat-card {
+    padding: 1.25rem;
+  }
+
+  .stat-number {
+    font-size: 1.8rem;
+  }
+
+  .content-card {
+    padding: 1rem;
+  }
+
+  .activity-item {
     padding: 0.75rem;
   }
 
-  .actionBtn {
+  .action-btn {
     padding: 0.875rem;
   }
 }
