@@ -1,18 +1,17 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Form, Row, Col } from 'react-bootstrap';
 import { Submit } from '../components/ButtonField.tsx';
 import axios from 'axios';
 
 export default function CrearEstablecimiento() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const eventoSeleccionado = location.state?.evento ?? null;
+  const { eventoId } = useParams();
 
   const [form, setForm] = useState({
     nombre: '',
     direccion: '',
-    evento: eventoSeleccionado?.id ?? null,
+    evento: eventoId ?? 0,
   });
 
   const handleChange = (

@@ -42,6 +42,10 @@ function App() {
                 path="CrearEstablecimiento"
                 element={<CrearEstablecimiento />}
               />
+              <Route
+                path="CrearEstablecimiento/:eventoId"
+                element={<CrearEstablecimiento />}
+              />
               <Route path="Registro" element={<Registro />}></Route>
               <Route
                 path="ForgottenPassword"
