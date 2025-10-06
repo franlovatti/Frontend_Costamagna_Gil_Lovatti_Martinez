@@ -19,10 +19,12 @@ import ChangePassword from './pages/ChangePassword.tsx';
 import Dashboard from './pages/Dashboard.tsx';
 import AuthLayout from './components/layout/AuthLayout.tsx';
 import CrearTorneo from './pages/CrearTorneo.tsx';
+import CrearPartido from './pages/CrearPartido.tsx';
 // import Listanoticias from './pages/Listanoticias.tsx';
 // import Crearnoticia from './pages/Crearnoticia.tsx';
 // import Editarnoticia from './pages/Editarnoticia.tsx';
 import NoLoggedHome from './pages/NoLoggedHome.tsx';
+import CrearEstablecimiento from './pages/CrearEstablecimiento.tsx';
 
 function App() {
   return (
@@ -34,6 +36,11 @@ function App() {
             <Route path="/" element={<MainLayout />}>
               <Route index element={<NoLoggedHome />} />
               <Route path="Login" element={<Login />} />
+              <Route path="CrearPartido" element={<CrearPartido />} />
+              <Route
+                path="CrearEstablecimiento"
+                element={<CrearEstablecimiento />}
+              />
               <Route path="Registro" element={<Registro />}></Route>
               <Route
                 path="ForgottenPassword"
