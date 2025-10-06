@@ -67,8 +67,8 @@ type Establecimiento = {
   id: number;
   nombre: string;
   direccion: string;
-  localidad: string;
   partidos: Partido[];
+  evento: number;
 };
 type Noticia = {
   id: number;
