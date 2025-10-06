@@ -37,6 +37,7 @@ function App() {
               <Route index element={<NoLoggedHome />} />
               <Route path="Login" element={<Login />} />
               <Route path="CrearPartido" element={<CrearPartido />} />
+              <Route path="CrearPartido/:eventoId" element={<CrearPartido />} />
               <Route
                 path="CrearEstablecimiento"
                 element={<CrearEstablecimiento />}

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Form, Button, Container, Row, Col, Alert } from 'react-bootstrap';
+import { Form, Container, Row, Col, Alert } from 'react-bootstrap';
+import { Submit } from '../components/ButtonField.tsx';
 
 export default function CrearNoticia() {
   const [formData, setFormData] = useState({ titulo: '', descripcion: '' });
@@ -68,9 +69,7 @@ export default function CrearNoticia() {
               />
             </Form.Group>
 
-            <Button variant="primary" type="submit">
-              Enviar
-            </Button>
+            <Submit>Enviar</Submit>
           </Form>
           {mensaje && <Alert variant="info">{mensaje}</Alert>}
         </Col>
