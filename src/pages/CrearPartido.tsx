@@ -64,8 +64,8 @@ export default function CrearPartido() {
   ];
 
   const [form, setForm] = useState({
-    fecha: '',
-    hora: '',
+    fecha: '2023-12-31',
+    hora: '12:00',
     juez: '',
     resultado: '',
     equipoLocal: '',

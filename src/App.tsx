@@ -26,6 +26,7 @@ import CrearPartido from './pages/CrearPartido.tsx';
 import NoLoggedHome from './pages/NoLoggedHome.tsx';
 import CrearEstablecimiento from './pages/CrearEstablecimiento.tsx';
 import EditarEstablecimiento from './pages/EditarEstablecimiento.tsx';
+import EditarPartido from './pages/EditarPartido.tsx';
 
 function App() {
   return (
@@ -50,6 +51,10 @@ function App() {
               <Route
                 path="EditarEstablecimiento/:eventoId"
                 element={<EditarEstablecimiento />}
+              />
+              <Route
+                path="EditarPartido/:eventoId"
+                element={<EditarPartido />}
               />
               <Route path="Registro" element={<Registro />}></Route>
               <Route

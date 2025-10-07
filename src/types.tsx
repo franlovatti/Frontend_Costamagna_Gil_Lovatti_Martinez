@@ -38,9 +38,13 @@ type Partido = {
   equipoVisitante: Equipo;
   mvp?: Usuario;
   maxAnotador?: Usuario;
-  eventos: Torneo[];
+  evento: Torneo;
+  fecha: Date;
+  hora: Date;
   establecimiento?: Establecimiento;
   participations?: Participation[];
+  resultado: string;
+  juez: string;
 };
 
 type Usuario = {
