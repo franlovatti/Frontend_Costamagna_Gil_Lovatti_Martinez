@@ -23,6 +23,8 @@ import CrearTorneo from './pages/CrearTorneo.tsx';
 // import Crearnoticia from './pages/Crearnoticia.tsx';
 // import Editarnoticia from './pages/Editarnoticia.tsx';
 import NoLoggedHome from './pages/NoLoggedHome.tsx';
+import TorneoDetalle from './pages/TorneoDetalle.tsx';
+import EditarTorneo from './pages/EditarTorneo.tsx';
 
 function App() {
   return (
@@ -50,6 +52,8 @@ function App() {
                 <Route index element={<MainHome />} />
                 <Route path="torneos" element={<Torneos />} />
                 <Route path="torneos/crear-torneo" element={<CrearTorneo />} />
+                <Route path="torneos/:id" element={<TorneoDetalle />} />
+                <Route path="torneos/:id/editar" element={<EditarTorneo />} />
                 <Route path="noticias" element={<Noticias />} />
 
                 <Route path="perfil" element={<Perfil />} />

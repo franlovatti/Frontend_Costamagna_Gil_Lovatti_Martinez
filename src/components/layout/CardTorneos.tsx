@@ -1,6 +1,17 @@
 import { Button, Card, ListGroup } from 'react-bootstrap';
 import type { Torneo } from '../../types';
-export default function CardTorneos(torneo: Torneo) {
+interface CardTorneosProps {
+  torneo: Torneo;
+  handleClick: (id: number) => void;
+}
+
+export default function CardTorneos({ torneo, handleClick }: CardTorneosProps) {
+  const fechaInicioEvento = new Date(
+    torneo.fechaInicioEvento
+  ).toLocaleDateString('es-AR');
+  const fechaFinEvento = new Date(torneo.fechaFinEvento).toLocaleDateString(
+    'es-AR'
+  );
   return (
     <Card bg="dark" text="white">
       <Card.Img variant="top" src={torneo.img} />
@@ -17,18 +28,22 @@ export default function CardTorneos(torneo: Torneo) {
         </Card.Text>
         <ListGroup variant="flush">
           <ListGroup.Item className="bg-dark text-white border-primary">
-            {torneo.deporte}
+            {torneo.deporte.nombre}
           </ListGroup.Item>
           <ListGroup.Item className="bg-dark text-white border-primary">
-            {torneo.fechaInicioTorneo} - {torneo.fechaFinTorneo}
+            {fechaInicioEvento} - {fechaFinEvento}
           </ListGroup.Item>
           <ListGroup.Item className="bg-dark text-white border-primary">
-            {torneo.ubicacion}
+            {torneo.localidad.nombre}
           </ListGroup.Item>
           <ListGroup.Item className="bg-dark text-white border-primary"></ListGroup.Item>
         </ListGroup>
         <div className="d-flex justify-content-center">
-          <Button variant="outline-info" className="align-self-center">
+          <Button
+            variant="outline-info"
+            className="align-self-center"
+            onClick={() => handleClick(torneo.id)}
+          >
             Mas Informacion
           </Button>
         </div>
