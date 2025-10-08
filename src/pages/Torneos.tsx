@@ -42,7 +42,7 @@ export default function Torneos() {
           setDataLocalidades(response.data.data);
         }
       })
-      .catch((error) => console.error('Error fetching deportes:', error));
+      .catch((error) => console.error('Error fetching localidades:', error));
   }, []);
 
   const handleClick = (id: number) => {
