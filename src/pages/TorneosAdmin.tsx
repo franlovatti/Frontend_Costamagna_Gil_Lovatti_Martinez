@@ -1,87 +1,125 @@
 import { useState } from 'react';
 import './TorneosAdmin.css';
-import { Button } from '../components/ButtonField.tsx';
+import SearchBar from '../components/SearchBar.tsx';
+import type { Torneo } from '../contexts/torneo.tsx';
+import type { Deporte } from '../contexts/deporte.tsx';
+import { useTorneo } from '../hooks/useTorneo.tsx';
+import TorneoCard from '../components/TorneoCard.tsx';
+import ConfirmModal from '../components/ConfirmModal.tsx';
+import TorneoFormModal from '../components/TorneoFormModal.tsx';
+import { toDatetimeLocal, parseDatetimeLocal,  } from '../helpers/convertirFechas.tsx';
 
 const TorneosAdmin = () => {
-  const [deportes, setDeportes] = useState([
-    { id: 1, nombre: 'Fútbol', tipo: 'Equipo', jugadoresPorEquipo: 11, descripcion: 'Deporte de equipo con balón' },
-    { id: 2, nombre: 'Básquetbol', tipo: 'Equipo', jugadoresPorEquipo: 5, descripcion: 'Deporte de canasta' },
-    { id: 3, nombre: 'Tenis', tipo: 'Individual', jugadoresPorEquipo: 1, descripcion: 'Deporte de raqueta' },
-    { id: 4, nombre: 'Voleibol', tipo: 'Equipo', jugadoresPorEquipo: 6, descripcion: 'Deporte de red' },
-    { id: 5, nombre: 'Padel', tipo: 'Individual', jugadoresPorEquipo: 2, descripcion: 'Deporte de raqueta en parejas' }
-  ]);
-
+  const { torneos, borrarTorneo, modificarTorneo, crearTorneo } = useTorneo();
   const [searchTerm, setSearchTerm] = useState('');
+  const [editingTorneo, setEditingTorneo] = useState<Torneo | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [editingDeporte, setEditingDeporte] = useState(null);
   const [formData, setFormData] = useState({
     nombre: '',
-    tipo: 'Equipo',
-    jugadoresPorEquipo: 1,
-    descripcion: ''
+    esPublico: true,
+    contraseña: '',
+    cantEquiposMax: 0,
+    fechaInicioInscripcion: '',
+    fechaFinInscripcion: '',
+    fechaInicioEvento: '',
+    fechaFinEvento: '',
+    deporte: '' as unknown as Deporte,
   });
 
-  // Filtrar deportes
-  const deportesFiltrados = deportes.filter(deporte =>
-    deporte.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    deporte.tipo.toLowerCase().includes(searchTerm.toLowerCase())
+  // Filtrar torneos
+  const torneosFiltrados = torneos.filter(torneo =>
+    torneo.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
+  
+  
   // Abrir modal para crear
   const handleCreate = () => {
-    setEditingDeporte(null);
+    setEditingTorneo(null);
     setFormData({
       nombre: '',
-      tipo: 'Equipo',
-      jugadoresPorEquipo: 1,
-      descripcion: ''
+      esPublico: true,
+      contraseña: '',
+      cantEquiposMax: 0,
+      fechaInicioInscripcion: '',
+      fechaFinInscripcion: '',
+      fechaInicioEvento: '',
+      fechaFinEvento: '',
+      deporte: '' as unknown as Deporte,
     });
     setShowModal(true);
   };
 
   // Abrir modal para editar
-  const handleEdit = (deporte) => {
-    setEditingDeporte(deporte);
+  const handleEdit = (torneo: Torneo) => {
+    setEditingTorneo(torneo);
     setFormData({
-      nombre: deporte.nombre,
-      tipo: deporte.tipo,
-      jugadoresPorEquipo: deporte.jugadoresPorEquipo,
-      descripcion: deporte.descripcion
+      nombre: torneo.nombre,
+      esPublico: torneo.esPublico,
+      contraseña: torneo.contraseña || '',
+      cantEquiposMax: torneo.cantEquiposMax,
+      fechaInicioInscripcion: toDatetimeLocal(torneo.fechaInicioInscripcion),
+      fechaFinInscripcion: toDatetimeLocal(torneo.fechaFinInscripcion),
+      fechaInicioEvento: toDatetimeLocal(torneo.fechaInicioEvento),
+      fechaFinEvento: toDatetimeLocal(torneo.fechaFinEvento),
+      deporte: torneo.deporte,
     });
     setShowModal(true);
   };
 
   // Guardar (crear o editar)
   const handleSave = () => {
-    if (!formData.nombre.trim()) {
-      alert('El nombre es obligatorio');
-      return;
-    }
-
-    if (editingDeporte) {
+    if (editingTorneo) {
       // Editar
-      setDeportes(deportes.map(d =>
-        d.id === editingDeporte.id
-          ? { ...d, ...formData }
-          : d
-      ));
-    } else {
-      // Crear
-      const newDeporte = {
-        id: Math.max(...deportes.map(d => d.id)) + 1,
-        ...formData
+      const torneo: Torneo = {
+        ...editingTorneo,
+        nombre: formData.nombre,
+        esPublico: formData.esPublico,
+        contraseña: formData.contraseña || undefined,
+        cantEquiposMax: formData.cantEquiposMax,
+        fechaInicioInscripcion: parseDatetimeLocal(formData.fechaInicioInscripcion)!,
+        fechaFinInscripcion: parseDatetimeLocal(formData.fechaFinInscripcion)!,
+        fechaInicioEvento: parseDatetimeLocal(formData.fechaInicioEvento)!,
+        fechaFinEvento: parseDatetimeLocal(formData.fechaFinEvento)!,
+        deporte: formData.deporte,
       };
-      setDeportes([...deportes, newDeporte]);
+      modificarTorneo(torneo);
+    } else {
+      const newTorneo: Torneo = {
+        nombre: formData.nombre,
+        esPublico: formData.esPublico,
+        contraseña: formData.contraseña || undefined,
+        cantEquiposMax: formData.cantEquiposMax,
+        fechaInicioInscripcion: parseDatetimeLocal(formData.fechaInicioInscripcion)!,
+        fechaFinInscripcion: parseDatetimeLocal(formData.fechaFinInscripcion)!,
+        fechaInicioEvento: parseDatetimeLocal(formData.fechaInicioEvento)!,
+        fechaFinEvento: parseDatetimeLocal(formData.fechaFinEvento)!,
+        deporte: formData.deporte,
+      };
+      crearTorneo(newTorneo);
     }
 
     setShowModal(false);
   };
 
-  // Eliminar
-  const handleDelete = (id) => {
-    if (window.confirm('¿Estás seguro de eliminar este deporte?')) {
-      setDeportes(deportes.filter(d => d.id !== id));
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [torneoAEliminar, setTorneoAEliminar] = useState<Torneo | null>(null);
+
+  const handleDelete = (torneo: Torneo) => {
+    setTorneoAEliminar(torneo);
+    setShowConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (torneoAEliminar !== null) {
+      await borrarTorneo(torneoAEliminar.id!);
     }
+    setShowConfirm(false);
+    setTorneoAEliminar(null);
+  };
+
+  const handleCancelDelete = () => {
+    setShowConfirm(false);
+    setTorneoAEliminar(null);
   };
 
   return (
@@ -91,125 +129,51 @@ const TorneosAdmin = () => {
         <p className="text-muted-custom mb-0">Administra los torneos disponibles en la plataforma</p>
       </div>
 
-      <div className="d-flex gap-3 mb-4 align-items-center search-bar-row">
-        <input
-          type="text"
-          className="form-control search-input flex-grow-1"
-          placeholder="Buscar torneos..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <Button className="btn btn-primary-custom d-flex align-items-center gap-2 mt-2 mt-sm-0" onClick={handleCreate}>
-          <span>➕</span>
-          Crear Torneo
-        </Button>
-      </div>
+      <SearchBar
+              value={searchTerm}
+              onChange={setSearchTerm}
+              onCreate={handleCreate}
+              crear="Torneo"
+      />
 
       <div className="row g-3">
-        {deportesFiltrados.length === 0 ? (
+        {torneosFiltrados.length === 0 ? (
           <div className="col-12">
             <div className="empty-state text-center py-5">
-              <p className="text-muted-custom mb-0">No se encontraron deportes</p>
+              <p className="text-muted-custom mb-0">No se encontraron torneos</p>
             </div>
           </div>
         ) : (
-          deportesFiltrados.map((deporte) => (
-            <div key={deporte.id} className="col-12 col-md-6 col-lg-4">
-              <div className="deporte-card h-100">
-                <div className="d-flex justify-content-between align-items-start mb-3">
-                  <h3 className="deporte-nombre mb-0">{deporte.nombre}</h3>
-                  <span className={`badge-custom ${deporte.tipo === 'Equipo' ? 'badge-equipo' : 'badge-individual'}`}>
-                    {deporte.tipo}
-                  </span>
-                </div>
-                
-                <div className="deporte-info mb-3">
-                  <div className="d-flex align-items-center gap-2 mb-2">
-                    <span className="info-icon">👥</span>
-                    <span className="info-text">{deporte.jugadoresPorEquipo} jugadores</span>
-                  </div>
-                  <p className="deporte-descripcion mb-0">{deporte.descripcion}</p>
-                </div>
-                
-                <div className="d-flex gap-2 mt-auto">
-                  <button className="btn-action flex-grow-1" onClick={() => handleEdit(deporte)}>
-                    ✏️ Editar
-                  </button>
-                  <button className="btn-action btn-delete flex-grow-1" onClick={() => handleDelete(deporte.id)}>
-                    🗑️ Eliminar
-                  </button>
-                </div>
-              </div>
-            </div>
+          torneosFiltrados.map((torneo) => (
+            <TorneoCard
+            key={torneo.id}
+            torneo={torneo} 
+            onEdit={handleEdit} 
+            onDelete={handleDelete} />
           ))
         )}
       </div>
 
       {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-content-custom" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title mb-4">
-              {editingDeporte ? 'Editar Deporte' : 'Crear Nuevo Deporte'}
-            </h2>
-
-            <div className="mb-3">
-              <label className="form-label">Nombre *</label>
-              <input
-                type="text"
-                className="form-control custom-input"
-                value={formData.nombre}
-                onChange={(e) => setFormData({...formData, nombre: e.target.value})}
-                placeholder="Ej: Fútbol"
+              <TorneoFormModal
+                setShowModal={setShowModal}
+                editingTorneo={editingTorneo}
+                formData={formData}
+                setFormData={setFormData}
+                handleSave={handleSave}
               />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Tipo *</label>
-              <select
-                className="form-select custom-input"
-                value={formData.tipo}
-                onChange={(e) => setFormData({...formData, tipo: e.target.value})}
-              >
-                <option value="Equipo">Equipo</option>
-                <option value="Individual">Individual</option>
-              </select>
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Jugadores por equipo *</label>
-              <input
-                type="number"
-                className="form-control custom-input"
-                value={formData.jugadoresPorEquipo}
-                onChange={(e) => setFormData({...formData, jugadoresPorEquipo: parseInt(e.target.value) || 1})}
-                min="1"
+            )}
+      
+      {showConfirm && (
+              <ConfirmModal
+                objeto="torneo"
+                setShowConfirm={setShowConfirm}
+                objetoAEliminar={torneoAEliminar}
+                handleConfirmDelete={handleConfirmDelete}
+                handleCancelDelete={handleCancelDelete}
               />
-            </div>
-
-            <div className="mb-4">
-              <label className="form-label">Descripción</label>
-              <input
-                type="text"
-                className="form-control custom-input"
-                value={formData.descripcion}
-                onChange={(e) => setFormData({...formData, descripcion: e.target.value})}
-                placeholder="Breve descripción del deporte"
-              />
-            </div>
-
-            <div className="d-flex gap-3">
-              <button className="btn btn-cancel-custom flex-grow-1" onClick={() => setShowModal(false)}>
-                Cancelar
-              </button>
-              <button className="btn btn-save-custom flex-grow-1" onClick={handleSave}>
-                {editingDeporte ? 'Guardar Cambios' : 'Crear Deporte'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            )}
     </div>
   );
 };
-
 export default TorneosAdmin;

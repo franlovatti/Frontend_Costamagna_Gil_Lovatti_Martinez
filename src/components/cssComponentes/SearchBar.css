@@ -1,0 +1,61 @@
+.search-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .search-bar-row {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .search-bar-row .form-control {
+    min-width: 0;
+    flex-basis: 100%;
+    flex-grow: 1;
+  }
+  .search-bar-row .btn-primary-custom {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Search Input */
+.search-input {
+  min-width: 250px;
+  background-color: #1a1a1a !important;
+  border: 1px solid rgba(0, 109, 226, 0.3) !important;
+  color: var(--text) !important;
+  font-weight: 300;
+}
+
+.search-input::placeholder {
+  color: rgba(229, 245, 247, 0.4);
+}
+
+.search-input:focus {
+  background-color: #1a1a1a !important;
+  border-color: var(--primary) !important;
+  color: var(--text) !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 109, 226, 0.15) !important;
+}
+
+/* Botón crear */
+.btn-primary-custom {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary);
+  color: var(--text);
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn-primary-custom:hover {
+  background-color: #0052a3;
+  color: var(--text);
+}

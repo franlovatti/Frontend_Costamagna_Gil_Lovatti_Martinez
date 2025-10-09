@@ -1,8 +1,10 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import "./App.css";
 // Context and Providers
 import AuthProvider from './providers/AuthProvider.tsx';
 import DeportesProvider from "./providers/DeporteProvider.tsx";
 import ProtectedRoute from './components/ProtectedRoute.tsx';
+import TorneosProvider from "./providers/TorneoProvider.tsx";
 
 // Layouts and Components
 import NotFound from './pages/NotFound.js';
@@ -26,6 +28,7 @@ function App() {
   return (
     <AuthProvider>
       <DeportesProvider>
+      <TorneosProvider>
         <BrowserRouter>
           <div className="App">
           <Routes>
@@ -48,13 +51,14 @@ function App() {
                 <Route index element={<Dashboard />} />
                 {/* <Route path="/admin/usuarios" element={<UsuariosAdmin />} /> */}
                 <Route path="/admin/deportes" element={<DeportesProvider><DeportesAdmin /></DeportesProvider>} />
-                <Route path="/admin/torneos" element={<TorneosAdmin />} />
+                <Route path="/admin/torneos" element={<TorneosProvider><TorneosAdmin /></TorneosProvider>} />
               </Route>
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
           </div>
         </BrowserRouter>
+      </TorneosProvider>
       </DeportesProvider>
     </AuthProvider>
   );

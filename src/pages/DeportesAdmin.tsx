@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Button } from '../components/ButtonField.tsx';
 import { useDeporte } from '../hooks/useDeporte.tsx';
 import './DeportesAdmin.css';
 import type { Deporte } from '../contexts/deporte.tsx';
+import SearchBar from '../components/SearchBar.tsx';
+import DeportesTable from '../components/DeporteTable.tsx';
+import DeporteFormModal from '../components/DeporteFormModal.tsx';
+import ConfirmModal from '../components/ConfirmModal.tsx';
 
 const DeportesAdmin = () => {
   const { deportes, borrarDeporte, modificarDeporte, crearDeporte } = useDeporte();
@@ -101,157 +104,37 @@ const DeportesAdmin = () => {
         <p className="text-muted-custom mb-0">Administra los deportes disponibles en la plataforma</p>
       </div>
 
-      <div className="d-flex gap-3 mb-4 align-items-center search-bar-row">
-        <input
-          type="text"
-          className="form-control search-input flex-grow-1"
-          placeholder="Buscar deportes..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <Button className="btn btn-primary-custom d-flex align-items-center gap-2 mt-2 mt-sm-0" onClick={handleCreate}>
-          <span>➕</span>
-          Crear Deporte
-        </Button>
-      </div>
+      <SearchBar
+        value={searchTerm}
+        onChange={setSearchTerm}
+        onCreate={handleCreate}
+        crear="Deporte"
+      />
 
-      <div className="table-responsive custom-table-container">
-        <table className="table custom-table mb-0">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Tipo</th>
-              <th>Mínimo de jugadores</th>
-              <th>Máximo de jugadores</th>
-              <th>Duración</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {deportesFiltrados.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="text-center py-5 text-muted-custom">
-                  No se encontraron deportes
-                </td>
-              </tr>
-            ) : (
-              deportesFiltrados.map((deporte) => (
-                <tr key={deporte.id}>
-                  <td>{deporte.nombre}</td>
-                  <td>
-                    <span className={`badge-custom ${deporte.cantMaxJugadores === 1 ? 'badge-equipo' : 'badge-individual'}`}>
-                      {deporte.cantMaxJugadores === 1 ? 'Individual' : 'Equipo'}
-                    </span>
-                  </td>
-                  <td>{deporte.cantMinJugadores}</td>
-                  <td>{deporte.cantMaxJugadores}</td>
-                  <td>{deporte.duracion}</td>
-                  <td>
-                    <button className="btn-action me-2" onClick={() => handleEdit(deporte)}>
-                      ✏️ Editar
-                    </button>
-                    <button className="btn-action btn-delete" onClick={() => handleDelete(deporte)}>
-                      🗑️ Eliminar
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      
-
+      <DeportesTable
+        deportes={deportesFiltrados}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
 
       {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-content-custom" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title mb-4">
-              {editingDeporte ? 'Editar Deporte' : 'Crear Nuevo Deporte'}
-            </h2>
-
-            <div className="mb-3">
-              <label className="form-label">Nombre *</label>
-              <input
-                type="text"
-                className="form-control custom-input"
-                value={formData.nombre}
-                onChange={(e) => setFormData({...formData, nombre: e.target.value})}
-                placeholder="Ej: Fútbol"
-                required
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Jugadores minimos por equipo *</label>
-              <input
-                type="number"
-                className="form-control custom-input"
-                value={formData.cantMinJugadores}
-                onChange={(e) => setFormData({...formData, cantMinJugadores: parseInt(e.target.value) || 0})}
-                min="0"
-                required
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Jugadores maximos por equipo *</label>
-              <input
-                type="number"
-                className="form-control custom-input"
-                value={formData.cantMaxJugadores}
-                onChange={(e) => setFormData({...formData, cantMaxJugadores: parseInt(e.target.value) || 0})}
-                min="0"
-                required
-              />
-            </div>
-
-            <div className="mb-4">
-              <label className="form-label">Duración</label>
-              <input
-                type="text"
-                className="form-control custom-input"
-                value={formData.duracion}
-                onChange={(e) => setFormData({...formData, duracion: parseInt(e.target.value) || 0})}
-                placeholder="Duración en minutos"
-                required
-              />
-            </div>
-
-            <div className="d-flex gap-3">
-              <button className="btn btn-cancel-custom flex-grow-1" onClick={() => setShowModal(false)}>
-                Cancelar
-              </button>
-              <button className="btn btn-save-custom flex-grow-1" onClick={handleSave}>
-                {editingDeporte ? 'Guardar Cambios' : 'Crear Deporte'}
-              </button>
-            </div>
-          </div>
-        </div>
+        <DeporteFormModal
+          setShowModal={setShowModal}
+          editingDeporte={editingDeporte}
+          formData={formData}
+          setFormData={setFormData}
+          handleSave={handleSave}
+        />
       )}
 
-
       {showConfirm && (
-        <div className="modal-overlay" onClick={() => setShowConfirm(false)}>
-          <div className="modal-content-custom" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header">
-                <h5 className="modal-title">Confirmar eliminación</h5>
-                <button type="button" className="btn-close" onClick={handleCancelDelete}></button>
-              </div>
-              <div className="modal-body">
-                <p>¿Estás seguro de que deseas eliminar el deporte {deporteAEliminar?.nombre}?</p>
-              </div>
-              <div className="modal-footer">
-                <button className="btn btn-action mx-2" onClick={handleCancelDelete}>
-                  Cancelar
-                </button>
-                <button className="btn btn-action btn-delete mx-2" onClick={handleConfirmDelete}>
-                  Eliminar
-                </button>
-              </div>
-            </div>
-          </div>
+        <ConfirmModal
+          objeto="deporte"
+          setShowConfirm={setShowConfirm}
+          objetoAEliminar={deporteAEliminar}
+          handleConfirmDelete={handleConfirmDelete}
+          handleCancelDelete={handleCancelDelete}
+        />
       )}
     </div>
   );

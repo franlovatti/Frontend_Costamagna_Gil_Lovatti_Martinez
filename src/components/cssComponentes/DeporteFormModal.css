@@ -1,0 +1,25 @@
+/* Form */
+.form-label {
+  color: rgba(229, 245, 247, 0.8);
+  font-size: 0.9rem;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+}
+
+.custom-input {
+  background-color: #0f0f0f !important;
+  border: 1px solid rgba(0, 109, 226, 0.3) !important;
+  color: var(--text) !important;
+  font-weight: 300;
+}
+
+.custom-input::placeholder {
+  color: rgba(229, 245, 247, 0.4);
+}
+
+.custom-input:focus {
+  background-color: #0f0f0f !important;
+  border-color: var(--primary) !important;
+  color: var(--text) !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 109, 226, 0.15) !important;
+}

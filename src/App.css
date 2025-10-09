@@ -6,3 +6,85 @@
   --secondary: #021666;
   --accent: #2e2e8a;
 }
+
+/* Botones de acción */
+.btn-action {
+  padding: 0.4rem 0.8rem;
+  background-color: transparent;
+  border: 1px solid rgba(0, 109, 226, 0.3);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 300;
+  min-width: 100px;
+}
+
+.btn-action:hover {
+  background-color: rgba(0, 109, 226, 0.1);
+  border-color: var(--primary);
+}
+
+.btn-delete {
+  border-color: rgba(231, 76, 60, 0.4);
+  color: #e74c3c;
+}
+
+.btn-delete:hover {
+  background-color: rgba(231, 76, 60, 0.1);
+  border-color: #e74c3c;
+}
+
+/* Botones del modal */
+.btn-cancel-custom {
+  padding: 0.75rem;
+  background-color: transparent;
+  border: 1px solid rgba(0, 109, 226, 0.3);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 300;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel-custom:hover {
+  background-color: rgba(0, 109, 226, 0.1);
+  border-color: var(--primary);
+}
+
+.btn-save-custom {
+  padding: 0.75rem;
+  background-color: var(--primary);
+  border: none;
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-save-custom:hover {
+  background-color: #0052a3;
+}
+
+/* Badges */
+.badge-custom {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 400;
+  display: inline-block;
+}
+
+.badge-equipo {
+  background-color: rgba(0, 109, 226, 0.2);
+  color: var(--primary);
+}
+
+.badge-individual {
+  background-color: rgba(46, 46, 138, 0.2);
+  color: #7c7cdb;
+}

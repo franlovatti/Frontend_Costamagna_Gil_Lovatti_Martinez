@@ -1,0 +1,44 @@
+/* Cards de torneos */
+.torneo-card {
+  background-color: #1a1a1a;
+  border: 1px solid rgba(0, 109, 226, 0.2);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.torneo-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.torneo-nombre {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.torneo-info {
+  flex-grow: 1;
+}
+
+.info-icon {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.info-text {
+  color: rgba(229, 245, 247, 0.7);
+  font-size: 0.9rem;
+  font-weight: 300;
+}
+
+.torneo-descripcion {
+  color: rgba(229, 245, 247, 0.6);
+  font-size: 0.9rem;
+  font-weight: 300;
+  line-height: 1.5;
+}
