@@ -1,8 +1,8 @@
-import { useAuth } from "../hooks/useAuth"
+import { useAuth } from '../hooks/useAuth';
 
-export default function Perfil(){
+export default function Perfil() {
   const { user } = useAuth();
-  return(
+  return (
     <div className="text-bg-dark">
       <h1>PERFIL</h1>
       <p>Tu rol es: {user?.role || 'Usuario'}</p>
@@ -10,5 +10,5 @@ export default function Perfil(){
       <p>Nombre: {user?.nombre || 'N/A'}</p>
       <p>Apellido: {user?.apellido || 'N/A'}</p>
     </div>
-  )
+  );
 }
