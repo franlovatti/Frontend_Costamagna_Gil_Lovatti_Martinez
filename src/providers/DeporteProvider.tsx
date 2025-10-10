@@ -50,7 +50,6 @@ const DeportesProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    console.log("useEffect ejecutado del provider");
     getDeportes();
   }, []);
 
