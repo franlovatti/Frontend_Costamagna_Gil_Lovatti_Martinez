@@ -1,33 +1,37 @@
 type Torneo = {
   id: number;
   nombre: string;
-  deporte: string;
+  deporte: Deporte;
   descripcion: string;
   fechaInicioInscripcion: string;
   fechaFinInscripcion: string;
-  fechaInicioTorneo: string;
-  fechaFinTorneo: string;
-  ubicacion: string;
+  fechaInicioEvento: string;
+  fechaFinEvento: string;
+  localidad: Localidad;
   privado: boolean;
-  cantidadEquipos: number;
+  cantEquiposMax: number;
   img: string;
   equipos?: Equipo[];
+  creador: number;
 };
 
 type Deporte = {
   id: number;
   nombre: string;
+  cantMaxJugadores: number;
+  cantMinJugadores: number;
 };
 
 type Equipo = {
   id: number;
   nombre: string;
   nombreCapitan: string;
+  capitan: number | Usuario;
   puntos: number;
-  privado: boolean;
+  esPublico: boolean;
   contraseña: string;
   miembros: Usuario[];
-  evento: Torneo;
+  evento: Torneo | number;
   partidoVisitante: Partido[];
   partidoLocal: Partido[];
 };
@@ -57,13 +61,15 @@ type Usuario = {
   mvps: Partido[];
   maxAnotados: Partido[];
   participations: Participation[];
+  equipocomocapitan: Equipo[];
 };
 
 type Participation = {
   id: number;
   usuario: Usuario;
-  minutosJugados: number;
+  minutosjugados: number;
   faltas: number;
+  puntos: number; // Added property
   partido: Partido;
 };
 
@@ -80,6 +86,12 @@ type Noticia = {
   contenido: string;
   fechaPublicacion: string;
 };
+
+type Localidad = {
+  id: number;
+  nombre: string;
+  descripcion: string;
+};
 export type {
   Torneo,
   Deporte,
@@ -89,4 +101,5 @@ export type {
   Participation,
   Establecimiento,
   Noticia,
+  Localidad,
 };

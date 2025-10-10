@@ -41,6 +41,9 @@ export default function MainLayout() {
                   <Nav.Link as={Link} to="perfil">
                     Perfil
                   </Nav.Link>
+                  <Nav.Link as={Link} to="participaciones/crear">
+                    Crear Participación
+                  </Nav.Link>
                   {user?.role === 'Administrador' && (
                     <Nav.Link as={Link} to="admin">
                       Admin
