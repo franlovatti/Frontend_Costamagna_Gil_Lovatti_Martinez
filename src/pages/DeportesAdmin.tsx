@@ -8,7 +8,8 @@ import DeporteFormModal from '../components/DeporteFormModal.tsx';
 import ConfirmModal from '../components/ConfirmModal.tsx';
 
 const DeportesAdmin = () => {
-  const { deportes, borrarDeporte, modificarDeporte, crearDeporte } = useDeporte();
+  const { deportes, borrarDeporte, modificarDeporte, crearDeporte } =
+    useDeporte();
   const [searchTerm, setSearchTerm] = useState('');
   const [editingDeporte, setEditingDeporte] = useState<Deporte | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -16,15 +17,14 @@ const DeportesAdmin = () => {
     nombre: '',
     cantMinJugadores: 0,
     cantMaxJugadores: 0,
-    duracion: 0
+    duracion: 0,
   });
 
   // Filtrar deportes
-  const deportesFiltrados = deportes.filter(deporte =>
+  const deportesFiltrados = deportes.filter((deporte) =>
     deporte.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
-  
+
   // Abrir modal para crear
   const handleCreate = () => {
     setEditingDeporte(null);
@@ -32,7 +32,7 @@ const DeportesAdmin = () => {
       nombre: '',
       cantMinJugadores: 0,
       cantMaxJugadores: 0,
-      duracion: 0
+      duracion: 0,
     });
     setShowModal(true);
   };
@@ -44,7 +44,7 @@ const DeportesAdmin = () => {
       nombre: deporte.nombre,
       cantMinJugadores: deporte.cantMinJugadores,
       cantMaxJugadores: deporte.cantMaxJugadores,
-      duracion: deporte.duracion
+      duracion: deporte.duracion,
     });
     setShowModal(true);
   };
@@ -58,7 +58,7 @@ const DeportesAdmin = () => {
         nombre: formData.nombre,
         cantMinJugadores: formData.cantMinJugadores,
         cantMaxJugadores: formData.cantMaxJugadores,
-        duracion: formData.duracion
+        duracion: formData.duracion,
       };
       modificarDeporte(deporte);
     } else {
@@ -67,7 +67,7 @@ const DeportesAdmin = () => {
         nombre: formData.nombre,
         cantMinJugadores: formData.cantMinJugadores,
         cantMaxJugadores: formData.cantMaxJugadores,
-        duracion: formData.duracion
+        duracion: formData.duracion,
       };
       crearDeporte(newDeporte as Deporte);
     }
@@ -76,7 +76,9 @@ const DeportesAdmin = () => {
   };
 
   const [showConfirm, setShowConfirm] = useState(false);
-  const [deporteAEliminar, setDeporteAEliminar] = useState<Deporte | null>(null);
+  const [deporteAEliminar, setDeporteAEliminar] = useState<Deporte | null>(
+    null
+  );
 
   const handleDelete = (deporte: Deporte) => {
     setDeporteAEliminar(deporte);
@@ -96,12 +98,13 @@ const DeportesAdmin = () => {
     setDeporteAEliminar(null);
   };
 
-
   return (
     <div className="deportes-page">
       <div className="page-header mb-4 pb-3">
         <h1 className="mb-2">Gestión de Deportes</h1>
-        <p className="text-muted-custom mb-0">Administra los deportes disponibles en la plataforma</p>
+        <p className="text-muted-custom mb-0">
+          Administra los deportes disponibles en la plataforma
+        </p>
       </div>
 
       <SearchBar

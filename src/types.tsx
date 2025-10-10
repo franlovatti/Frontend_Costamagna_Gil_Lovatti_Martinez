@@ -79,12 +79,13 @@ type Establecimiento = {
   direccion: string;
   partidos: Partido[];
   evento: number;
+  localidad: string;
 };
 type Noticia = {
   id: number;
   titulo: string;
-  contenido: string;
-  fechaPublicacion: string;
+  fecha: string;
+  descripcion: string;
 };
 
 type Localidad = {

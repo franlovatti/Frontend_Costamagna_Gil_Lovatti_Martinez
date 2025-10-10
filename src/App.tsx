@@ -40,6 +40,8 @@ import VerEquipo from './pages/VerEquipo.tsx';
 import EditarEquipo from './pages/EditarEquipo.tsx';
 import CrearParticipacion from './pages/CrearParticipacion.tsx';
 import EditarParticipacion from './pages/EditarParticipacion.tsx';
+import NoticiaPage from './pages/NoticiaPage.tsx';
+import NoticiasProvider from './providers/NoticiaProvider.tsx';
 function App() {
   return (
     <AuthProvider>
@@ -138,6 +140,14 @@ function App() {
                         <DeportesProvider>
                           <DeportesAdmin />
                         </DeportesProvider>
+                      }
+                    />
+                    <Route
+                      path="/admin/noticias"
+                      element={
+                        <NoticiasProvider>
+                          <NoticiaPage />
+                        </NoticiasProvider>
                       }
                     />
                     <Route
