@@ -94,8 +94,8 @@ export default function EditarPartido() {
             const selected = partidos?.find((p) => p.id === selectedId);
             if (selected) {
               setForm({
-                fecha: selected.fecha.toISOString().split('T')[0],
-                hora: selected.hora.toTimeString().split(' ')[0],
+                fecha: new Date(selected.fecha).toISOString().split('T')[0],
+                hora: new Date(selected.hora).toTimeString().split(' ')[0],
                 juez: selected.juez,
                 resultado: selected.resultado,
                 equipoLocal: selected.equipoLocal.id,
@@ -113,7 +113,7 @@ export default function EditarPartido() {
             partidos.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.equipoLocal.nombre} vs {p.equipoVisitante.nombre} -{' '}
-                {p.fecha.toISOString().split('T')[0]}
+                {new Date(p.fecha).toISOString().split('T')[0]}
               </option>
             ))}
         </select>
