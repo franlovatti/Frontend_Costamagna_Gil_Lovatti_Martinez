@@ -26,11 +26,12 @@ type Equipo = {
   id: number;
   nombre: string;
   nombreCapitan: string;
+  capitan: number | Usuario;
   puntos: number;
   esPublico: boolean;
   contraseña: string;
   miembros: Usuario[];
-  evento: Torneo;
+  evento: Torneo | number;
   partidoVisitante: Partido[];
   partidoLocal: Partido[];
 };
@@ -44,6 +45,8 @@ type Partido = {
   eventos: Torneo[];
   establecimiento?: Establecimiento;
   participations?: Participation[];
+  fecha: string;
+  hora: string;
 };
 
 type Usuario = {
@@ -56,13 +59,15 @@ type Usuario = {
   mvps: Partido[];
   maxAnotados: Partido[];
   participations: Participation[];
+  equipocomocapitan: Equipo[];
 };
 
 type Participation = {
   id: number;
   usuario: Usuario;
-  minutosJugados: number;
+  minutosjugados: number;
   faltas: number;
+  puntos: number; // Added property
   partido: Partido;
 };
 

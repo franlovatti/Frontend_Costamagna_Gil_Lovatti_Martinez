@@ -25,7 +25,11 @@ import CrearTorneo from './pages/CrearTorneo.tsx';
 import NoLoggedHome from './pages/NoLoggedHome.tsx';
 import TorneoDetalle from './pages/TorneoDetalle.tsx';
 import EditarTorneo from './pages/EditarTorneo.tsx';
-
+import CrearEquipo from './pages/CrearEquipo.tsx';
+import VerEquipo from './pages/VerEquipo.tsx';
+import EditarEquipo from './pages/EditarEquipo.tsx';
+import CrearParticipacion from './pages/CrearParticipacion.tsx';
+import EditarParticipacion from './pages/EditarParticipacion.tsx';
 function App() {
   return (
     <AuthProvider>
@@ -55,6 +59,20 @@ function App() {
                 <Route path="torneos/:id" element={<TorneoDetalle />} />
                 <Route path="torneos/:id/editar" element={<EditarTorneo />} />
                 <Route path="noticias" element={<Noticias />} />
+                <Route
+                  path="torneos/:id/crear-equipo"
+                  element={<CrearEquipo />}
+                />
+                <Route path="equipos/:id" element={<VerEquipo />} />
+                <Route path="equipos/:id/editar" element={<EditarEquipo />} />
+                <Route
+                  path="participaciones/crear"
+                  element={<CrearParticipacion />}
+                />
+                <Route
+                  path="editarparticipacion/:id"
+                  element={<EditarParticipacion />}
+                />
 
                 <Route path="perfil" element={<Perfil />} />
               </Route>
