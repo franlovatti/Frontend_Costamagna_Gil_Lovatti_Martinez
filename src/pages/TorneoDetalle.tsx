@@ -1,23 +1,126 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
-import { useNavigate } from 'react-router-dom';
-import type { Equipo, Torneo } from '../types';
+import { useNavigate, Link } from 'react-router-dom';
+import type { Equipo, Torneo, Usuario } from '../types';
 import apiAxios from '../helpers/api';
-import { Button, Col, Row, Table } from 'react-bootstrap';
+import { Button, Col, Row, Table, Modal, Form } from 'react-bootstrap';
 import { useAuth } from '../hooks/useAuth';
 
 export default function TorneoDetalle() {
   const [torneo, setTorneo] = useState<Torneo | null>(null);
+  const [showEnrollModal, setShowEnrollModal] = useState(false);
+  const [selectedTeam, setSelectedTeam] = useState<Equipo | null>(null);
+  const [enrollPassword, setEnrollPassword] = useState('');
+  const [enrollError, setEnrollError] = useState<string | null>(null);
+  const [enrolling, setEnrolling] = useState(false);
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
-
   useEffect(() => {
     if (!id) return;
     apiAxios.get(`/eventos/${id}`).then((res) => {
       setTorneo(res.data.data);
     });
   }, [id]);
+
+  const fetchTorneo = async () => {
+    if (!id) return;
+    try {
+      const res = await apiAxios.get(`/eventos/${id}`);
+      setTorneo(res.data.data);
+    } catch (err) {
+      console.error('Error fetching torneo:', err);
+    }
+  };
+
+  const userIsMember = (): boolean => {
+    if (!user || !torneo?.equipos) return false;
+    const userIdStr = String(user.id);
+    return torneo.equipos.some((e) => {
+      const miembros = e.miembros ?? [];
+      return miembros.some((m) => {
+        const memberId = m.id;
+        return memberId !== undefined && String(memberId) === userIdStr;
+      });
+    });
+  };
+
+  const isCaptain = (equipo: Equipo): boolean => {
+    if (!user) return false;
+    const capitan = equipo.capitan as Usuario;
+    return capitan !== undefined && String(capitan.id) === String(user.id);
+  };
+
+  const isMember = (equipo: Equipo): boolean => {
+    if (!user) return false;
+    const miembros = (equipo.miembros as Usuario[]) ?? [];
+    const userIdStr = String(user.id);
+    return miembros.some((m) => {
+      const memberId = m.id;
+      return memberId !== undefined && String(memberId) === userIdStr;
+    });
+  };
+
+  const handleDeleteTeam = async (teamId: number) => {
+    try {
+      await apiAxios.delete(`/equipos/${teamId}`);
+      fetchTorneo();
+    } catch (err) {
+      console.error('Error eliminando equipo:', err);
+    }
+  };
+  const handleInscribe = async () => {
+    if (!selectedTeam) return;
+    if (!selectedTeam.esPublico && enrollPassword.trim() === '') {
+      setEnrollError('La contraseña es obligatoria para este equipo');
+      return;
+    }
+
+    if (!selectedTeam.esPublico && enrollPassword !== selectedTeam.contraseña) {
+      setEnrollError('La contraseña es incorrecta');
+      return;
+    }
+
+    setEnrollError(null);
+    setEnrolling(true);
+
+    try {
+      const userId = Number(user?.id);
+      const body: Record<string, unknown> = { usuarioId: userId };
+      if (!selectedTeam.esPublico) body.contraseña = enrollPassword;
+      await apiAxios.post(`/equipos/${selectedTeam.id}/miembros`, body);
+      await fetchTorneo();
+      setShowEnrollModal(false);
+    } catch (err: unknown) {
+      console.error('Error al inscribirse:', err);
+      let message = 'Error al inscribirse';
+      if (typeof err === 'object' && err !== null) {
+        const errObj = err as Record<string, unknown>;
+        if (
+          'response' in errObj &&
+          typeof errObj.response === 'object' &&
+          errObj.response !== null
+        ) {
+          const resp = errObj.response as Record<string, unknown>;
+          if (
+            'data' in resp &&
+            typeof resp.data === 'object' &&
+            resp.data !== null
+          ) {
+            const data = resp.data as Record<string, unknown>;
+            if ('message' in data) message = String(data.message);
+          }
+        } else if ('message' in errObj) {
+          message = String((errObj as { message: unknown }).message);
+        }
+      } else if (typeof err === 'string') {
+        message = err;
+      }
+      setEnrollError(message);
+    } finally {
+      setEnrolling(false);
+    }
+  };
 
   const handleDelete = async () => {
     if (!id) return;
@@ -85,7 +188,15 @@ export default function TorneoDetalle() {
           )}
         </Col>
         <Col className="d-flex justify-content-center">
-          <Button variant="primary">Crear Equipo</Button>
+          {!userIsMember() ? (
+            <Link to={`/home/torneos/${torneo.id}/crear-equipo`}>
+              <Button variant="primary">Inscribir Equipo</Button>
+            </Link>
+          ) : (
+            <div className="mt-2 alert alert-info py-2 mb-0">
+              Ya estás inscrito en un equipo de este evento.
+            </div>
+          )}
         </Col>
         <Col className="d-flex justify-content-center">
           {Number(user?.id) === torneo.creador && (
@@ -116,16 +227,109 @@ export default function TorneoDetalle() {
               <td>{idx + 1}</td>
               <td>{equipo.nombre}</td>
               <td>
-                {equipo.miembros.length}/{torneo.deporte.cantMaxJugadores}
+                {equipo.miembros?.length ?? 0}/
+                {torneo.deporte?.cantMaxJugadores ?? '-'}
               </td>
+
               <td>{equipo.esPublico ? 'Sí' : 'No'}</td>
               <td>
-                <Button variant="outline-primary">Unirse</Button>
+                {!userIsMember() ? (
+                  <div className="d-flex flex-column align-items-start">
+                    <Button
+                      variant="outline-primary"
+                      onClick={() => {
+                        setSelectedTeam(equipo);
+                        setEnrollPassword('');
+                        setEnrollError(null);
+                        setShowEnrollModal(true);
+                      }}
+                    >
+                      Unirse
+                    </Button>
+                  </div>
+                ) : isCaptain(equipo) ? (
+                  <div className="d-flex gap-2">
+                    <Button
+                      variant="outline-light"
+                      onClick={() =>
+                        navigate(`/home/equipos/${equipo.id}/editar`)
+                      }
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      variant="danger"
+                      onClick={() => handleDeleteTeam(equipo.id)}
+                    >
+                      Eliminar
+                    </Button>
+                    <Button
+                      variant="primary"
+                      onClick={() => navigate(`/home/equipos/${equipo.id}`)}
+                    >
+                      Ver equipo
+                    </Button>
+                  </div>
+                ) : isMember(equipo) ? (
+                  <Button
+                    variant="primary"
+                    onClick={() => navigate(`/home/equipos/${equipo.id}`)}
+                  >
+                    Ver equipo
+                  </Button>
+                ) : null}
               </td>
             </tr>
           ))}
         </tbody>
       </Table>
+
+      <Modal
+        show={showEnrollModal}
+        onHide={() => setShowEnrollModal(false)}
+        centered
+        backdrop="static"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            {selectedTeam
+              ? `Inscribirse en ${selectedTeam.nombre}`
+              : 'Inscribirse'}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {enrollError && (
+            <div className="alert alert-danger">{enrollError}</div>
+          )}
+          {selectedTeam && !selectedTeam.esPublico && (
+            <Form.Group>
+              <Form.Label>Contraseña del equipo</Form.Label>
+              <Form.Control
+                type="password"
+                value={enrollPassword}
+                onChange={(e) => setEnrollPassword(e.target.value)}
+                placeholder="Ingrese la contraseña"
+                autoFocus
+              />
+            </Form.Group>
+          )}
+          {selectedTeam && selectedTeam.esPublico && (
+            <p>Este equipo es público. Confirme para inscribirse.</p>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowEnrollModal(false)}>
+            Cancelar
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleInscribe}
+            disabled={enrolling}
+          >
+            {enrolling ? 'Enviando...' : 'Confirmar'}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
