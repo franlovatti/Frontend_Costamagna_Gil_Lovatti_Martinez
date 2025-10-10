@@ -21,7 +21,8 @@ export default function FormTorneos() {
   const [dataDeportes, setDataDeportes] = useState<Deporte[]>([]);
   const [dataLocalidades, setDataLocalidades] = useState<Localidad[]>([]);
   const { id } = useParams<{ id: string }>();
-  console.log(id);
+  const [error, setError] = useState<boolean>(false);
+  const [errorConexion, setErrorConexion] = useState<boolean>(false);
 
   useEffect(() => {
     apiAxios
@@ -31,7 +32,10 @@ export default function FormTorneos() {
           setDataDeportes(response.data.data);
         }
       })
-      .catch((error) => console.error('Error fetching deportes:', error));
+      .catch((error) => {
+        console.error('Error fetching deportes:', error);
+        setErrorConexion(true);
+      });
     apiAxios
       .get('/localidades')
       .then((response) => {
@@ -39,7 +43,10 @@ export default function FormTorneos() {
           setDataLocalidades(response.data.data);
         }
       })
-      .catch((error) => console.error('Error fetching localidades:', error));
+      .catch((error) => {
+        console.error('Error fetching localidades:', error);
+        setErrorConexion(true);
+      });
   }, []);
 
   useEffect(() => {
@@ -97,13 +104,14 @@ export default function FormTorneos() {
       fechaInicioEvento: new Date(form.fechaInicioTorneo).toISOString(),
       fechaFinEvento: new Date(form.fechaFinTorneo).toISOString(),
     };
+    console.log(payload);
     if (id !== undefined) {
       try {
         await apiAxios.put(`/eventos/${id}`, payload);
         navigate(`/home/torneos/${id}`);
       } catch (error) {
         console.error(error);
-        alert('Error al actualizar el torneo');
+        setError(true);
       }
     } else {
       apiAxios
@@ -114,11 +122,25 @@ export default function FormTorneos() {
         })
         .catch((error) => {
           console.error('Error al crear el torneo:', error);
+          setError(true);
         });
     }
   };
   return (
     <div className="text-bg-dark container">
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          Ocurrió un error al procesar el formulario. Por favor, inténtelo de
+          nuevo.
+        </div>
+      )}
+      {errorConexion && (
+        <div className="alert alert-danger" role="alert">
+          Ocurrió un error al recuperar los datos. Por favor, inténtelo de
+          nuevo.
+        </div>
+      )}
+
       <Form onSubmit={handleSubmit}>
         <Row>
           <Col md={6}>

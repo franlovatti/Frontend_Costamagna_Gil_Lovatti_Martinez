@@ -12,45 +12,37 @@ export default function Torneos() {
   const [selectedLocalidad, setSelectedLocalidad] = useState<string>('');
   const [dataDeportes, setDataDeportes] = useState<Deporte[]>([]);
   const [dataLocalidades, setDataLocalidades] = useState<Localidad[]>([]);
+  const [errorConexion, setErrorConexion] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    apiAxios
-      .get('/eventos')
-      .then((response) => {
-        setDataTorneos(response.data.data);
+    Promise.all([
+      apiAxios.get('/eventos'),
+      apiAxios.get('/deportes'),
+      apiAxios.get('/localidades'),
+    ])
+      .then(([torneosRes, deportesRes, localidadesRes]) => {
+        setDataTorneos(torneosRes.data.data);
+        setDataDeportes(deportesRes.data.data);
+        setDataLocalidades(localidadesRes.data.data);
       })
-      .catch((error) => console.error('Error fetching torneos:', error));
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+        setErrorConexion(true);
+      });
   }, []);
-
-  useEffect(() => {
-    apiAxios
-      .get('/deportes')
-      .then((response) => {
-        {
-          setDataDeportes(response.data.data);
-        }
-      })
-      .catch((error) => console.error('Error fetching deportes:', error));
-  }, []);
-
-  useEffect(() => {
-    apiAxios
-      .get('/localidades')
-      .then((response) => {
-        {
-          setDataLocalidades(response.data.data);
-        }
-      })
-      .catch((error) => console.error('Error fetching deportes:', error));
-  }, []);
-
   const handleClick = (id: number) => {
     navigate(`/home/torneos/${id}`);
   };
 
   return (
     <div className="text-bg-dark container">
+      {errorConexion && (
+        <div className="alert alert-danger" role="alert">
+          Ocurrió un error al recuperar los datos. Por favor, inténtelo de
+          nuevo.
+        </div>
+      )}
       <Row className="text-center p-3">
         <Col>
           <Button variant="outline-primary">Ingresar codigo</Button>
