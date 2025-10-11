@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
+import ThemeToggle from "../ThemeToggle.tsx";
 
 
 
@@ -21,6 +22,7 @@ const MainLayout = () => {
       <Navbar expand="lg" fixed='top' bg="dark" data-bs-theme="dark">
         <Container>
           <Navbar.Brand href="/">React-Bootstrap</Navbar.Brand>
+          <ThemeToggle />
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto fw-bold">

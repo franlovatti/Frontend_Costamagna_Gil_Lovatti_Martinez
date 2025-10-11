@@ -1,7 +1,8 @@
 import { Outlet, Link } from 'react-router-dom';
-import './AuthLayout.css';
+import '../cssComponentes/AuthLayout.css';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import ThemeToggle from '../ThemeToggle.tsx';
 
 const AuthLayout = () => {
   const { user, logout } = useAuth();
@@ -50,10 +51,10 @@ const AuthLayout = () => {
             <span>Estadísticas</span>
           </Link>
         </nav>
-        
+        <ThemeToggle/>
         <div className="sidebar-footer p-4">
           <button onClick={handleLogout} className="logout-btn w-100 d-flex align-items-center justify-content-center gap-2">
-            <span className="icon">🚪</span>
+            {/* <span className="icon">🚪</span> */}
             <span>Cerrar sesión</span>
           </button>
         </div>

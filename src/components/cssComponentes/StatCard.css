@@ -1,7 +1,7 @@
 /* Stat Cards */
 .stat-card {
-  background-color: #1a1a1a;
-  border: 1px solid rgba(0, 109, 226, 0.2);
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 1.5rem;
   transition: all 0.3s ease;
@@ -20,7 +20,7 @@
 .stat-title {
   font-size: 0.85rem;
   font-weight: 400;
-  color: rgba(229, 245, 247, 0.7);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -34,6 +34,6 @@
 
 .stat-change {
   font-size: 0.8rem;
-  color: rgba(229, 245, 247, 0.5);
+  color: var(--text-muted-light);
   font-weight: 300;
 }

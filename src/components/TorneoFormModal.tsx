@@ -43,7 +43,7 @@ export default function TorneoFormModal({
 
   useEffect(() => {
     getDeportes();
-  }, []);
+  }, [getDeportes]);
 
   return (
     <div className="modal-overlay" onClick={() => setShowModal(false)}>

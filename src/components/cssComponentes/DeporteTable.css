@@ -1,7 +1,7 @@
 /* Tabla */
 .custom-table-container {
-  background-color: #1a1a1a;
-  border: 1px solid rgba(0, 109, 226, 0.2);
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border);
   border-radius: 8px;
 }
 
@@ -9,12 +9,12 @@
   margin-bottom: 0;
   --bs-table-bg: transparent;
   --bs-table-striped-bg: transparent;
-  --bs-table-hover-bg: rgba(0, 109, 226, 0.05);
-  --bs-table-border-color: rgba(0, 109, 226, 0.1);
+  --bs-table-hover-bg: var(--hover-bg);
+  --bs-table-border-color: var(--border);
 }
 
 .custom-table thead {
-  background-color: rgba(0, 109, 226, 0.1);
+  background-color: var(--hover-bg);
 }
 
 .custom-table thead th {
@@ -23,15 +23,15 @@
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: rgba(229, 245, 247, 0.8) !important;
-  border-bottom: 1px solid rgba(0, 109, 226, 0.2) !important;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
   border-top: none !important;
   background-color: transparent;
 }
 
 .custom-table tbody td {
   padding: 1rem;
-  border-bottom: 1px solid rgba(0, 109, 226, 0.1) !important;
+  border-bottom: 1px solid var(--hover-bg) !important;
   color: var(--text) !important;
   font-weight: 300;
   font-size: 0.95rem;

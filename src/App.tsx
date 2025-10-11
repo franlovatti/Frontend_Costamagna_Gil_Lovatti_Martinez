@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import "./temas.css";
 import "./App.css";
 // Context and Providers
 import AuthProvider from './providers/AuthProvider.tsx';
@@ -23,6 +24,7 @@ import Dashboard from './pages/Dashboard.tsx';
 import AuthLayout from "./components/layout/AuthLayout.tsx";
 import DeportesAdmin from "./pages/DeportesAdmin.tsx";
 import TorneosAdmin from "./pages/TorneosAdmin.tsx";
+import EstadisticasAdmin from "./pages/EstadisticasAdmin.tsx";
 
 function App() {
   return (
@@ -52,6 +54,7 @@ function App() {
                 {/* <Route path="/admin/usuarios" element={<UsuariosAdmin />} /> */}
                 <Route path="/admin/deportes" element={<DeportesProvider><DeportesAdmin /></DeportesProvider>} />
                 <Route path="/admin/torneos" element={<TorneosProvider><TorneosAdmin /></TorneosProvider>} />
+                <Route path="/admin/estadisticas" element={<EstadisticasAdmin />} />
               </Route>
             </Route>
             <Route path="*" element={<NotFound />} />

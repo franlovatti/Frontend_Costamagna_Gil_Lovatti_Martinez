@@ -1,25 +1,25 @@
 /* Form */
 .form-label {
-  color: rgba(229, 245, 247, 0.8);
+  color: var(--text);
   font-size: 0.9rem;
   font-weight: 400;
   margin-bottom: 0.5rem;
 }
 
 .custom-input {
-  background-color: #0f0f0f !important;
-  border: 1px solid rgba(0, 109, 226, 0.3) !important;
-  color: var(--text) !important;
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border);
+  color: var(--text);
   font-weight: 300;
 }
 
 .custom-input::placeholder {
-  color: rgba(229, 245, 247, 0.4);
+  color: var(--text-muted-light);
 }
 
 .custom-input:focus {
-  background-color: #0f0f0f !important;
-  border-color: var(--primary) !important;
-  color: var(--text) !important;
-  box-shadow: 0 0 0 0.2rem rgba(0, 109, 226, 0.15) !important;
+  background-color: var(--background);
+  border-color: var(--primary);
+  color: var(--text);
+  box-shadow: 0 0 0 0.2rem var(--hover-bg-strong);
 }

@@ -71,10 +71,14 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         const loginSuccess = await login(usuario, contraseña, remember); // Iniciar sesión automáticamente después del registro
         return loginSuccess;
       }
+      if (response.status === 409){
+        setError("El usuario o email ya existe");
+        return false;
+      }
       setError("Error en el registro");
       return false;
     } catch {
-      setError("Error en la conexión");
+      setError("Error en la conexión ");
       return false;
     } finally {
       setLoading(false);
