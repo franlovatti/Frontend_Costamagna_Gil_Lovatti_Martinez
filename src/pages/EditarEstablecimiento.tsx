@@ -3,7 +3,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { Submit } from '../components/ButtonField.tsx';
 import { useEstablecimientos } from '../hooks/useEstablecimientos.tsx';
-import alert from '../components/alert.tsx';
+import alert from '../components/Alert.tsx';
 
 export default function EditarEstablecimiento() {
   const navigate = useNavigate();

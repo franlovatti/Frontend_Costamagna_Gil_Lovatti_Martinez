@@ -4,7 +4,7 @@ import { Submit } from '../components/ButtonField.tsx';
 import axios from 'axios';
 import { useEstablecimientos } from '../hooks/useEstablecimientos.tsx';
 import type { Partido } from '../types.ts';
-import alert from '../components/alert.tsx';
+import alert from '../components/Alert.tsx';
 
 export default function EditarPartido() {
   const navigate = useNavigate();

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Form, Row, Col } from 'react-bootstrap';
 import { Submit } from '../components/ButtonField.tsx';
-import alert from '../components/alert.tsx';
+import alert from '../components/Alert.tsx';
 import axios from 'axios';
 
 export default function CrearEstablecimiento() {

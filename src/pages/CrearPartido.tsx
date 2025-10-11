@@ -4,7 +4,7 @@ import React, { useState} from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEstablecimientos } from '../hooks/useEstablecimientos.tsx';
-import alert from '../components/alert.tsx';
+import alert from '../components/Alert.tsx';
 
 export default function CrearPartido() {
   const navigate = useNavigate();
