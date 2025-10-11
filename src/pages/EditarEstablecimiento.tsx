@@ -3,10 +3,13 @@ import { useState } from 'react';
 import axios from 'axios';
 import { Submit } from '../components/ButtonField.tsx';
 import { useEstablecimientos } from '../hooks/useEstablecimientos.tsx';
+import alert from '../components/alert.tsx';
 
 export default function EditarEstablecimiento() {
   const navigate = useNavigate();
   const { eventoId } = useParams();
+  const [message, setMessage] = useState<string>();
+  const [success, setSuccess] = useState(false);
 
   const [form, setForm] = useState({
     nombre: '',
@@ -40,15 +43,18 @@ export default function EditarEstablecimiento() {
         }
       );
       console.log('Respuesta del backend:', response.data);
-      alert('Establecimiento modificado con éxito');
+      setMessage('Establecimiento modificado con éxito');
+      setSuccess(true);
+      setTimeout(() => {
       navigate(-1);
+      }, 2000);
     } catch (error: unknown) {
       if (error instanceof Error === false) {
         console.error('Error desconocido:', error);
-        alert('Ocurrió un error desconocido.');
+        setMessage('Ocurrió un error desconocido.');
       } else {
         console.error('Error al modificar establecimiento: ', error.message);
-        alert('Error al modificar establecimiento: ' + error.message);
+        setMessage('Error al modificar establecimiento: ' + error.message);
       }
     }
   };
@@ -60,6 +66,8 @@ export default function EditarEstablecimiento() {
           Error al cargar los establecimientos: {errorEstablecimientos.message}
         </div>
         )}
+
+        {alert({message, success})}
 
       {/* Selección del establecimiento */}
       <div className="mb-3">

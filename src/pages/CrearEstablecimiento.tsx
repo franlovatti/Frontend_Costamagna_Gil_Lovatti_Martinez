@@ -2,11 +2,14 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Form, Row, Col } from 'react-bootstrap';
 import { Submit } from '../components/ButtonField.tsx';
+import alert from '../components/alert.tsx';
 import axios from 'axios';
 
 export default function CrearEstablecimiento() {
   const navigate = useNavigate();
   const { eventoId } = useParams();
+  const [message, setMessage] = useState<string>();
+  const [success, setSuccess] = useState<boolean>(false);
 
   const [form, setForm] = useState({
     nombre: '',
@@ -38,21 +41,25 @@ export default function CrearEstablecimiento() {
         }
       );
       console.log('Respuesta del backend:', response.data);
-      alert('Establecimiento creado con éxito');
-      navigate(-1);
+      setMessage('Establecimiento creado con éxito');
+      setSuccess(true);
+      setTimeout(() => {
+        navigate(-1);
+      }, 2000);
     } catch (error: unknown) {
       if (error instanceof Error === false) {
         console.error('Error desconocido:', error);
-        alert('Ocurrió un error desconocido.');
+        setMessage('Ocurrió un error desconocido.');
       } else {
         console.error('Error al crear establecimiento: ', error.message);
-        alert('Error al crear establecimiento: ' + error.message);
+        setMessage('Error al crear establecimiento: ' + error.message);
       }
     }
   };
 
   return (
     <div className="container mt-4 text-bg-dark p-4 rounded-3 shadow-lg">
+      {alert({ message, success })}
       <Form onSubmit={handleSubmit}>
         <Row>
           <Col md={6}>

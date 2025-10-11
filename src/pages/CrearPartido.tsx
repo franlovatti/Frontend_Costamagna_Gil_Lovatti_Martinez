@@ -4,10 +4,13 @@ import React, { useState} from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEstablecimientos } from '../hooks/useEstablecimientos.tsx';
+import alert from '../components/alert.tsx';
 
 export default function CrearPartido() {
   const navigate = useNavigate();
   const { eventoId } = useParams();
+  const [success, setSuccess] = useState(false);
+  const [message, setMessage] = useState<string>();
 
   const {establecimientos, loadingEstablecimientos, errorEstablecimientos} = useEstablecimientos(eventoId);
 
@@ -72,15 +75,18 @@ export default function CrearPartido() {
         }
       );
       console.log('Respuesta del backend:', response.data);
-      alert('Partido creado con éxito');
+      setMessage('Partido creado con éxito');
+      setSuccess(true);
+      setTimeout(() => {
       navigate(-1);
+      }, 2000);
     } catch (error: unknown) {
       if (error instanceof Error === false) {
         console.error('Error desconocido:', error);
-        alert('Ocurrió un error desconocido.');
+        setMessage('Ocurrió un error desconocido.');
       } else {
         console.error('Error al crear establecimiento: ', error.message);
-        alert('Error al crear establecimiento: ' + error.message);
+        setMessage('Error al crear establecimiento: ' + error.message);
       }
     }
   };
@@ -92,6 +98,7 @@ export default function CrearPartido() {
         Error al cargar los establecimientos: {errorEstablecimientos.message}
       </div>
     )}
+    {alert({ message, success })}
       <Form onSubmit={handleSubmit}>
         <Row>
           <Col md={6}>

@@ -4,6 +4,7 @@ import { Submit } from '../components/ButtonField.tsx';
 import axios from 'axios';
 import { useEstablecimientos } from '../hooks/useEstablecimientos.tsx';
 import type { Partido } from '../types.ts';
+import alert from '../components/alert.tsx';
 
 export default function EditarPartido() {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ export default function EditarPartido() {
   const [errorPartido, setErrorPartido] = useState<Error | null>(null);
   const [partido, setPartido] = useState<Partido>();
   const [message, setMessage] = useState<string>();
-  const [succes, setSucces] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const [form, setForm] = useState({
     fecha: '2023-12-31',
@@ -91,7 +92,7 @@ export default function EditarPartido() {
       );
       console.log('Respuesta del backend:', response.data);
       setMessage('Partido modificado con éxito');
-      setSucces(true);
+      setSuccess(true);
       setTimeout(() => {
       navigate(-1);
     }, 2000);
@@ -114,11 +115,7 @@ export default function EditarPartido() {
           Error al cargar el partido: {errorPartido.message}
         </div>
       )}
-      {message && (
-        <div className={`alert ${succes ? 'alert-success' : 'alert-danger'}`}>
-          {message}
-        </div>
-      )}
+      {alert({ message, success })}
       {/* Formulario para editar */}
       {form.id && (
         <form onSubmit={handleSubmit}>
