@@ -13,6 +13,7 @@ type Torneo = {
   img: string;
   equipos?: Equipo[];
   creador: number;
+  partidos?: Partido[];
 };
 
 type Deporte = {

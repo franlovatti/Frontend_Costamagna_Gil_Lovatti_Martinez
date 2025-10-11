@@ -6,12 +6,11 @@ import axios from 'axios';
 
 export default function CrearEstablecimiento() {
   const navigate = useNavigate();
-  const { eventoId } = useParams();
+  const { id } = useParams<{ id: string }>();
 
   const [form, setForm] = useState({
     nombre: '',
     direccion: '',
-    evento: eventoId ?? 0,
   });
 
   const handleChange = (
@@ -28,10 +27,17 @@ export default function CrearEstablecimiento() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('evento id', id);
+    const payload = {
+      nombre: form.nombre,
+      direccion: form.direccion,
+      evento: id,
+    };
+    console.log('Payload a enviar:', payload);
     try {
       const response = await axios.post(
         'http://localhost:3000/api/establecimientos',
-        form,
+        payload,
         {
           headers: { 'Content-Type': 'application/json' },
         }

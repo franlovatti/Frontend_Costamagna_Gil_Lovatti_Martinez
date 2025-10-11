@@ -48,7 +48,9 @@ export default function CardTorneos({ torneo, handleClick }: CardTorneosProps) {
           </Button>
         </div>
       </Card.Body>
-      <Button variant="outline-primary">Inscribirse</Button>
+      <Button variant="outline-primary" onClick={() => handleClick(torneo.id)}>
+        Inscribirse
+      </Button>
     </Card>
   );
 }

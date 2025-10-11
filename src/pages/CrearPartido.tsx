@@ -3,17 +3,20 @@ import { Submit } from '../components/ButtonField.tsx';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
+import apiAxios from '../helpers/api.tsx';
+import type { Equipo } from '../types.tsx';
 
 export default function CrearPartido() {
   const navigate = useNavigate();
-  const { eventoId } = useParams();
+  const { id } = useParams<{ id: string }>();
+  const [equipos, setEquipos] = useState<Equipo[]>([]);
+
   const [loading, setLoading] = useState(false);
   interface Establecimiento {
     id: number;
     nombre: string;
     direccion: string;
   }
-
   const [establecimientos, setEstablecimientos] = useState<Establecimiento[]>(
     []
   );
@@ -23,7 +26,7 @@ export default function CrearPartido() {
       setLoading(true);
       try {
         const response = await axios.get(
-          'http://localhost:3000/api/establecimientos/evento/' + eventoId
+          'http://localhost:3000/api/establecimientos/evento/' + id
         );
         setEstablecimientos(response.data.data);
       } catch (err) {
@@ -34,43 +37,29 @@ export default function CrearPartido() {
     };
 
     fetchItems();
-  }, [eventoId]);
+  }, [id]);
 
-  const equipos = [
-    {
-      id: 1,
-      nombre: 'Equipo A',
-      nombreCapitan: 'Capitán A',
-      miembros: ['Jugador 1', 'Jugador 2', 'Jugador 3'],
-    },
-    {
-      id: 2,
-      nombre: 'Equipo B',
-      nombreCapitan: 'Capitán B',
-      miembros: ['Jugador 4', 'Jugador 5', 'Jugador 6'],
-    },
-    {
-      id: 3,
-      nombre: 'Equipo C',
-      nombreCapitan: 'Capitán C',
-      miembros: ['Jugador 7', 'Jugador 8', 'Jugador 9'],
-    },
-    {
-      id: 4,
-      nombre: 'Equipo D',
-      nombreCapitan: 'Capitán D',
-      miembros: ['Jugador 10', 'Jugador 11', 'Jugador 12'],
-    },
-  ];
+  useEffect(() => {
+    console.log('Fetching equipos for eventoId:', id);
+    apiAxios
+      .get(`/eventos/${id}`)
+      .then((response) => {
+        const torneo = response.data.data;
+        setEquipos(torneo.equipos);
+      })
+      .catch((error) => {
+        console.error('Error fetching evento:', error);
+      });
+  }, [id]);
 
   const [form, setForm] = useState({
-    fecha: '2023-12-31',
-    hora: '12:00',
+    fecha: '',
+    hora: '',
     juez: '',
     resultado: '',
     equipoLocal: '',
     equipoVisitante: '',
-    evento: eventoId ?? 0,
+    evento: id ?? 0,
     establecimiento: '',
   });
 
@@ -189,7 +178,6 @@ export default function CrearPartido() {
                 name="juez"
                 value={form.juez}
                 onChange={handleChange}
-                required
               />
             </Form.Group>
           </Col>

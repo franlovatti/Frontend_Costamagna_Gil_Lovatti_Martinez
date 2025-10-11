@@ -7,9 +7,9 @@ import axios from 'axios';
 export default function EditarPartido() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const { eventoId } = useParams();
+  const { id } = useParams<{ id: string }>();
   const [partidos, setPartidos] = useState<Partido[]>();
-
+  console.log('eventoId:', id);
   const [form, setForm] = useState({
     fecha: '2023-12-31',
     hora: '12:00',
@@ -17,7 +17,7 @@ export default function EditarPartido() {
     resultado: '',
     equipoLocal: 0,
     equipoVisitante: 0,
-    evento: eventoId ?? 0,
+    evento: id ?? 0,
     establecimiento: 0,
     id: 0,
   });
@@ -27,7 +27,7 @@ export default function EditarPartido() {
       setLoading(true);
       try {
         const response = await axios.get(
-          'http://localhost:3000/api/partidos/evento/' + eventoId
+          'http://localhost:3000/api/partidos/evento/' + id
         );
         setPartidos(response.data.data);
       } catch (err) {
@@ -38,7 +38,7 @@ export default function EditarPartido() {
     };
 
     fetchItems();
-  }, [eventoId]);
+  }, [id]);
 
   const handleChange = (
     e: React.ChangeEvent<

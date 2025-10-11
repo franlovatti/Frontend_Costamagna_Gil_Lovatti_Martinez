@@ -1,9 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { useNavigate, Link } from 'react-router-dom';
-import type { Equipo, Torneo, Usuario } from '../types';
+import type { Equipo, Partido, Torneo, Usuario } from '../types';
 import apiAxios from '../helpers/api';
-import { Button, Col, Row, Table, Modal, Form } from 'react-bootstrap';
+import {
+  Button,
+  Col,
+  Row,
+  Table,
+  Modal,
+  Form,
+  Tabs,
+  Tab,
+} from 'react-bootstrap';
 import { useAuth } from '../hooks/useAuth';
 
 export default function TorneoDetalle() {
@@ -13,6 +22,11 @@ export default function TorneoDetalle() {
   const [enrollPassword, setEnrollPassword] = useState('');
   const [enrollError, setEnrollError] = useState<string | null>(null);
   const [enrolling, setEnrolling] = useState(false);
+  const [resultadoModal, setResultadoModal] = useState(false);
+  const [resultado, setResultado] = useState('');
+  const [partidoSeleccionado, setPartidoSeleccionado] =
+    useState<Partido | null>(null);
+  const [tabKey, setTabKey] = useState<string>('');
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -122,6 +136,20 @@ export default function TorneoDetalle() {
     }
   };
 
+  const handleCargarResultado = async () => {
+    if (!partidoSeleccionado) return;
+    try {
+      await apiAxios.put(`/partidos/${partidoSeleccionado.id}`, {
+        resultado,
+      });
+      setResultadoModal(false);
+      setResultado('');
+      setPartidoSeleccionado(null);
+      await fetchTorneo();
+    } catch (err) {
+      console.error('Error al cargar resultado:', err);
+    }
+  };
   const handleDelete = async () => {
     if (!id) return;
     try {
@@ -131,7 +159,20 @@ export default function TorneoDetalle() {
       console.error('Error eliminando torneo:', error);
     }
   };
+
+  const partidosOrdenados = [...(torneo?.partidos || [])].sort(
+    (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
+  );
+
+  const partidosPorFecha = partidosOrdenados.reduce((acc, partido) => {
+    const fechaKey = new Date(partido.fecha).toDateString();
+    if (!acc[fechaKey]) acc[fechaKey] = [];
+    acc[fechaKey].push(partido);
+    return acc;
+  }, {} as Record<string, Partido[]>);
+
   if (!torneo) return <p>Cargando...</p>;
+
   return (
     <div className="container text-bg-dark p-3">
       <Row>
@@ -175,7 +216,20 @@ export default function TorneoDetalle() {
         </Col>
       </Row>
       <Row className="mb-3">
-        <Col className="d-flex justify-content-center">
+        <Col>
+          {userIsMember() && (
+            <div className="mt-2 alert alert-info py-2 mb-0">
+              Ya estás inscripto en un equipo de este evento.
+            </div>
+          )}
+        </Col>
+      </Row>
+      <Row className="mb-3">
+        <Col
+          xs={12}
+          md={4}
+          className="d-flex justify-content-center mb-2 mb-md-0"
+        >
           {Number(user?.id) === torneo.creador && (
             <Button
               variant="outline-light"
@@ -187,18 +241,22 @@ export default function TorneoDetalle() {
             </Button>
           )}
         </Col>
-        <Col className="d-flex justify-content-center">
+        <Col
+          xs={12}
+          md={4}
+          className="d-flex justify-content-center mb-2 mb-md-0"
+        >
           {!userIsMember() ? (
             <Link to={`/home/torneos/${torneo.id}/crear-equipo`}>
               <Button variant="primary">Inscribir Equipo</Button>
             </Link>
           ) : (
-            <div className="mt-2 alert alert-info py-2 mb-0">
-              Ya estás inscrito en un equipo de este evento.
-            </div>
+            <Button variant="primary" disabled>
+              Inscribir Equipo
+            </Button>
           )}
         </Col>
-        <Col className="d-flex justify-content-center">
+        <Col xs={12} md={4} className="d-flex justify-content-center">
           {Number(user?.id) === torneo.creador && (
             <Button
               variant="danger"
@@ -211,7 +269,38 @@ export default function TorneoDetalle() {
           )}
         </Col>
       </Row>
-      <Table striped variant="dark">
+      <Row>
+        <Col
+          xs={12}
+          md={4}
+          className="d-flex justify-content-center mb-2 mb-md-0"
+        >
+          {Number(user?.id) === torneo.creador && (
+            <Link to={`CrearEstablecimiento`}>
+              <Button variant="outline-primary">Crear Establecimientos</Button>
+            </Link>
+          )}
+        </Col>
+        <Col
+          xs={12}
+          md={4}
+          className="d-flex justify-content-center mb-2 mb-md-0"
+        >
+          {Number(user?.id) === torneo.creador && (
+            <Link to={`/home/torneos/${torneo.id}/CrearPartido`}>
+              <Button variant="outline-primary">Crear Partidos</Button>
+            </Link>
+          )}
+        </Col>
+        <Col xs={12} md={4} className="d-flex justify-content-center">
+          {Number(user?.id) === torneo.creador && (
+            <Link to={`/home/Participaciones/${torneo.id}`}>
+              <Button variant="outline-primary">Cargar Participaciones</Button>
+            </Link>
+          )}
+        </Col>
+      </Row>
+      <Table responsive striped variant="dark">
         <thead>
           <tr>
             <th>#</th>
@@ -283,6 +372,122 @@ export default function TorneoDetalle() {
           ))}
         </tbody>
       </Table>
+
+      <Tabs
+        id="tab-partidos"
+        activeKey={tabKey}
+        onSelect={(k) => {
+          if (typeof k === 'string') setTabKey(k);
+        }}
+      >
+        {Object.entries(partidosPorFecha).map(([fecha, partidos], idx) => (
+          <Tab
+            key={fecha}
+            eventKey={fecha}
+            title={`Fecha ${idx + 1} - ${new Date(fecha).toLocaleDateString(
+              'es-AR'
+            )}`}
+          >
+            <Table responsive striped variant="dark">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Fecha</th>
+                  <th>Hora inicio</th>
+                  <th>Establecimiento</th>
+                  <th>Local</th>
+                  <th>Visitante</th>
+                  <th>Resultado</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {partidos.map((partido, i) => (
+                  <tr key={partido.id}>
+                    <td>{i + 1}</td>
+                    <td>{new Date(partido.fecha).toLocaleDateString()}</td>
+                    <td>
+                      {partido.hora instanceof Date
+                        ? partido.hora.toLocaleTimeString()
+                        : partido.hora}
+                    </td>
+                    <td>{partido.establecimiento?.nombre}</td>
+                    <td>{partido.equipoLocal.nombre}</td>
+                    <td>{partido.equipoVisitante.nombre}</td>
+                    <td>{partido.resultado || '-'}</td>
+                    <td>
+                      {Number(user?.id) === torneo.creador && (
+                        <div className="d-flex gap-2 align-items-start">
+                          <Link to={`/home/Participaciones/${torneo.id}`}>
+                            <Button variant="outline-primary">
+                              Cargar Participaciones
+                            </Button>
+                          </Link>
+                          <Link to={`/home/torneos/${torneo.id}/EditarPartido`}>
+                            <Button variant="outline-primary">
+                              Editar Partido
+                            </Button>
+                          </Link>
+                          <Button
+                            variant="outline-primary"
+                            onClick={() => {
+                              setPartidoSeleccionado(partido);
+                              setResultadoModal(true);
+                            }}
+                          >
+                            Editar Resultado
+                          </Button>
+                          <Button variant="danger">Eliminar</Button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </Tab>
+        ))}
+      </Tabs>
+
+      <Modal
+        show={resultadoModal}
+        onHide={() => setResultadoModal(false)}
+        contentClassName="bg-dark text-light"
+        backdropClassName="bg-dark bg-opacity-20"
+      >
+        <Modal.Header
+          closeButton
+          closeVariant="white"
+          className="border-secondary"
+        >
+          <Modal.Title>
+            Resultado de {partidoSeleccionado?.equipoLocal.nombre} -{' '}
+            {partidoSeleccionado?.equipoVisitante.nombre}
+          </Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          <Form.Group>
+            <Form.Label>Resultado del equipo </Form.Label>
+            <Form.Control
+              type="text"
+              value={resultado}
+              onChange={(e) => setResultado(e.target.value)}
+              placeholder="Ingrese el resultado del partido (ej: 3-1)"
+              autoFocus
+            />
+          </Form.Group>
+        </Modal.Body>
+
+        <Modal.Footer className="border-secondary">
+          <Button variant="secondary" onClick={() => setResultadoModal(false)}>
+            Cancelar
+          </Button>
+          <Button variant="primary" onClick={handleCargarResultado}>
+            Guardar
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       <Modal
         show={showEnrollModal}

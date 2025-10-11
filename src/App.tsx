@@ -54,27 +54,6 @@ function App() {
                 <Route path="/" element={<MainLayout />}>
                   <Route index element={<NoLoggedHome />} />
                   <Route path="Login" element={<Login />} />
-                  <Route path="CrearPartido" element={<CrearPartido />} />
-                  <Route
-                    path="CrearPartido/:eventoId"
-                    element={<CrearPartido />}
-                  />
-                  <Route
-                    path="CrearEstablecimiento"
-                    element={<CrearEstablecimiento />}
-                  />
-                  <Route
-                    path="CrearEstablecimiento/:eventoId"
-                    element={<CrearEstablecimiento />}
-                  />
-                  <Route
-                    path="EditarEstablecimiento/:eventoId"
-                    element={<EditarEstablecimiento />}
-                  />
-                  <Route
-                    path="EditarPartido/:eventoId"
-                    element={<EditarPartido />}
-                  />
                   <Route path="Registro" element={<Registro />}></Route>
                   <Route
                     path="ForgottenPassword"
@@ -109,13 +88,30 @@ function App() {
                       path="torneos/:id/crear-equipo"
                       element={<CrearEquipo />}
                     />
+                    <Route path="CrearPartido" element={<CrearPartido />} />
+                    <Route
+                      path="torneos/:id/CrearPartido"
+                      element={<CrearPartido />}
+                    />
+                    <Route
+                      path="torneos/:id/CrearEstablecimiento"
+                      element={<CrearEstablecimiento />}
+                    />
+                    <Route
+                      path="torneos/:id/EditarEstablecimiento"
+                      element={<EditarEstablecimiento />}
+                    />
+                    <Route
+                      path="torneos/:id/EditarPartido"
+                      element={<EditarPartido />}
+                    />
                     <Route path="equipos/:id" element={<VerEquipo />} />
                     <Route
                       path="equipos/:id/editar"
                       element={<EditarEquipo />}
                     />
                     <Route
-                      path="participaciones/crear"
+                      path="participaciones/:id"
                       element={<CrearParticipacion />}
                     />
                     <Route
