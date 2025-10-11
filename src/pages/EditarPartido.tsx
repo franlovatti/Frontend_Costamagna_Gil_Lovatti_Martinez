@@ -1,14 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import type { Partido } from '../types.tsx';
 import { Submit } from '../components/ButtonField.tsx';
 import axios from 'axios';
+import { useEstablecimientos } from '../hooks/useEstablecimientos.tsx';
+import { usePartidos } from '../hooks/usePartidos.tsx';
 
 export default function EditarPartido() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
   const { eventoId } = useParams();
-  const [partidos, setPartidos] = useState<Partido[]>();
 
   const [form, setForm] = useState({
     fecha: '2023-12-31',
@@ -22,23 +21,9 @@ export default function EditarPartido() {
     id: 0,
   });
 
-  useEffect(() => {
-    const fetchItems = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(
-          'http://localhost:3000/api/partidos/evento/' + eventoId
-        );
-        setPartidos(response.data.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchItems();
-  }, [eventoId]);
+ const {partidos, loadingPartidos, errorPartidos} = usePartidos(eventoId);
+ const { establecimientos, loadingEstablecimientos, errorEstablecimientos } = useEstablecimientos(eventoId);
+ 
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -79,7 +64,6 @@ export default function EditarPartido() {
   return (
     <div className="container mt-4 text-bg-dark p-4 rounded-3 shadow-lg">
       <h2>Editar Partido</h2>
-
       {/* Selección del partido */}
       <div className="mb-3">
         <label htmlFor="selectPartido" className="form-label">
@@ -88,7 +72,7 @@ export default function EditarPartido() {
         <select
           id="selectPartido"
           className="form-select"
-          value={form.id ?? ''} // necesitamos que form tenga id
+          value={form.id ?? ''} 
           onChange={(e) => {
             const selectedId = Number(e.target.value);
             const selected = partidos?.find((p) => p.id === selectedId);
@@ -107,8 +91,8 @@ export default function EditarPartido() {
             }
           }}
         >
-          <option value="">Seleccione un partido</option>
-          {!loading &&
+          <option value="" disabled>{loadingPartidos ? 'CargandoPartidos...': 'Seleccione un partido'}</option>
+          {!loadingPartidos &&
             partidos &&
             partidos.map((p) => (
               <option key={p.id} value={p.id}>
@@ -117,6 +101,11 @@ export default function EditarPartido() {
               </option>
             ))}
         </select>
+         {errorPartidos && (
+            <div className="alert alert-danger mt-3">
+        Error al cargar los partidos: {errorPartidos.message}
+      </div>
+    )}
       </div>
 
       {/* Formulario para editar */}
@@ -212,18 +201,37 @@ export default function EditarPartido() {
           </div>
 
           <div className="mb-3">
-            <label htmlFor="establecimiento" className="form-label">
-              Establecimiento
-            </label>
-            <input
-              type="text"
-              id="establecimiento"
-              name="establecimiento"
-              value={form.establecimiento}
-              onChange={handleChange}
-              className="form-control"
-            />
-          </div>
+  <label htmlFor="establecimiento" className="form-label">
+    Seleccione un Establecimiento
+  </label>
+  <select
+    id="establecimiento"
+    name="establecimiento"
+    className="form-select"
+    value={form.establecimiento}
+    onChange={handleChange}
+  >
+    <option value="" disabled>
+      {loadingEstablecimientos
+        ? 'Cargando establecimientos...'
+        : establecimientos.length === 0
+        ? 'No hay establecimientos disponibles'
+        : 'Seleccione el establecimiento'}
+    </option>
+    {!loadingEstablecimientos &&
+      establecimientos.map((est) => (
+        <option key={est.id} value={est.id}>
+          {est.nombre} - {est.direccion}
+        </option>
+      ))}
+  </select>
+
+  {errorEstablecimientos && (
+    <div className="alert alert-danger mt-3">
+      Error al cargar los establecimientos: {errorEstablecimientos.message}
+    </div>
+  )}
+</div>
 
           <Submit>Guardar cambios</Submit>
         </form>

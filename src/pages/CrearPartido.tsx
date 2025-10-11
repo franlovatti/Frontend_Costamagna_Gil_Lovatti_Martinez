@@ -1,40 +1,15 @@
 import { Form, Row, Col } from 'react-bootstrap';
 import { Submit } from '../components/ButtonField.tsx';
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useEstablecimientos } from '../hooks/useEstablecimientos.tsx';
 
 export default function CrearPartido() {
   const navigate = useNavigate();
   const { eventoId } = useParams();
-  const [loading, setLoading] = useState(false);
-  interface Establecimiento {
-    id: number;
-    nombre: string;
-    direccion: string;
-  }
 
-  const [establecimientos, setEstablecimientos] = useState<Establecimiento[]>(
-    []
-  );
-
-  useEffect(() => {
-    const fetchItems = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(
-          'http://localhost:3000/api/establecimientos/evento/' + eventoId
-        );
-        setEstablecimientos(response.data.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchItems();
-  }, [eventoId]);
+  const {establecimientos, loadingEstablecimientos, errorEstablecimientos} = useEstablecimientos(eventoId);
 
   const equipos = [
     {
@@ -112,6 +87,11 @@ export default function CrearPartido() {
 
   return (
     <div className="text-bg-dark container">
+        {errorEstablecimientos && (
+      <div className="alert alert-danger mt-3">
+        Error al cargar los establecimientos: {errorEstablecimientos.message}
+      </div>
+    )}
       <Form onSubmit={handleSubmit}>
         <Row>
           <Col md={6}>
@@ -218,14 +198,14 @@ export default function CrearPartido() {
                 required
               >
                 <option value="">
-                  {loading
+                  {loadingEstablecimientos
                     ? 'Cargando establecimientos...'
                     : establecimientos.length === 0
                     ? 'No hay establecimientos disponibles'
                     : 'Seleccione el establecimiento'}
                 </option>
 
-                {!loading &&
+                {!loadingEstablecimientos &&
                   establecimientos.map((establecimiento) => (
                     <option key={establecimiento.id} value={establecimiento.id}>
                       {establecimiento.nombre +

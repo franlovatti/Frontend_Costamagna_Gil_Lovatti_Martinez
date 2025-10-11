@@ -11,7 +11,7 @@ export default function CrearEstablecimiento() {
   const [form, setForm] = useState({
     nombre: '',
     direccion: '',
-    evento: eventoId ?? 0,
+    evento: eventoId? Number(eventoId) : 0,
   });
 
   const handleChange = (
@@ -28,6 +28,7 @@ export default function CrearEstablecimiento() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Enviando formulario con datos:', form);
     try {
       const response = await axios.post(
         'http://localhost:3000/api/establecimientos',

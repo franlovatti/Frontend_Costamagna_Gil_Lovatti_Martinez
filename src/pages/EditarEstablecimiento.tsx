@@ -1,14 +1,12 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
-import type { Establecimiento } from '../types.tsx';
 import { Submit } from '../components/ButtonField.tsx';
+import { useEstablecimientos } from '../hooks/useEstablecimientos.tsx';
 
 export default function EditarEstablecimiento() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
   const { eventoId } = useParams();
-  const [establecimientos, setEstablecimientos] = useState<Establecimiento[]>();
 
   const [form, setForm] = useState({
     nombre: '',
@@ -17,23 +15,7 @@ export default function EditarEstablecimiento() {
     id: 0,
   });
 
-  useEffect(() => {
-    const fetchItems = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(
-          'http://localhost:3000/api/establecimientos/evento/' + eventoId
-        );
-        setEstablecimientos(response.data.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchItems();
-  }, [eventoId]);
+  const {establecimientos, loadingEstablecimientos, errorEstablecimientos} = useEstablecimientos(eventoId);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -73,6 +55,11 @@ export default function EditarEstablecimiento() {
   return (
     <div className="container mt-4 text-bg-dark p-4 rounded-3 shadow-lg">
       <h2>Editar Establecimiento</h2>
+      {errorEstablecimientos && (
+        <div className ="alet alert-danger" role="alert">
+          Error al cargar los establecimientos: {errorEstablecimientos.message}
+        </div>
+        )}
 
       {/* Selección del establecimiento */}
       <div className="mb-3">
@@ -82,7 +69,7 @@ export default function EditarEstablecimiento() {
         <select
           id="selectEstablecimiento"
           className="form-select"
-          value={form.nombre} // temporalmente usamos nombre para detectar selección
+          value={form.id} 
           onChange={(e) => {
             const selectedId = Number(e.target.value);
             const selected = establecimientos?.find(
@@ -99,7 +86,7 @@ export default function EditarEstablecimiento() {
           }}
         >
           <option value="">Seleccione un establecimiento</option>
-          {!loading &&
+          {!loadingEstablecimientos &&
             establecimientos &&
             establecimientos.map((est) => (
               <option key={est.id} value={est.id}>
@@ -109,7 +96,7 @@ export default function EditarEstablecimiento() {
         </select>
       </div>
 
-      {form.nombre && (
+      {form.id != 0 && (
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="nombre" className="form-label">
