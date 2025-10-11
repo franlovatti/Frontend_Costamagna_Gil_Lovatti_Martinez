@@ -1,13 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { Submit } from '../components/ButtonField.tsx';
 import axios from 'axios';
 import { useEstablecimientos } from '../hooks/useEstablecimientos.tsx';
-import { usePartidos } from '../hooks/usePartidos.tsx';
+import type { Partido } from '../types.ts';
 
 export default function EditarPartido() {
   const navigate = useNavigate();
-  const { eventoId } = useParams();
+  const { eventoId, partidoId } = useParams();
+  const [loadingPartido, setLoadingPartido] = useState(false);
+  const [errorPartido, setErrorPartido] = useState<Error | null>(null);
+  const [partido, setPartido] = useState<Partido>();
+  const [message, setMessage] = useState<string>();
+  const [succes, setSucces] = useState(false);
 
   const [form, setForm] = useState({
     fecha: '2023-12-31',
@@ -21,9 +26,46 @@ export default function EditarPartido() {
     id: 0,
   });
 
- const {partidos, loadingPartidos, errorPartidos} = usePartidos(eventoId);
  const { establecimientos, loadingEstablecimientos, errorEstablecimientos } = useEstablecimientos(eventoId);
- 
+
+ useEffect(() => {
+    if (!partidoId) return;
+
+    const fetchData = async () => {
+      setLoadingPartido(true);
+      setErrorPartido(null);
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/partidos/${partidoId}`
+        );
+        setPartido(response.data.data);
+        console.log(response.data.data);
+      } catch (err) {
+        setErrorPartido(err as Error);
+      } finally {
+        setLoadingPartido(false);
+      }
+    };
+
+    fetchData();
+  }, [partidoId]);
+
+  useEffect(() => {
+  if (partido) {
+    setForm({
+      fecha: new Date(partido.fecha).toISOString().split('T')[0],
+      hora: partido.hora,
+      juez: partido.juez,
+      resultado: partido.resultado,
+      equipoLocal: partido.equipoLocal.id,
+      equipoVisitante: partido.equipoVisitante.id,
+      evento: partido.evento.id,
+      establecimiento: partido.establecimiento?.id ?? 0,
+      id: partido.id,
+    });
+  }
+}, [partido]);
+
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -48,66 +90,35 @@ export default function EditarPartido() {
         }
       );
       console.log('Respuesta del backend:', response.data);
-      alert('Partido modificado con éxito');
+      setMessage('Partido modificado con éxito');
+      setSucces(true);
+      setTimeout(() => {
       navigate(-1);
+    }, 2000);
     } catch (error: unknown) {
       if (error instanceof Error === false) {
         console.error('Error desconocido:', error);
-        alert('Ocurrió un error desconocido.');
+        setMessage('Ocurrió un error desconocido.');
       } else {
         console.error('Error al modificar partido: ', error.message);
-        alert('Error al modificar partido: ' + error.message);
+        setMessage('Error al modificar partido: ' + error.message);
       }
     }
   };
 
   return (
     <div className="container mt-4 text-bg-dark p-4 rounded-3 shadow-lg">
-      <h2>Editar Partido</h2>
-      {/* Selección del partido */}
-      <div className="mb-3">
-        <label htmlFor="selectPartido" className="form-label">
-          Seleccione el partido a modificar
-        </label>
-        <select
-          id="selectPartido"
-          className="form-select"
-          value={form.id ?? ''} 
-          onChange={(e) => {
-            const selectedId = Number(e.target.value);
-            const selected = partidos?.find((p) => p.id === selectedId);
-            if (selected) {
-              setForm({
-                fecha: new Date(selected.fecha).toISOString().split('T')[0],
-                hora: new Date(selected.hora).toTimeString().split(' ')[0],
-                juez: selected.juez,
-                resultado: selected.resultado,
-                equipoLocal: selected.equipoLocal.id,
-                equipoVisitante: selected.equipoVisitante.id,
-                evento: selected.evento.id,
-                establecimiento: selected.establecimiento?.id ?? 0,
-                id: selected.id,
-              });
-            }
-          }}
-        >
-          <option value="" disabled>{loadingPartidos ? 'CargandoPartidos...': 'Seleccione un partido'}</option>
-          {!loadingPartidos &&
-            partidos &&
-            partidos.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.equipoLocal.nombre} vs {p.equipoVisitante.nombre} -{' '}
-                {new Date(p.fecha).toISOString().split('T')[0]}
-              </option>
-            ))}
-        </select>
-         {errorPartidos && (
-            <div className="alert alert-danger mt-3">
-        Error al cargar los partidos: {errorPartidos.message}
-      </div>
-    )}
-      </div>
-
+      <h2>{loadingPartido ? 'Cargando datos del partido...' : 'Editar Partido'}</h2>
+      {errorPartido && (
+        <div className="alert alert-danger">
+          Error al cargar el partido: {errorPartido.message}
+        </div>
+      )}
+      {message && (
+        <div className={`alert ${succes ? 'alert-success' : 'alert-danger'}`}>
+          {message}
+        </div>
+      )}
       {/* Formulario para editar */}
       {form.id && (
         <form onSubmit={handleSubmit}>
@@ -232,7 +243,6 @@ export default function EditarPartido() {
     </div>
   )}
 </div>
-
           <Submit>Guardar cambios</Submit>
         </form>
       )}
