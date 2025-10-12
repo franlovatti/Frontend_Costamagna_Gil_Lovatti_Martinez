@@ -418,7 +418,7 @@ export default function TorneoDetalle() {
                     <td>
                       {Number(user?.id) === torneo.creador && (
                         <div className="d-flex gap-2 align-items-start">
-                          <Link to={`/home/Participaciones/${torneo.id}`}>
+                          <Link to={`/home/Participaciones/${partido.id}`}>
                             <Button variant="outline-primary">
                               Cargar Participaciones
                             </Button>

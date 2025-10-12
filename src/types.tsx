@@ -70,7 +70,7 @@ type Participation = {
   usuario: Usuario;
   minutosjugados: number;
   faltas: number;
-  puntos: number; // Added property
+  puntos: number;
   partido: Partido;
 };
 
