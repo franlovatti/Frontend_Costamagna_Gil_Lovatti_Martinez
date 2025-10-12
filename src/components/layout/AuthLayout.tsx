@@ -17,10 +17,12 @@ const AuthLayout = () => {
     <div className="auth-layout d-flex">
       <aside className="auth-sidebar d-flex flex-column">
         <div className="sidebar-header p-4">
+          <span className="theme-toggle-wrapper">
+            <ThemeToggle />
+          </span>
           <h2 className="mb-2">Gestión de Torneos</h2>
           <p className="mb-0 text-muted-sidebar">Bienvenido, {user?.nombre || 'User'}!</p>
         </div>
-        
         <nav className="sidebar-nav flex-grow-1 py-3">
           <Link to="/" className="sidebar-link d-flex align-items-center gap-3 px-4 py-3 text-decoration-none">
             <span className="icon">🏠</span>
@@ -28,30 +30,26 @@ const AuthLayout = () => {
           </Link>
           <Link to="/admin" className="sidebar-link d-flex align-items-center gap-3 px-4 py-3 text-decoration-none">
             <span className="icon">📊</span>
-            <span>Panel de Control</span>
-          </Link>
-          <Link to="/admin/deportes" className="sidebar-link d-flex align-items-center gap-3 px-4 py-3 text-decoration-none">
-            <span className="icon">🏅</span>
-            <span>Deportes</span>
+            <span>Panel de Estadísticas</span>
           </Link>
           <Link to="/admin/usuarios" className="sidebar-link d-flex align-items-center gap-3 px-4 py-3 text-decoration-none">
             <span className="icon">👤</span>
             <span>Usuarios</span>
           </Link>
-          <Link to="/admin/noticias" className="sidebar-link d-flex align-items-center gap-3 px-4 py-3 text-decoration-none">
-            <span className="icon">📰</span>
-            <span>Noticias</span>
-          </Link>
           <Link to="/admin/torneos" className="sidebar-link d-flex align-items-center gap-3 px-4 py-3 text-decoration-none">
             <span className="icon">🏆</span>
             <span>Torneos</span>
           </Link>
-          <Link to="/admin/estadisticas" className="sidebar-link d-flex align-items-center gap-3 px-4 py-3 text-decoration-none">
-            <span className="icon">📈</span>
-            <span>Estadísticas</span>
+          <Link to="/admin/deportes" className="sidebar-link d-flex align-items-center gap-3 px-4 py-3 text-decoration-none">
+            <span className="icon">🏅</span>
+            <span>Deportes</span>
+          </Link> 
+          <Link to="/admin/noticias" className="sidebar-link d-flex align-items-center gap-3 px-4 py-3 text-decoration-none">
+            <span className="icon">📰</span>
+            <span>Noticias</span>
           </Link>
+          
         </nav>
-        <ThemeToggle/>
         <div className="sidebar-footer p-4">
           <button onClick={handleLogout} className="logout-btn w-100 d-flex align-items-center justify-content-center gap-2">
             {/* <span className="icon">🚪</span> */}

@@ -14,7 +14,7 @@
 }
 
 .dashboard-header h1 {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 300;
   color: var(--text);
   letter-spacing: -0.5px;
@@ -67,7 +67,80 @@
 }
 
 /* Responsive - Solo ajustes específicos */
+@media (max-width: 1200px) {
+  .chart-container {
+    height: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .estadisticas-page {
+    padding: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .periodo-select {
+    max-width: 100%;
+  }
+
+  .stat-card-large {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .stat-icon-large {
+    font-size: 2rem;
+  }
+
+  .stat-value {
+    font-size: 1.8rem;
+  }
+
+  .stats-card {
+    padding: 1.5rem;
+  }
+
+  .chart-container {
+    height: 180px;
+  }
+
+  .chart-bar {
+    max-width: 12px;
+  }
+
+  .donut-chart {
+    width: 160px;
+    height: 160px;
+  }
+}
+
 @media (max-width: 600px) {
+  .stats-card {
+    padding: 1rem;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+  }
+
+  .chart-legend {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .top-item {
+    padding: 0.75rem;
+  }
+
+  .top-rank {
+    width: 28px;
+    height: 28px;
+    font-size: 0.85rem;
+  }
+
   .dashboard-page {
     padding: 1rem;
   }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { DeporteContext } from "../contexts/deporte";
 import apiAxios from "../helpers/api";
 import type { Deporte } from "../contexts/deporte";
@@ -9,7 +9,7 @@ const DeportesProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const getDeportes = async () => {
+  const getDeportes = useCallback(async () => {
     setLoading(true);
     try {
       const res = await apiAxios.get('/deportes');
@@ -18,43 +18,55 @@ const DeportesProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       setDeportes([]);
       setError("No se pudieron cargar los deportes" + error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  };
+  }, []);
 
-  const borrarDeporte = async (id: number) => {
+  const borrarDeporte = useCallback(async (id: number) => {
     try {
       await apiAxios.delete(`/deportes/${id}`);
       await getDeportes();
     } catch (error) {
       setError("Error al borrar el deporte:" + error);
     }
-  };
+  }, [getDeportes]);
 
-  const modificarDeporte = async (deporte: Deporte) => {
+  const modificarDeporte = useCallback(async (deporte: Deporte) => {
     try {
       await apiAxios.put(`/deportes/${deporte.id}`, deporte);
       await getDeportes();
     } catch (error) {
       setError("Error al modificar el deporte:" + error);
     }
-  };
+  }, [getDeportes]);
 
-  const crearDeporte = async (deporte: Deporte) => {
+  const crearDeporte = useCallback(async (deporte: Deporte) => {
     try {
       await apiAxios.post("/deportes", deporte);
       await getDeportes();
     } catch (error) {
       setError("Error al crear el deporte:" + error);
     }
-  };
+  }, [getDeportes]);
 
   useEffect(() => {
     getDeportes();
-  }, []);
+  }, [getDeportes]);
+
+  const value = useMemo(() => ({
+    deportes,
+    loading,
+    error,
+    getDeportes,
+    borrarDeporte,
+    modificarDeporte,
+    crearDeporte
+  }), [deportes, loading, error, getDeportes, borrarDeporte, modificarDeporte, crearDeporte]);
+
 
   return (
-    <DeporteContext.Provider value={{ deportes, loading, error, getDeportes, borrarDeporte, modificarDeporte, crearDeporte }}>
+    <DeporteContext.Provider value={value}>
       {children}
     </DeporteContext.Provider>
   );

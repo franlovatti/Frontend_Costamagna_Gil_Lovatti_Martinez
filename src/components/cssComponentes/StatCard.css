@@ -1,4 +1,4 @@
-/* Stat Cards */
+/* Stat Cards
 .stat-card {
   background-color: var(--background-secondary);
   border: 1px solid var(--border);
@@ -25,6 +25,13 @@
   letter-spacing: 0.5px;
 }
 
+.stat-subtext {
+  font-size: 0.85rem;
+  color: var(--text-muted-light);
+  margin: 0.5rem 0 0 0;
+  font-weight: 300;
+}
+
 .stat-number {
   font-size: 2rem;
   font-weight: 300;
@@ -35,5 +42,51 @@
 .stat-change {
   font-size: 0.8rem;
   color: var(--text-muted-light);
+  font-weight: 300;
+} */
+
+.stat-card-large {
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.stat-card-large:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+}
+
+.stat-icon-large {
+  font-size: 2.5rem;
+  opacity: 0.9;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+  font-weight: 400;
+}
+
+.stat-value {
+  font-size: 2.25rem;
+  font-weight: 300;
+  color: var(--primary);
+  margin: 0;
+  line-height: 1;
+}
+
+.stat-subtext {
+  font-size: 0.85rem;
+  color: var(--text-muted-light);
+  margin: 0.5rem 0 0 0;
   font-weight: 300;
 }

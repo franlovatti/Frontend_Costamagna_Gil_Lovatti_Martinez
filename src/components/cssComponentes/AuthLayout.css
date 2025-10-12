@@ -17,6 +17,8 @@
 
 .sidebar-header {
   border-bottom: 1px solid var(--hover-bg);
+  position: relative;
+  padding-right: 70px !important;
 }
 
 .sidebar-header h2 {
@@ -69,6 +71,12 @@
 /* Sidebar Footer */
 .sidebar-footer {
   border-top: 1px solid var(--hover-bg);
+}
+
+.theme-toggle-wrapper {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
 }
 
 .logout-btn {

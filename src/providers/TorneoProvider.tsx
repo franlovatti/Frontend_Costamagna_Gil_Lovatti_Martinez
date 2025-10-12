@@ -50,6 +50,7 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const payload: Payload = { ...torneo, deporte: torneo.deporte.id, deporteC: torneo.deporte };
       payload.deporteC = undefined as unknown as Deporte; // No enviar el objeto deporte completo
+      console.log("Payload de torneo a modificar: ", payload);
       await apiAxios.put(`/eventos/${torneo.id}`, payload);
       await getTorneos();
     } catch (error) {
@@ -61,6 +62,7 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const payload: Payload = { ...torneo, deporte: torneo.deporte.id, deporteC: torneo.deporte };
       payload.deporteC = undefined as unknown as Deporte; // No enviar el objeto deporte completo
+      console.log("Payload de torneo a crear payload: ", payload);
       await apiAxios.post("/eventos", payload);
       await getTorneos();
     } catch (error) {
