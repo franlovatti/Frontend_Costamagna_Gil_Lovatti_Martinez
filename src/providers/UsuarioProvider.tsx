@@ -12,7 +12,7 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
   const getUsuarios = async (opts?: { q?: string; page?: number }) => {
     setLoading(true);
     try {
-      const res = await apiAxios.get('/usuarios/filter', { params: opts });
+      const res = await apiAxios.get('/usuarios', { params: opts });
       setUsuarios(Array.isArray(res.data.data) ? res.data.data : []);
       setError(null);
     } catch (error) {
@@ -20,15 +20,6 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
       setError("No se pudieron cargar los usuarios" + error);
     }
     setLoading(false);
-  };
-
-  const borrarUsuario = async (id: number) => {
-    try {
-      await apiAxios.delete(`/usuarios/${id}`);
-      await getUsuarios();
-    } catch (error) {
-      setError("Error al borrar el usuario:" + error);
-    }
   };
 
   const modificarUsuario = async (usuario: User) => {
@@ -40,21 +31,12 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const crearUsuario = async (usuario: User) => {
-    try {
-      await apiAxios.post("/usuarios", usuario);
-      await getUsuarios();
-    } catch (error) {
-      setError("Error al crear el usuario:" + error);
-    }
-  };
-
   useEffect(() => {
     getUsuarios();
   }, []);
 
   return (
-    <UsuarioContext.Provider value={{ usuarios, loading, error, getUsuarios, borrarUsuario, modificarUsuario, crearUsuario }}>
+    <UsuarioContext.Provider value={{ usuarios, loading, error, getUsuarios, modificarUsuario }}>
       {children}
     </UsuarioContext.Provider>
   );

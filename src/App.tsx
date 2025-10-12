@@ -6,6 +6,7 @@ import AuthProvider from './providers/AuthProvider.tsx';
 import DeportesProvider from "./providers/DeporteProvider.tsx";
 import ProtectedRoute from './components/ProtectedRoute.tsx';
 import TorneosProvider from "./providers/TorneoProvider.tsx";
+import UsuariosProvider from "./providers/UsuarioProvider.tsx";
 
 // Layouts and Components
 import NotFound from './pages/NotFound.js';
@@ -24,6 +25,7 @@ import Dashboard from './pages/Dashboard.tsx';
 import AuthLayout from "./components/layout/AuthLayout.tsx";
 import DeportesAdmin from "./pages/DeportesAdmin.tsx";
 import TorneosAdmin from "./pages/TorneosAdmin.tsx";
+import UsuariosAdmin from "./pages/UsuariosAdmin.tsx";
 
 function App() {
   return (
@@ -50,7 +52,7 @@ function App() {
             <Route element={<ProtectedRoute allowedRoles={["Administrador"]} />}>
               <Route path='/admin' element={<AuthLayout />}>
                 <Route index element={<Dashboard />} />
-                {/* <Route path="/admin/usuarios" element={<UsuariosAdmin />} /> */}
+                <Route path="/admin/usuarios" element={<UsuariosProvider><UsuariosAdmin /></UsuariosProvider>} />
                 <Route path="/admin/deportes" element={<DeportesProvider><DeportesAdmin /></DeportesProvider>} />
                 <Route path="/admin/torneos" element={<TorneosProvider><TorneosAdmin /></TorneosProvider>} />
               </Route>

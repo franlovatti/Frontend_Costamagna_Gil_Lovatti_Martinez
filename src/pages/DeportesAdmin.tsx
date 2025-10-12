@@ -12,12 +12,6 @@ const DeportesAdmin = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [editingDeporte, setEditingDeporte] = useState<Deporte | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({
-    nombre: '',
-    cantMinJugadores: 0,
-    cantMaxJugadores: 0,
-    duracion: 0
-  });
 
   // Filtrar deportes
   const deportesFiltrados = deportes.filter(deporte =>
@@ -28,48 +22,23 @@ const DeportesAdmin = () => {
   // Abrir modal para crear
   const handleCreate = () => {
     setEditingDeporte(null);
-    setFormData({
-      nombre: '',
-      cantMinJugadores: 0,
-      cantMaxJugadores: 0,
-      duracion: 0
-    });
     setShowModal(true);
   };
 
   // Abrir modal para editar
   const handleEdit = (deporte: Deporte) => {
     setEditingDeporte(deporte);
-    setFormData({
-      nombre: deporte.nombre,
-      cantMinJugadores: deporte.cantMinJugadores,
-      cantMaxJugadores: deporte.cantMaxJugadores,
-      duracion: deporte.duracion
-    });
     setShowModal(true);
   };
 
   // Guardar (crear o editar)
-  const handleSave = () => {
+  const handleSave = (deporteData: Partial<Deporte>) => {
     if (editingDeporte) {
       // Editar
-      const deporte: Deporte = {
-        id: editingDeporte.id,
-        nombre: formData.nombre,
-        cantMinJugadores: formData.cantMinJugadores,
-        cantMaxJugadores: formData.cantMaxJugadores,
-        duracion: formData.duracion
-      };
-      modificarDeporte(deporte);
+      modificarDeporte({ ...deporteData, id: editingDeporte.id } as Deporte);
     } else {
       // Crear
-      const newDeporte = {
-        nombre: formData.nombre,
-        cantMinJugadores: formData.cantMinJugadores,
-        cantMaxJugadores: formData.cantMaxJugadores,
-        duracion: formData.duracion
-      };
-      crearDeporte(newDeporte as Deporte);
+      crearDeporte(deporteData as Deporte);
     }
 
     setShowModal(false);
@@ -107,6 +76,7 @@ const DeportesAdmin = () => {
       <SearchBar
         value={searchTerm}
         onChange={setSearchTerm}
+        hayBoton={true}
         onCreate={handleCreate}
         crear="Deporte"
       />
@@ -121,17 +91,14 @@ const DeportesAdmin = () => {
         <DeporteFormModal
           setShowModal={setShowModal}
           editingDeporte={editingDeporte}
-          formData={formData}
-          setFormData={setFormData}
-          handleSave={handleSave}
+          onSave={handleSave}
         />
       )}
 
       {showConfirm && (
         <ConfirmModal
-          objeto="deporte"
+          objeto={"eliminar el deporte " + deporteAEliminar?.nombre}
           setShowConfirm={setShowConfirm}
-          objetoAEliminar={deporteAEliminar}
           handleConfirmDelete={handleConfirmDelete}
           handleCancelDelete={handleCancelDelete}
         />

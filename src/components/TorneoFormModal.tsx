@@ -64,7 +64,6 @@ export default function TorneoFormModal({
 
   const onSubmit = (data: TorneoFormFields) => {
     const deporteSeleccionado = deportes?.find(d => d.id === Number(data.deporteId));
-    console.log("Deporte seleccionado:", deporteSeleccionado);
     const torneoData: Partial<Torneo> = {
       nombre: data.nombre,
       esPublico: data.esPublico,

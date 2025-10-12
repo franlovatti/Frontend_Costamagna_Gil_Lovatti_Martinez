@@ -1,4 +1,4 @@
-import "../cssComponentes/DeportePopular.css";
+import "./cssComponentes/DeportePopular.css";
 
 export type DeportePopularProps = {
   deporte: {

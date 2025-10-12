@@ -66,6 +66,60 @@
   font-size: 1.2rem;
 }
 
+/* Stat Cards */
+.stat-card {
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.stat-icon {
+  font-size: 1.5rem;
+  opacity: 0.8;
+}
+
+.stat-title {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-subtext {
+  font-size: 0.85rem;
+  color: var(--text-muted-light);
+  margin: 0.5rem 0 0 0;
+  font-weight: 300;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 300;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.stat-change {
+  font-size: 0.8rem;
+  color: var(--text-muted-light);
+  font-weight: 300;
+} */
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--text);
+  margin: 0;
+}
+
 /* Responsive - Solo ajustes específicos */
 @media (max-width: 1200px) {
   .chart-container {

@@ -10,16 +10,6 @@ interface StatCardProps {
 }
 
 const StatCard: React.FC<StatCardProps> = ({ icon, title, value, subtitle, value2 }) => (
-  // <div className="stat-card">
-  //   <div className="stat-header">
-  //     <span className="stat-icon">{icon}</span>
-  //     <h3 className="stat-title">{title}</h3>
-  //   </div>
-  //   <p className="stat-number">{value}</p>
-  //   {subtitle && value2 !== undefined && (
-  //     <p className="stat-subtext">{subtitle}: {value2}</p>
-  //   )}
-  // </div>
   <div className="stat-card-large">
     <div className="stat-icon-large">{icon}</div>
     <div>

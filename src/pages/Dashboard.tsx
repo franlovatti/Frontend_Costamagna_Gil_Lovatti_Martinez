@@ -74,7 +74,7 @@ const Dashboard = () => {
               <div className="spinner-border text-primary" role="status"></div>
             </div>
           ) : (
-            <div className="stats-card h-100">
+            <div className="stat-card h-100">
               <h2 className="card-title mb-4">Deportes Más Populares</h2>
               <div className="deportes-list">
                 {deportesConEventos.map((deporte, index) => (
@@ -87,7 +87,7 @@ const Dashboard = () => {
           )}
         </div>
         <div className="col-12 col-lg-4">
-          <div className="stats-card h-100">
+          <div className="stat-card h-100">
             {loading ? (
               <div className="stat-card d-flex align-items-center justify-content-center" style={{ minHeight: 120 }}>
                 <div className="spinner-border text-primary" role="status"></div>

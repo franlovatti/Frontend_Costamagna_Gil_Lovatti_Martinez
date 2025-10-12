@@ -13,17 +13,6 @@ const TorneosAdmin = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [editingTorneo, setEditingTorneo] = useState<Torneo | null>(null);
   const [showModal, setShowModal] = useState(false);
-  // const [formData, setFormData] = useState({
-  //   nombre: '',
-  //   esPublico: true,
-  //   contraseña: '',
-  //   cantEquiposMax: 0,
-  //   fechaInicioInscripcion: '',
-  //   fechaFinInscripcion: '',
-  //   fechaInicioEvento: '',
-  //   fechaFinEvento: '',
-  //   deporte: '' as unknown as Deporte,
-  // });
 
   // Filtrar torneos
   const torneosFiltrados = torneos.filter(torneo =>
@@ -46,79 +35,9 @@ const TorneosAdmin = () => {
     if (editingTorneo) {
       modificarTorneo({ ...torneoData, id: editingTorneo.id } as Torneo);
     } else {
-      console.log("Se esta creando el torneo: ", torneoData);
       crearTorneo(torneoData as Torneo);
     }
   };
-
-  // // Abrir modal para crear
-  // const handleCreate = () => {
-  //   setEditingTorneo(null);
-  //   setFormData({
-  //     nombre: '',
-  //     esPublico: true,
-  //     contraseña: '',
-  //     cantEquiposMax: 0,
-  //     fechaInicioInscripcion: '',
-  //     fechaFinInscripcion: '',
-  //     fechaInicioEvento: '',
-  //     fechaFinEvento: '',
-  //     deporte: '' as unknown as Deporte,
-  //   });
-  //   setShowModal(true);
-  // };
-
-  // // Abrir modal para editar
-  // const handleEdit = (torneo: Torneo) => {
-  //   setEditingTorneo(torneo);
-  //   setFormData({
-  //     nombre: torneo.nombre,
-  //     esPublico: torneo.esPublico,
-  //     contraseña: torneo.contraseña || '',
-  //     cantEquiposMax: torneo.cantEquiposMax,
-  //     fechaInicioInscripcion: toDatetimeLocal(torneo.fechaInicioInscripcion),
-  //     fechaFinInscripcion: toDatetimeLocal(torneo.fechaFinInscripcion),
-  //     fechaInicioEvento: toDatetimeLocal(torneo.fechaInicioEvento),
-  //     fechaFinEvento: toDatetimeLocal(torneo.fechaFinEvento),
-  //     deporte: torneo.deporte,
-  //   });
-  //   setShowModal(true);
-  // };
-
-  // // Guardar (crear o editar)
-  // const handleSave = () => {
-  //   if (editingTorneo) {
-  //     // Editar
-  //     const torneo: Torneo = {
-  //       ...editingTorneo,
-  //       nombre: formData.nombre,
-  //       esPublico: formData.esPublico,
-  //       contraseña: formData.contraseña || undefined,
-  //       cantEquiposMax: formData.cantEquiposMax,
-  //       fechaInicioInscripcion: parseDatetimeLocal(formData.fechaInicioInscripcion)!,
-  //       fechaFinInscripcion: parseDatetimeLocal(formData.fechaFinInscripcion)!,
-  //       fechaInicioEvento: parseDatetimeLocal(formData.fechaInicioEvento)!,
-  //       fechaFinEvento: parseDatetimeLocal(formData.fechaFinEvento)!,
-  //       deporte: formData.deporte,
-  //     };
-  //     modificarTorneo(torneo);
-  //   } else {
-  //     const newTorneo: Torneo = {
-  //       nombre: formData.nombre,
-  //       esPublico: formData.esPublico,
-  //       contraseña: formData.contraseña || undefined,
-  //       cantEquiposMax: formData.cantEquiposMax,
-  //       fechaInicioInscripcion: parseDatetimeLocal(formData.fechaInicioInscripcion)!,
-  //       fechaFinInscripcion: parseDatetimeLocal(formData.fechaFinInscripcion)!,
-  //       fechaInicioEvento: parseDatetimeLocal(formData.fechaInicioEvento)!,
-  //       fechaFinEvento: parseDatetimeLocal(formData.fechaFinEvento)!,
-  //       deporte: formData.deporte,
-  //     };
-  //     crearTorneo(newTorneo);
-  //   }
-
-  //   setShowModal(false);
-  // };
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [torneoAEliminar, setTorneoAEliminar] = useState<Torneo | null>(null);
@@ -151,6 +70,7 @@ const TorneosAdmin = () => {
       <SearchBar
               value={searchTerm}
               onChange={setSearchTerm}
+              hayBoton={true}
               onCreate={handleCreate}
               crear="Torneo"
       />
@@ -183,9 +103,8 @@ const TorneosAdmin = () => {
       
       {showConfirm && (
               <ConfirmModal
-                objeto="torneo"
+                objeto={"eliminar el torneo " + torneoAEliminar?.nombre}
                 setShowConfirm={setShowConfirm}
-                objetoAEliminar={torneoAEliminar}
                 handleConfirmDelete={handleConfirmDelete}
                 handleCancelDelete={handleCancelDelete}
               />

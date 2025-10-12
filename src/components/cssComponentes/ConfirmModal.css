@@ -6,6 +6,8 @@
   right: 0;
   bottom: 0;
   background-color: var(--backgroud);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
