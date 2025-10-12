@@ -3,8 +3,9 @@ import { Submit } from '../components/ButtonField.tsx';
 import React, { useState} from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useEstablecimientos } from '../hooks/useEstablecimientos.tsx';
+import { useEstablecimientosEvento } from '../hooks/useEstablecimientos.tsx';
 import alert from '../components/Alert.tsx';
+import { useEquiposEvento } from '../hooks/useEquipos.tsx';
 
 export default function CrearPartido() {
   const navigate = useNavigate();
@@ -12,34 +13,9 @@ export default function CrearPartido() {
   const [success, setSuccess] = useState(false);
   const [message, setMessage] = useState<string>();
 
-  const {establecimientos, loadingEstablecimientos, errorEstablecimientos} = useEstablecimientos(eventoId);
+  const {establecimientos, loadingEstablecimientos, errorEstablecimientos} = useEstablecimientosEvento(eventoId);
 
-  const equipos = [
-    {
-      id: 1,
-      nombre: 'Equipo A',
-      nombreCapitan: 'Capitán A',
-      miembros: ['Jugador 1', 'Jugador 2', 'Jugador 3'],
-    },
-    {
-      id: 2,
-      nombre: 'Equipo B',
-      nombreCapitan: 'Capitán B',
-      miembros: ['Jugador 4', 'Jugador 5', 'Jugador 6'],
-    },
-    {
-      id: 3,
-      nombre: 'Equipo C',
-      nombreCapitan: 'Capitán C',
-      miembros: ['Jugador 7', 'Jugador 8', 'Jugador 9'],
-    },
-    {
-      id: 4,
-      nombre: 'Equipo D',
-      nombreCapitan: 'Capitán D',
-      miembros: ['Jugador 10', 'Jugador 11', 'Jugador 12'],
-    },
-  ];
+  const { equipos, loadingEquipos, errorEquipos } = useEquiposEvento(eventoId);
 
   const [form, setForm] = useState({
     fecha: '2023-12-31',
@@ -94,10 +70,13 @@ export default function CrearPartido() {
   return (
     <div className="text-bg-dark container">
         {errorEstablecimientos && (
-      <div className="alert alert-danger mt-3">
-        Error al cargar los establecimientos: {errorEstablecimientos.message}
-      </div>
+      alert({message: 'Error al cargar los establecimientos: ' + errorEstablecimientos.message, success: false})
     )}
+
+    {errorEquipos && (
+      alert({message: 'Error al cargar los equipos: ' + errorEquipos.message, success: false})
+    )}
+
     {alert({ message, success })}
       <Form onSubmit={handleSubmit}>
         <Row>
@@ -110,12 +89,14 @@ export default function CrearPartido() {
                 onChange={handleChange}
                 required
               >
-                <option value="">Seleccione el equipo local</option>
-                {equipos.map((equipo) => (
+                <option value="">
+                  {loadingEquipos ? 'Cargando equipos...' : 'Seleccione el equipo local'}
+                </option>
+                {!loadingEquipos && (equipos.map((equipo) => (
                   <option key={equipo.id} value={equipo.id}>
                     {equipo.nombre}
                   </option>
-                ))}
+                )))}
               </Form.Select>
             </Form.Group>
           </Col>

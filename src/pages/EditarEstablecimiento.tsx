@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
 import { Submit } from '../components/ButtonField.tsx';
-import { useEstablecimientos } from '../hooks/useEstablecimientos.tsx';
+import { useEstablecimientosEvento} from '../hooks/useEstablecimientos.tsx';
 import alert from '../components/Alert.tsx';
 
 export default function EditarEstablecimiento() {
@@ -18,7 +18,7 @@ export default function EditarEstablecimiento() {
     id: 0,
   });
 
-  const {establecimientos, loadingEstablecimientos, errorEstablecimientos} = useEstablecimientos(eventoId);
+  const {establecimientos, loadingEstablecimientos, errorEstablecimientos} = useEstablecimientosEvento(eventoId);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -62,9 +62,7 @@ export default function EditarEstablecimiento() {
     <div className="container mt-4 text-bg-dark p-4 rounded-3 shadow-lg">
       <h2>Editar Establecimiento</h2>
       {errorEstablecimientos && (
-        <div className ="alet alert-danger" role="alert">
-          Error al cargar los establecimientos: {errorEstablecimientos.message}
-        </div>
+        alert({message: 'Error al cargar los establecimientos: ' + errorEstablecimientos.message, success: false})
         )}
 
         {alert({message, success})}

@@ -2,16 +2,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { Submit } from '../components/ButtonField.tsx';
 import axios from 'axios';
-import { useEstablecimientos } from '../hooks/useEstablecimientos.tsx';
-import type { Partido } from '../types.ts';
+import { useEstablecimientosEvento } from '../hooks/useEstablecimientos.tsx';
 import alert from '../components/Alert.tsx';
+import { useOnePartido } from '../hooks/usePartidos.tsx';
 
 export default function EditarPartido() {
   const navigate = useNavigate();
   const { eventoId, partidoId } = useParams();
-  const [loadingPartido, setLoadingPartido] = useState(false);
-  const [errorPartido, setErrorPartido] = useState<Error | null>(null);
-  const [partido, setPartido] = useState<Partido>();
   const [message, setMessage] = useState<string>();
   const [success, setSuccess] = useState(false);
 
@@ -27,7 +24,8 @@ export default function EditarPartido() {
     id: 0,
   });
 
- const { establecimientos, loadingEstablecimientos, errorEstablecimientos } = useEstablecimientos(eventoId);
+ const { establecimientos, loadingEstablecimientos, errorEstablecimientos } = useEstablecimientosEvento(eventoId);
+ const { partido, loadingPartido, errorPartido, setPartido, setLoadingPartido, setErrorPartido} = useOnePartido(partidoId);
 
  useEffect(() => {
     if (!partidoId) return;
@@ -49,7 +47,8 @@ export default function EditarPartido() {
     };
 
     fetchData();
-  }, [partidoId]);
+   // eslint-disable-next-line react-hooks/exhaustive-deps    
+  }, [partidoId]); 
 
   useEffect(() => {
   if (partido) {
@@ -111,9 +110,7 @@ export default function EditarPartido() {
     <div className="container mt-4 text-bg-dark p-4 rounded-3 shadow-lg">
       <h2>{loadingPartido ? 'Cargando datos del partido...' : 'Editar Partido'}</h2>
       {errorPartido && (
-        <div className="alert alert-danger">
-          Error al cargar el partido: {errorPartido.message}
-        </div>
+        alert({message: 'Error al cargar los datos del partido: ' + errorPartido.message, success: false})
       )}
       {alert({ message, success })}
       {/* Formulario para editar */}
@@ -235,9 +232,7 @@ export default function EditarPartido() {
   </select>
 
   {errorEstablecimientos && (
-    <div className="alert alert-danger mt-3">
-      Error al cargar los establecimientos: {errorEstablecimientos.message}
-    </div>
+    alert({message: 'Error al cargar los establecimientos: ' + errorEstablecimientos.message, success: false})
   )}
 </div>
           <Submit>Guardar cambios</Submit>
