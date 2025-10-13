@@ -8,12 +8,14 @@ type Torneo = {
   fechaInicioEvento: string;
   fechaFinEvento: string;
   localidad: Localidad;
-  privado: boolean;
+  esPublico: boolean;
   cantEquiposMax: number;
   img: string;
   equipos?: Equipo[];
   creador: number;
   partidos?: Partido[];
+  codigo?: string;
+  contraseña?: string;
 };
 
 type Deporte = {
@@ -48,7 +50,8 @@ type Partido = {
   hora: Date;
   establecimiento?: Establecimiento;
   participations?: Participation[];
-  resultado: string;
+  resultadoLocal: number | null;
+  resultadoVisitante: number | null;
   juez: string;
 };
 

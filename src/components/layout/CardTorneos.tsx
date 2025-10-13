@@ -1,11 +1,19 @@
 import { Button, Card, ListGroup } from 'react-bootstrap';
 import type { Torneo } from '../../types';
+
 interface CardTorneosProps {
   torneo: Torneo;
   handleClick: (id: number) => void;
+  isMember?: boolean;
+  onEnroll?: (torneo: Torneo) => void;
 }
 
-export default function CardTorneos({ torneo, handleClick }: CardTorneosProps) {
+export default function CardTorneos({
+  torneo,
+  handleClick,
+  isMember = false,
+  onEnroll,
+}: CardTorneosProps) {
   const fechaInicioEvento = new Date(
     torneo.fechaInicioEvento
   ).toLocaleDateString('es-AR');
@@ -48,9 +56,14 @@ export default function CardTorneos({ torneo, handleClick }: CardTorneosProps) {
           </Button>
         </div>
       </Card.Body>
-      <Button variant="outline-primary" onClick={() => handleClick(torneo.id)}>
-        Inscribirse
-      </Button>
+      {!isMember && (
+        <Button
+          variant="outline-primary"
+          onClick={() => (onEnroll ? onEnroll(torneo) : handleClick(torneo.id))}
+        >
+          Inscribirse
+        </Button>
+      )}
     </Card>
   );
 }

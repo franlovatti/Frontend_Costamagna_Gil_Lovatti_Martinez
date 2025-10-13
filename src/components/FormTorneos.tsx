@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import apiAxios from '../helpers/api';
 import type { Localidad, Deporte } from '../types';
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router-dom';
 
 export default function FormTorneos() {
   const navigate = useNavigate();
@@ -15,7 +15,8 @@ export default function FormTorneos() {
     fechaInicioTorneo: '',
     fechaFinTorneo: '',
     localidad: 0,
-    esPublico: false,
+    privado: false,
+    contraseña: '',
   });
   const [cantidadEquipos, setCantidadEquipos] = useState<number>(32);
   const [dataDeportes, setDataDeportes] = useState<Deporte[]>([]);
@@ -63,9 +64,10 @@ export default function FormTorneos() {
         fechaInicioTorneo: torneo.fechaInicioEvento.split('T')[0],
         fechaFinTorneo: torneo.fechaFinEvento.split('T')[0],
         localidad: torneo.localidad.id,
-        esPublico: torneo.esPublico,
+        privado: torneo.privado,
+        contraseña: torneo.contraseña,
       });
-      setCantidadEquipos(torneo.cantidadEquipos);
+      setCantidadEquipos(torneo.cantEquiposMax);
     });
   }, [id]);
 
@@ -78,7 +80,7 @@ export default function FormTorneos() {
     if (name === 'privado' && type === 'checkbox') {
       setForm((prev) => ({
         ...prev,
-        esPublico: !(e.target as HTMLInputElement).checked,
+        privado: (e.target as HTMLInputElement).checked,
       }));
     } else {
       setForm((prev) => ({
@@ -90,12 +92,24 @@ export default function FormTorneos() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const payload = {
+    const payload: {
+      nombre: string;
+      descripcion: string;
+      deporte: number;
+      localidad: number;
+      esPublico: boolean;
+      cantEquiposMax: number;
+      fechaInicioInscripcion: string;
+      fechaFinInscripcion: string;
+      fechaInicioEvento: string;
+      fechaFinEvento: string;
+      contraseña: string | null;
+    } = {
       nombre: form.nombre,
       descripcion: form.descripcion,
       deporte: Number(form.deporte),
       localidad: Number(form.localidad),
-      esPublico: !form.esPublico,
+      esPublico: !form.privado,
       cantEquiposMax: cantidadEquipos,
       fechaInicioInscripcion: new Date(
         form.fechaInicioInscripcion
@@ -103,7 +117,13 @@ export default function FormTorneos() {
       fechaFinInscripcion: new Date(form.fechaFinInscripcion).toISOString(),
       fechaInicioEvento: new Date(form.fechaInicioTorneo).toISOString(),
       fechaFinEvento: new Date(form.fechaFinTorneo).toISOString(),
+      contraseña: null,
     };
+    if (form.privado) {
+      payload.contraseña = form.contraseña || '';
+    } else {
+      payload.contraseña = null;
+    }
     console.log(payload);
     if (id !== undefined) {
       try {
@@ -267,10 +287,22 @@ export default function FormTorneos() {
             type="checkbox"
             label="Privado"
             name="privado"
-            checked={!form.esPublico}
+            checked={form.privado}
             onChange={handleChange}
           />
         </Form.Group>
+        {form.privado && (
+          <Form.Group className="mb-3" controlId="contraseña">
+            <Form.Label>contraseña</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Ingrese la contraseña"
+              name="contraseña"
+              value={form.contraseña}
+              onChange={handleChange}
+            />
+          </Form.Group>
+        )}
         <Button variant="primary" type="submit">
           {id ? 'Editar' : 'Crear'} Torneo
         </Button>

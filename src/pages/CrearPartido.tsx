@@ -56,7 +56,8 @@ export default function CrearPartido() {
     fecha: '',
     hora: '',
     juez: '',
-    resultado: '',
+    resultadoLocal: '',
+    resultadoVisitante: '',
     equipoLocal: '',
     equipoVisitante: '',
     evento: id ?? 0,
@@ -78,9 +79,18 @@ export default function CrearPartido() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const payload = {
+        ...form,
+        resultadoLocal:
+          form.resultadoLocal === '' ? null : Number(form.resultadoLocal),
+        resultadoVisitante:
+          form.resultadoVisitante === ''
+            ? null
+            : Number(form.resultadoVisitante),
+      };
       const response = await axios.post(
         'http://localhost:3000/api/partidos',
-        form,
+        payload,
         {
           headers: { 'Content-Type': 'application/json' },
         }
@@ -181,14 +191,26 @@ export default function CrearPartido() {
               />
             </Form.Group>
           </Col>
-          <Col md={6}>
-            <Form.Group className="mb-3" controlId="formMatchResult">
-              <Form.Label>Resultado</Form.Label>
+          <Col md={3}>
+            <Form.Group className="mb-3" controlId="formResultadoLocal">
+              <Form.Label>Goles Local</Form.Label>
               <Form.Control
-                type="text"
-                placeholder="Ej: 2 - 1"
-                name="resultado"
-                value={form.resultado}
+                type="number"
+                min={0}
+                name="resultadoLocal"
+                value={form.resultadoLocal}
+                onChange={handleChange}
+              />
+            </Form.Group>
+          </Col>
+          <Col md={3}>
+            <Form.Group className="mb-3" controlId="formResultadoVisitante">
+              <Form.Label>Goles Visitante</Form.Label>
+              <Form.Control
+                type="number"
+                min={0}
+                name="resultadoVisitante"
+                value={form.resultadoVisitante}
                 onChange={handleChange}
               />
             </Form.Group>

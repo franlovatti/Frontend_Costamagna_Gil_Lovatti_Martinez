@@ -23,7 +23,8 @@ export default function TorneoDetalle() {
   const [enrollError, setEnrollError] = useState<string | null>(null);
   const [enrolling, setEnrolling] = useState(false);
   const [resultadoModal, setResultadoModal] = useState(false);
-  const [resultado, setResultado] = useState('');
+  const [resultadoLocal, setResultadoLocal] = useState<string>('');
+  const [resultadoVisitante, setResultadoVisitante] = useState<string>('');
   const [partidoSeleccionado, setPartidoSeleccionado] =
     useState<Partido | null>(null);
   const [tabKey, setTabKey] = useState<string>('');
@@ -140,10 +141,13 @@ export default function TorneoDetalle() {
     if (!partidoSeleccionado) return;
     try {
       await apiAxios.put(`/partidos/${partidoSeleccionado.id}`, {
-        resultado,
+        resultadoLocal: resultadoLocal === '' ? null : Number(resultadoLocal),
+        resultadoVisitante:
+          resultadoVisitante === '' ? null : Number(resultadoVisitante),
       });
       setResultadoModal(false);
-      setResultado('');
+      setResultadoLocal('');
+      setResultadoVisitante('');
       setPartidoSeleccionado(null);
       await fetchTorneo();
     } catch (err) {
@@ -190,6 +194,12 @@ export default function TorneoDetalle() {
             <strong>Duracion:</strong>{' '}
             {new Date(torneo.fechaInicioEvento).toLocaleDateString()} {' - '}{' '}
             {new Date(torneo.fechaFinEvento).toLocaleDateString()}
+          </p>
+        </Col>
+
+        <Col>
+          <p>
+            <strong>Código:</strong> {torneo.codigo}
           </p>
         </Col>
         <Col>
@@ -414,7 +424,12 @@ export default function TorneoDetalle() {
                     <td>{partido.establecimiento?.nombre}</td>
                     <td>{partido.equipoLocal.nombre}</td>
                     <td>{partido.equipoVisitante.nombre}</td>
-                    <td>{partido.resultado || '-'}</td>
+                    <td>
+                      {partido.resultadoLocal != null &&
+                      partido.resultadoVisitante != null
+                        ? `${partido.resultadoLocal} - ${partido.resultadoVisitante}`
+                        : '-'}
+                    </td>
                     <td>
                       {Number(user?.id) === torneo.creador && (
                         <div className="d-flex gap-2 align-items-start">
@@ -432,6 +447,16 @@ export default function TorneoDetalle() {
                             variant="outline-primary"
                             onClick={() => {
                               setPartidoSeleccionado(partido);
+                              setResultadoLocal(
+                                partido.resultadoLocal == null
+                                  ? ''
+                                  : String(partido.resultadoLocal)
+                              );
+                              setResultadoVisitante(
+                                partido.resultadoVisitante == null
+                                  ? ''
+                                  : String(partido.resultadoVisitante)
+                              );
                               setResultadoModal(true);
                             }}
                           >
@@ -467,16 +492,33 @@ export default function TorneoDetalle() {
         </Modal.Header>
 
         <Modal.Body>
-          <Form.Group>
-            <Form.Label>Resultado del equipo </Form.Label>
-            <Form.Control
-              type="text"
-              value={resultado}
-              onChange={(e) => setResultado(e.target.value)}
-              placeholder="Ingrese el resultado del partido (ej: 3-1)"
-              autoFocus
-            />
-          </Form.Group>
+          <Row>
+            <Col>
+              <Form.Group>
+                <Form.Label>Goles Local</Form.Label>
+                <Form.Control
+                  type="number"
+                  min={0}
+                  value={resultadoLocal}
+                  onChange={(e) => setResultadoLocal(e.target.value)}
+                  placeholder="0"
+                  autoFocus
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Label>Goles Visitante</Form.Label>
+                <Form.Control
+                  type="number"
+                  min={0}
+                  value={resultadoVisitante}
+                  onChange={(e) => setResultadoVisitante(e.target.value)}
+                  placeholder="0"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
         </Modal.Body>
 
         <Modal.Footer className="border-secondary">

@@ -1,10 +1,11 @@
-import { Button, Col, Row, Form } from 'react-bootstrap';
+import { Button, Col, Row, Form, Modal } from 'react-bootstrap';
 import { useState } from 'react';
 import CardTorneos from '../components/layout/CardTorneos';
 import { Link, useNavigate } from 'react-router-dom';
 import apiAxios from '../helpers/api';
 import { useEffect } from 'react';
-import type { Torneo, Deporte, Localidad } from '../types';
+import type { Torneo, Deporte, Localidad, Usuario, Equipo } from '../types';
+import { useAuth } from '../hooks/useAuth';
 
 export default function Torneos() {
   const [dataTorneos, setDataTorneos] = useState<Torneo[]>([]);
@@ -13,7 +14,18 @@ export default function Torneos() {
   const [dataDeportes, setDataDeportes] = useState<Deporte[]>([]);
   const [dataLocalidades, setDataLocalidades] = useState<Localidad[]>([]);
   const [errorConexion, setErrorConexion] = useState<boolean>(false);
+  const [showCodeModal, setShowCodeModal] = useState(false);
+  const [code, setCode] = useState('');
+  const [codeError, setCodeError] = useState<string | null>(null);
+  const [resolving, setResolving] = useState(false);
+  // Modal de inscripción a evento
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Torneo | null>(null);
+  const [eventPwd, setEventPwd] = useState('');
+  const [eventError, setEventError] = useState<string | null>(null);
+  const [eventSubmitting, setEventSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     Promise.all([
@@ -35,8 +47,179 @@ export default function Torneos() {
     navigate(`/home/torneos/${id}`);
   };
 
+  const handleEnrollFromCard = async (evt: Torneo) => {
+    setSelectedEvent(evt);
+    setEventPwd('');
+    setEventError(null);
+    setShowEventModal(true);
+  };
+
+  const handleSubmitEventEnroll = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!selectedEvent) return;
+    setEventError(null);
+    setEventSubmitting(true);
+    try {
+      if (selectedEvent.esPublico === false) {
+        const requiredPwd = selectedEvent.contraseña;
+        if (!eventPwd.trim()) {
+          setEventError('Ingrese la contraseña');
+          return;
+        }
+        if (eventPwd !== requiredPwd) {
+          setEventError('Contraseña incorrecta');
+          return;
+        }
+      }
+      // Si es público o la contraseña coincide, navegamos al detalle
+      setShowEventModal(false);
+      navigate(`/home/torneos/${selectedEvent.id}`);
+    } catch (err) {
+      console.error('Error preparando inscripción:', err);
+      setEventError('No se pudo validar el torneo. Intente nuevamente.');
+    } finally {
+      setEventSubmitting(false);
+    }
+  };
+
+  const userIsMemberOf = (torneo: Torneo): boolean => {
+    if (!user || !torneo?.equipos) return false;
+    const userIdStr = String(user.id);
+    return torneo.equipos.some((e: Equipo) => {
+      const miembros = (e.miembros as Usuario[]) ?? [];
+      return miembros.some((m) => String(m.id) === userIdStr);
+    });
+  };
+
+  const openCodeModal = () => {
+    setCode('');
+    setCodeError(null);
+    setShowCodeModal(true);
+  };
+
+  const handleResolveCode = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    const trimmed = code.trim();
+    if (!trimmed) {
+      setCodeError('Ingrese un código');
+      return;
+    }
+    setResolving(true);
+    try {
+      const res = await apiAxios.get(
+        `/eventos/codigo/${encodeURIComponent(trimmed)}`
+      );
+      const evento = res.data?.data ?? res.data;
+      if (evento && typeof evento.id === 'number') {
+        // Abrimos el mismo modal de inscripción para validar en cliente si es privado
+        setShowCodeModal(false);
+        handleEnrollFromCard(evento as Torneo);
+      } else {
+        setCodeError('Código inválido');
+      }
+    } catch {
+      setCodeError('No se encontró un torneo con ese código');
+    } finally {
+      setResolving(false);
+    }
+  };
   return (
     <div className="text-bg-dark container">
+      <Modal
+        show={showCodeModal}
+        onHide={() => setShowCodeModal(false)}
+        centered
+      >
+        <Modal.Header closeButton className="text-bg-dark border-primary">
+          <Modal.Title>Ingresar código de torneo</Modal.Title>
+        </Modal.Header>
+        <Form onSubmit={handleResolveCode}>
+          <Modal.Body className="text-bg-dark">
+            <Form.Group controlId="codigoTorneo">
+              <Form.Label>Código</Form.Label>
+              <Form.Control
+                className="bg-bs-dark text-bg-dark border border-primary"
+                type="text"
+                placeholder="p. ej. ABC123"
+                value={code}
+                onChange={(e) => {
+                  setCode(e.target.value.toUpperCase());
+                  if (codeError) setCodeError(null);
+                }}
+                autoFocus
+              />
+              {codeError && <div className="text-danger mt-2">{codeError}</div>}
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer className="text-bg-dark border-primary">
+            <Button
+              variant="secondary"
+              onClick={() => setShowCodeModal(false)}
+              disabled={resolving}
+            >
+              Cancelar
+            </Button>
+            <Button type="submit" variant="primary" disabled={resolving}>
+              {resolving ? 'Buscando...' : 'Ir al torneo'}
+            </Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
+      {/* Modal de inscripción al evento */}
+      <Modal
+        show={showEventModal}
+        onHide={() => setShowEventModal(false)}
+        centered
+      >
+        <Form onSubmit={handleSubmitEventEnroll}>
+          <Modal.Header closeButton className="text-bg-dark border-primary">
+            <Modal.Title>
+              {selectedEvent?.esPublico === false
+                ? 'Inscribirse a torneo privado'
+                : 'Inscribirse al torneo'}
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body className="text-bg-dark">
+            <p className="mb-3">
+              Torneo: <strong>{selectedEvent?.nombre}</strong>
+            </p>
+            {selectedEvent?.esPublico === false ? (
+              <Form.Group controlId="eventoPassword">
+                <Form.Label>Contraseña del torneo</Form.Label>
+                <Form.Control
+                  className="bg-bs-dark text-bg-dark border border-primary"
+                  type="password"
+                  placeholder="Ingrese la contraseña"
+                  value={eventPwd}
+                  onChange={(e) => {
+                    setEventPwd(e.target.value);
+                    if (eventError) setEventError(null);
+                  }}
+                  autoFocus
+                />
+              </Form.Group>
+            ) : (
+              <div>
+                Este torneo es público. ¿Desea continuar y ver los detalles para
+                inscribirse?
+              </div>
+            )}
+            {eventError && <div className="text-danger mt-2">{eventError}</div>}
+          </Modal.Body>
+          <Modal.Footer className="text-bg-dark border-primary">
+            <Button
+              variant="secondary"
+              onClick={() => setShowEventModal(false)}
+              disabled={eventSubmitting}
+            >
+              Cancelar
+            </Button>
+            <Button type="submit" variant="primary" disabled={eventSubmitting}>
+              {eventSubmitting ? 'Validando...' : 'Continuar'}
+            </Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
       {errorConexion && (
         <div className="alert alert-danger" role="alert">
           Ocurrió un error al recuperar los datos. Por favor, inténtelo de
@@ -45,7 +228,9 @@ export default function Torneos() {
       )}
       <Row className="text-center p-3">
         <Col>
-          <Button variant="outline-primary">Ingresar codigo</Button>
+          <Button variant="outline-primary" onClick={openCodeModal}>
+            Ingresar codigo
+          </Button>
         </Col>
         <Col>
           <Link to="crear-torneo" className="btn btn-primary">
@@ -94,7 +279,12 @@ export default function Torneos() {
           )
           .map((torneo) => (
             <Col key={torneo.id} xs={12} sm={6} md={4} lg={3} className="mb-4">
-              <CardTorneos torneo={torneo} handleClick={handleClick} />
+              <CardTorneos
+                torneo={torneo}
+                handleClick={handleClick}
+                isMember={userIsMemberOf(torneo)}
+                onEnroll={handleEnrollFromCard}
+              />
             </Col>
           ))}
       </Row>

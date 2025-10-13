@@ -2,7 +2,16 @@ import { useParams } from 'react-router';
 import { useNavigate } from 'react-router';
 import apiAxios from '../helpers/api.tsx';
 import { useEffect, useState, useCallback } from 'react';
-import { Card, Nav, Form, Button, Row, Col, Modal } from 'react-bootstrap';
+import {
+  Card,
+  Nav,
+  Form,
+  Button,
+  Row,
+  Col,
+  Modal,
+  Table,
+} from 'react-bootstrap';
 import type { Partido, Usuario, Participation } from '../types.tsx';
 
 export default function CrearParticipacion() {
@@ -285,40 +294,57 @@ export default function CrearParticipacion() {
       <Card className="bg-bs-dark text-bg-dark border border-primary mt-3">
         <Card.Body>
           <Card.Title>Participaciones de {equipo.nombre}</Card.Title>
-          <ul className="list-group list-group-flush">
-            {participaciones?.map((participacion) => (
-              <li
-                key={participacion.id}
-                className="list-group-item bg-bs-dark text-bg-dark d-flex justify-content-between align-items-center"
-              >
-                <span>
-                  {participacion.usuario?.nombre || 'Usuario desconocido'} -{' '}
-                  {participacion.puntos} pts, {participacion.minutosjugados}{' '}
-                  min, {participacion.faltas} faltas
-                </span>
-                <span className="d-flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline-warning"
-                    onClick={() => handleEdit(participacion)}
-                  >
-                    Modificar
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline-danger"
-                    onClick={() => askDelete(participacion)}
-                  >
-                    Borrar
-                  </Button>
-                </span>
-              </li>
-            ))}
-          </ul>
+          <Table
+            striped
+            bordered
+            hover
+            responsive
+            size="sm"
+            className="mb-0 table-dark align-middle"
+          >
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Puntos</th>
+                <th>Minutos</th>
+                <th>Faltas</th>
+                <th style={{ width: 170 }}>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {participaciones?.map((participacion) => (
+                <tr key={participacion.id}>
+                  <td>{participacion.usuario?.nombre ?? ''}</td>
+                  <td>{participacion.usuario?.apellido ?? ''}</td>
+                  <td>{participacion.puntos}</td>
+                  <td>{participacion.minutosjugados}</td>
+                  <td>{participacion.faltas}</td>
+                  <td>
+                    <div className="d-flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline-warning"
+                        onClick={() => handleEdit(participacion)}
+                      >
+                        Modificar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline-danger"
+                        onClick={() => askDelete(participacion)}
+                      >
+                        Eliminar
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
         </Card.Body>
       </Card>
 
-      {/* Modal Editar Participación */}
       <Modal
         show={showEditModal}
         onHide={handleCancelEdit}
@@ -402,10 +428,7 @@ export default function CrearParticipacion() {
           {` ${participacionAEliminar?.usuario?.nombre ?? ''}`}?
         </Modal.Body>
         <Modal.Footer className="border-primary">
-          <Button
-            variant="outline-secondary"
-            onClick={() => setShowDeleteModal(false)}
-          >
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
             Cancelar
           </Button>
           <Button variant="danger" onClick={handleConfirmDelete}>

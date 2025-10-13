@@ -14,7 +14,8 @@ export default function EditarPartido() {
     fecha: '2023-12-31',
     hora: '12:00',
     juez: '',
-    resultado: '',
+    resultadoLocal: '',
+    resultadoVisitante: '',
     equipoLocal: 0,
     equipoVisitante: 0,
     evento: id ?? 0,
@@ -55,9 +56,18 @@ export default function EditarPartido() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const payload = {
+        ...form,
+        resultadoLocal:
+          form.resultadoLocal === '' ? null : Number(form.resultadoLocal),
+        resultadoVisitante:
+          form.resultadoVisitante === ''
+            ? null
+            : Number(form.resultadoVisitante),
+      };
       const response = await axios.put(
         'http://localhost:3000/api/partidos/' + form.id,
-        form,
+        payload,
         {
           headers: { 'Content-Type': 'application/json' },
         }
@@ -97,7 +107,14 @@ export default function EditarPartido() {
                 fecha: new Date(selected.fecha).toISOString().split('T')[0],
                 hora: new Date(selected.hora).toTimeString().split(' ')[0],
                 juez: selected.juez,
-                resultado: selected.resultado,
+                resultadoLocal:
+                  selected.resultadoLocal == null
+                    ? ''
+                    : String(selected.resultadoLocal),
+                resultadoVisitante:
+                  selected.resultadoVisitante == null
+                    ? ''
+                    : String(selected.resultadoVisitante),
                 equipoLocal: selected.equipoLocal.id,
                 equipoVisitante: selected.equipoVisitante.id,
                 evento: selected.evento.id,
@@ -168,14 +185,30 @@ export default function EditarPartido() {
           </div>
 
           <div className="mb-3">
-            <label htmlFor="resultado" className="form-label">
-              Resultado
+            <label htmlFor="resultadoLocal" className="form-label">
+              Goles Local
             </label>
             <input
-              type="text"
-              id="resultado"
-              name="resultado"
-              value={form.resultado}
+              type="number"
+              min={0}
+              id="resultadoLocal"
+              name="resultadoLocal"
+              value={form.resultadoLocal}
+              onChange={handleChange}
+              className="form-control"
+            />
+          </div>
+
+          <div className="mb-3">
+            <label htmlFor="resultadoVisitante" className="form-label">
+              Goles Visitante
+            </label>
+            <input
+              type="number"
+              min={0}
+              id="resultadoVisitante"
+              name="resultadoVisitante"
+              value={form.resultadoVisitante}
               onChange={handleChange}
               className="form-control"
             />
