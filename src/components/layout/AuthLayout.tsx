@@ -20,7 +20,7 @@ const AuthLayout = () => {
           <span className="theme-toggle-wrapper">
             <ThemeToggle />
           </span>
-          <h2 className="mb-2">Gestión de Torneos</h2>
+          <h2 className="mb-2 p-1">Gestión de Torneos</h2>
           <p className="mb-0 text-muted-sidebar">Bienvenido, {user?.nombre || 'User'}!</p>
         </div>
         <nav className="sidebar-nav flex-grow-1 py-3">

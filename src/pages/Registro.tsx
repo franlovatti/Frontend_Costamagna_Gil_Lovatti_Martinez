@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import "./Auth.css";
 
 export default function Registro() {
-  const { registro, loading: cargandoAuth, error } = useAuth();
+  const { registro, loading: cargandoAuth, error, setError } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
   const [tipoFecha, setTipoFecha] = useState<"text" | "date">("text");
@@ -166,7 +166,7 @@ export default function Registro() {
             <button
               type="button"
               className="auth-btn auth-btn-secondary"
-              onClick={() => navigate('/Login')}
+              onClick={() => {setError(null); navigate('/Login');}}
             >
               Iniciar Sesión
             </button>

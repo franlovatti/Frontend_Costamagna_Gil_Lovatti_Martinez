@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { jwtDecode } from "jwt-decode";
 import apiAxios from '../helpers/api';
 import { useMemo } from 'react';
+import { AxiosError } from 'axios';
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -29,18 +30,13 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         setUser({ usuario, role: data.role, id: data.id, nombre: data.nombre, apellido: data.apellido, email: data.email, estado: data.estado });
         return true;
       }
-      if (response.status === 401) {
-        setError("Credenciales inválidas");
-        return false;
-      }
-      if (response.status === 403) {
-        setError("Usuario deshabilitado, contacte al administrador");
-        return false;
-      }
-      setError("Credenciales inválidas");
+      setError("Usuario o contraseña incorrectos");
       return false;
-    } catch {
-      setError("Error en la conexión");
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      const errorMsg = axiosError.response?.data?.message || "Credenciales inválidas";
+      setError(errorMsg);
+      setUser(null);
       return false;
     } finally {
       setLoading(false);
@@ -77,14 +73,12 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         const loginSuccess = await login(usuario, contraseña, remember); // Iniciar sesión automáticamente después del registro
         return loginSuccess;
       }
-      if (response.status === 409){
-        setError("El usuario o email ya existe");
-        return false;
-      }
       setError("Error en el registro");
       return false;
-    } catch {
-      setError("Error en la conexión ");
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      const errorMsg = axiosError.response?.data?.message || "Error en la conexión";
+      setError(errorMsg);
       return false;
     } finally {
       setLoading(false);
@@ -104,6 +98,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     user,
     loading,
     error,
+    setError,
     login,
     logout,
     registro,
