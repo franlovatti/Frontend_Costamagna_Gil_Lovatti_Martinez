@@ -43,8 +43,7 @@ import VerEquipo from './pages/VerEquipo.tsx';
 import EditarEquipo from './pages/EditarEquipo.tsx';
 import CrearParticipacion from './pages/CrearParticipacion.tsx';
 import EditarParticipacion from './pages/EditarParticipacion.tsx';
-import NoticiaPage from './pages/NoticiaPage.tsx';
-import NoticiasProvider from './providers/NoticiaProvider.tsx';import UsuariosAdmin from "./pages/UsuariosAdmin.tsx";
+import UsuariosAdmin from "./pages/UsuariosAdmin.tsx";
 import NoticiasAdmin from "./pages/NoticiasAdmin.tsx";
 
 function App() {
