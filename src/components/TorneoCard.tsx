@@ -24,7 +24,6 @@ export default function TorneoCard({
 
   const deporte = torneo.deporte ?? null;
   const isIndividual = deporte?.cantMaxJugadores === 1;
-  console.log({isIndividual, deporte});
 
   return (
 

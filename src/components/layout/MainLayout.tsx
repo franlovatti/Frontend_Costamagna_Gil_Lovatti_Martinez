@@ -3,6 +3,7 @@ import { useAuth } from '../../hooks/useAuth.tsx';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
+import ThemeToggle from "../ThemeToggle.tsx";
 
 export default function MainLayout() {
   /**Con logica de logeo <Navbar.Brand href="/">React-Bootstrap</Navbar.Brand> tendria el href="/home" */
@@ -20,6 +21,7 @@ export default function MainLayout() {
           <Navbar.Brand as={Link} to={isAuthenticated ? '/home' : '/'}>
             React-Bootstrap
           </Navbar.Brand>
+          <ThemeToggle />
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto fw-bold">

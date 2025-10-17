@@ -1,6 +1,6 @@
 /* Contenedor principal */
 .deportes-page {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 2rem;
   background-color: var(--background);
@@ -10,7 +10,7 @@
 
 /* Header */
 .page-header {
-  border-bottom: 1px solid rgba(0, 109, 226, 0.1);
+  border-bottom: 1px solid var(--header);
 }
 
 .page-header h1 {
@@ -21,7 +21,7 @@
 }
 
 .text-muted-custom {
-  color: rgba(229, 245, 247, 0.6) !important;
+  color: var(--text-muted);
   font-weight: 300;
 }
 

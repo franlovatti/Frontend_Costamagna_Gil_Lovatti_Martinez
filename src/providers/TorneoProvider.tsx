@@ -37,6 +37,21 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(false);
   };
 
+  const filtrarTorneos = async (fechaDesde?: string, fechaHasta?: string, deporte?: string, modalidad?: string, equiposDesde?: number, equiposHasta?: number) => {
+    setLoading(true);
+    try {
+      const res = await apiAxios.get('/eventos/filter', {
+        params: { fechaDesde, fechaHasta, deporte, modalidad, equiposDesde, equiposHasta },
+      });
+      setTorneos(Array.isArray(res.data.data) ? res.data.data : []);
+      setError(null);
+    } catch (error) {
+      setTorneos([]);
+      setError('No se pudieron cargar los torneos filtrados' + error);
+    }
+    setLoading(false);
+  };
+
   const borrarTorneo = async (id: number) => {
     try {
       await apiAxios.delete(`/eventos/${id}`);
@@ -50,6 +65,7 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const payload: Payload = { ...torneo, deporte: torneo.deporte.id, deporteC: torneo.deporte };
       payload.deporteC = undefined as unknown as Deporte; // No enviar el objeto deporte completo
+      console.log("Payload de torneo a modificar: ", payload);
       await apiAxios.put(`/eventos/${torneo.id}`, payload);
       await getTorneos();
     } catch (error) {
@@ -61,6 +77,7 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const payload: Payload = { ...torneo, deporte: torneo.deporte.id, deporteC: torneo.deporte };
       payload.deporteC = undefined as unknown as Deporte; // No enviar el objeto deporte completo
+      console.log("Payload de torneo a crear payload: ", payload);
       await apiAxios.post("/eventos", payload);
       await getTorneos();
     } catch (error) {
@@ -73,7 +90,7 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <TorneoContext.Provider value={{ torneos, loading, error, getTorneos, borrarTorneo, modificarTorneo, crearTorneo }}>
+    <TorneoContext.Provider value={{ torneos, loading, error, getTorneos, borrarTorneo, modificarTorneo, crearTorneo, filtrarTorneos }}>
       {children}
     </TorneoContext.Provider>
   );

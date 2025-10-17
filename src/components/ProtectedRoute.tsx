@@ -7,13 +7,13 @@ interface ProtectedRouteProps {
 
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
-  const { user, isAuthenticated, wasAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   // 1. Verificar autenticación
   if (!isAuthenticated) {
     // Si no está autenticado, redirige a la página de login.
     // 'replace' evita que el usuario vuelva a la página protegida con el botón de atrás.
-    return <Navigate to={wasAuthenticated ? "/" : "/login"} replace />;
+    return <Navigate to={isAuthenticated ? "/" : "/login"} replace />;
   }
 
   // 2. Verificar roles (si se especificaron 'allowedRoles')

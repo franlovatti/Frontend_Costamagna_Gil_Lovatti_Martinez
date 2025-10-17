@@ -1,34 +1,50 @@
+import DonutChart from '../components/DonutChart.tsx';
 import StatCard from '../components/StatCard.tsx';
-import ActivityItem from '../components/ActivityItem.tsx';
+import DeportePopular from '../components/DeportePopular.tsx';
 import { useStats } from '../hooks/useStats.tsx';
 import './Dashboard.css';
 
 const statCards = [
   {
     icon: "👥",
-    title: "Total Usuarios",
-    key: "totalUsers",
+    title: "Usuarios activos",
+    subtitle: "Usuarios totales",
+    key2: "totalUsers",
+    key: "activeUsers"
   },
   {
     icon: "⚽",
-    title: "Deportes",
-    key: "deportes",
+    title: "Deportes con eventos activos",
+    subtitle: "Deportes totales",
+    key: "activeDeportes",
+    key2: "deportes"
   },
   {
     icon: "🏆",
-    title: "Eventos",
-    key: "eventos",
+    title: "Eventos activos",
+    subtitle: "Eventos totales",
+    key2: "eventos",
+    key: "activeEventos"
+  },
+  {
+    icon: "🎮",
+    title: "Partidos jugados",
+    subtitle: "Partidos programados",
+    key: "partidosJugados",
+    key2: "partidosPorJugar"
   }
 ];
 
 const Dashboard = () => {
-  const { stats, loading } = useStats();
+  const { stats, deportesConEventos, loading } = useStats();
+
+  const eventos = stats?.eventos || 0;
 
   return (
     <div className="dashboard-page">
       <div className="dashboard-header mb-4 pb-3">
-        <h1 className="mb-2">Panel de Control</h1>
-        <p className="text-muted-custom mb-0">Gestión de torneos deportivos</p>
+        <h1 className="mb-2">Panel de Estadísticas</h1>
+        <p className="text-muted-custom mb-0">Análisis general de la plataforma</p>
       </div>
       
       <div className="row g-3 mb-4">
@@ -43,50 +59,46 @@ const Dashboard = () => {
                 icon={card.icon}
                 title={card.title}
                 value={stats?.[card.key] ?? 0}
+                subtitle={card.subtitle}
+                value2={stats?.[card.key2] ?? 0}
               />
             )}
           </div>
         ))}
       </div>
       
-      <div className="row g-4">
+      <div className="row g-4 mb-4">
         <div className="col-12 col-lg-8">
-          <div className="content-card h-100">
-            <h2 className="mb-4">Actividad Reciente</h2>
-            <div className="d-flex flex-column gap-3">
-              <ActivityItem icon="👤" text="Nuevo usuario registrado" time="hace 2 minutos" />
-              <ActivityItem icon="💰" text="Pago recibido" time="hace 15 minutos" />
-              <ActivityItem icon="📧" text="Campaña de correo enviada" time="hace 1 hora" />
-              <ActivityItem icon="🏆" text="Torneo finalizado" time="hace 3 horas" />
+          {loading ? (
+            <div className="stat-card d-flex align-items-center justify-content-center" style={{ minHeight: 120 }}>
+              <div className="spinner-border text-primary" role="status"></div>
             </div>
-          </div>
+          ) : (
+            <div className="stat-card h-100">
+              <h2 className="card-title mb-4">Deportes Más Populares</h2>
+              <div className="deportes-list">
+                {deportesConEventos.map((deporte, index) => (
+                  <div key={index} className="deporte-item">
+                    <DeportePopular deporte={deporte} eventos={eventos} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-        
         <div className="col-12 col-lg-4">
-          <div className="content-card h-100">
-            <h2 className="mb-4">Acciones Rápidas</h2>
-            <div className="d-flex flex-column gap-2">
-              <button className="action-btn">
-                <span>📊</span>
-                Ver Reportes
-              </button>
-              <button className="action-btn">
-                <span>👥</span>
-                Gestionar Usuarios
-              </button>
-              <button className="action-btn">
-                <span>⚙️</span>
-                Configuración
-              </button>
-              <button className="action-btn">
-                <span>📧</span>
-                Enviar Email
-              </button>
-            </div>
+          <div className="stat-card h-100">
+            {loading ? (
+              <div className="stat-card d-flex align-items-center justify-content-center" style={{ minHeight: 120 }}>
+                <div className="spinner-border text-primary" role="status"></div>
+              </div>
+            ) : (
+              <DonutChart publicos={stats?.publicos ?? 0} totales={stats?.eventos ?? 0} />
+            )}
           </div>
         </div>
-      </div>
     </div>
+  </div>
   );
 };
 

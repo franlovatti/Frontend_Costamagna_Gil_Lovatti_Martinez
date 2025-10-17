@@ -2,103 +2,46 @@ import { useState } from 'react';
 import './TorneosAdmin.css';
 import SearchBar from '../components/SearchBar.tsx';
 import type { Torneo } from '../contexts/torneo.tsx';
-import type { Deporte } from '../contexts/deporte.tsx';
+// import type { Deporte } from '../contexts/deporte.tsx';
 import { useTorneo } from '../hooks/useTorneo.tsx';
+import { useDeporte } from '../hooks/useDeporte.tsx';
 import TorneoCard from '../components/TorneoCard.tsx';
 import ConfirmModal from '../components/ConfirmModal.tsx';
 import TorneoFormModal from '../components/TorneoFormModal.tsx';
-import { toDatetimeLocal, parseDatetimeLocal,  } from '../helpers/convertirFechas.tsx';
+import FiltroFecha from '../components/filtros/FiltroFecha.tsx';
+import FiltroSelect from '../components/filtros/FiltroSelect.tsx';
+import FiltroRango from '../components/filtros/FiltroRango.tsx';
+import Filtros from '../components/filtros/Filtros.tsx';
 
 const TorneosAdmin = () => {
-  const { torneos, borrarTorneo, modificarTorneo, crearTorneo } = useTorneo();
+  const { torneos, borrarTorneo, modificarTorneo, crearTorneo, filtrarTorneos, getTorneos } = useTorneo();
   const [searchTerm, setSearchTerm] = useState('');
   const [editingTorneo, setEditingTorneo] = useState<Torneo | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({
-    nombre: '',
-    esPublico: true,
-    contraseña: '',
-    cantEquiposMax: 0,
-    fechaInicioInscripcion: '',
-    fechaFinInscripcion: '',
-    fechaInicioEvento: '',
-    fechaFinEvento: '',
-    deporte: '' as unknown as Deporte,
-  });
 
   // Filtrar torneos
   const torneosFiltrados = torneos.filter(torneo =>
     torneo.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
-  
-  // Abrir modal para crear
-  const handleCreate = () => {
+   const handleCreate = () => {
     setEditingTorneo(null);
-    setFormData({
-      nombre: '',
-      esPublico: true,
-      contraseña: '',
-      cantEquiposMax: 0,
-      fechaInicioInscripcion: '',
-      fechaFinInscripcion: '',
-      fechaInicioEvento: '',
-      fechaFinEvento: '',
-      deporte: '' as unknown as Deporte,
-    });
     setShowModal(true);
   };
 
   // Abrir modal para editar
   const handleEdit = (torneo: Torneo) => {
     setEditingTorneo(torneo);
-    setFormData({
-      nombre: torneo.nombre,
-      esPublico: torneo.esPublico,
-      contraseña: torneo.contraseña || '',
-      cantEquiposMax: torneo.cantEquiposMax,
-      fechaInicioInscripcion: toDatetimeLocal(torneo.fechaInicioInscripcion),
-      fechaFinInscripcion: toDatetimeLocal(torneo.fechaFinInscripcion),
-      fechaInicioEvento: toDatetimeLocal(torneo.fechaInicioEvento),
-      fechaFinEvento: toDatetimeLocal(torneo.fechaFinEvento),
-      deporte: torneo.deporte,
-    });
     setShowModal(true);
   };
 
   // Guardar (crear o editar)
-  const handleSave = () => {
+  const handleSave = (torneoData: Partial<Torneo>) => {
     if (editingTorneo) {
-      // Editar
-      const torneo: Torneo = {
-        ...editingTorneo,
-        nombre: formData.nombre,
-        esPublico: formData.esPublico,
-        contraseña: formData.contraseña || undefined,
-        cantEquiposMax: formData.cantEquiposMax,
-        fechaInicioInscripcion: parseDatetimeLocal(formData.fechaInicioInscripcion)!,
-        fechaFinInscripcion: parseDatetimeLocal(formData.fechaFinInscripcion)!,
-        fechaInicioEvento: parseDatetimeLocal(formData.fechaInicioEvento)!,
-        fechaFinEvento: parseDatetimeLocal(formData.fechaFinEvento)!,
-        deporte: formData.deporte,
-      };
-      modificarTorneo(torneo);
+      modificarTorneo({ ...torneoData, id: editingTorneo.id } as Torneo);
     } else {
-      const newTorneo: Torneo = {
-        nombre: formData.nombre,
-        esPublico: formData.esPublico,
-        contraseña: formData.contraseña || undefined,
-        cantEquiposMax: formData.cantEquiposMax,
-        fechaInicioInscripcion: parseDatetimeLocal(formData.fechaInicioInscripcion)!,
-        fechaFinInscripcion: parseDatetimeLocal(formData.fechaFinInscripcion)!,
-        fechaInicioEvento: parseDatetimeLocal(formData.fechaInicioEvento)!,
-        fechaFinEvento: parseDatetimeLocal(formData.fechaFinEvento)!,
-        deporte: formData.deporte,
-      };
-      crearTorneo(newTorneo);
+      crearTorneo(torneoData as Torneo);
     }
-
-    setShowModal(false);
   };
 
   const [showConfirm, setShowConfirm] = useState(false);
@@ -122,6 +65,33 @@ const TorneosAdmin = () => {
     setTorneoAEliminar(null);
   };
 
+  const { deportes } = useDeporte();
+
+  const [filtros, setFiltros] = useState({
+    fechaDesde: '',
+    fechaHasta: '',
+    deporte: '',
+    modalidad: '',
+    equiposDesde: 1,
+    equiposHasta: 64,
+  });
+
+  const handleFiltros = () => {
+    filtrarTorneos(filtros.fechaDesde, filtros.fechaHasta, filtros.deporte, filtros.modalidad, filtros.equiposDesde, filtros.equiposHasta);
+  };
+
+  const handleLimpiarFiltros = () => {
+    setFiltros({
+      fechaDesde: '',
+      fechaHasta: '',
+      deporte: '',
+      modalidad: '',
+      equiposDesde: 1,
+      equiposHasta: 64,
+    });
+    getTorneos();
+  };
+
   return (
     <div className="torneos-page">
       <div className="page-header mb-4 pb-3">
@@ -130,11 +100,42 @@ const TorneosAdmin = () => {
       </div>
 
       <SearchBar
-              value={searchTerm}
-              onChange={setSearchTerm}
-              onCreate={handleCreate}
-              crear="Torneo"
+        value={searchTerm}
+        onChange={setSearchTerm}
+        hayBoton={true}
+        onCreate={handleCreate}
+        crear="Torneo"
       />
+
+      <Filtros
+        onAplicar={handleFiltros}
+        onLimpiar={handleLimpiarFiltros}
+      >
+        <FiltroFecha
+          fechaDesde={filtros.fechaDesde}
+          fechaHasta={filtros.fechaHasta}
+          onFechaDesdeChange={(fecha) => setFiltros({...filtros, fechaDesde: fecha})}
+          onFechaHastaChange={(fecha) => setFiltros({...filtros, fechaHasta: fecha})}
+          label="Fecha del evento"
+        />
+        <FiltroSelect
+          title="Deporte del torneo"
+          label="Deporte"
+          value={filtros.deporte}
+          onChange={(value) => setFiltros({...filtros, deporte: value})}
+          options={deportes.map(d => ({ value: d.id, label: d.nombre }))}
+          placeholder="Todos los deportes"
+        />
+        <FiltroRango
+          title="Cantidad de Equipos"
+          min={1}
+          max={64}
+          valueMin={filtros.equiposDesde}
+          valueMax={filtros.equiposHasta}
+          onMinChange={(value) => setFiltros({...filtros, equiposDesde: value})}
+          onMaxChange={(value) => setFiltros({...filtros, equiposHasta: value})}
+        />
+      </Filtros>
 
       <div className="row g-3">
         {torneosFiltrados.length === 0 ? (
@@ -158,17 +159,14 @@ const TorneosAdmin = () => {
               <TorneoFormModal
                 setShowModal={setShowModal}
                 editingTorneo={editingTorneo}
-                formData={formData}
-                setFormData={setFormData}
-                handleSave={handleSave}
+                onSave={handleSave}
               />
             )}
       
       {showConfirm && (
               <ConfirmModal
-                objeto="torneo"
+                objeto={"eliminar el torneo " + torneoAEliminar?.nombre}
                 setShowConfirm={setShowConfirm}
-                objetoAEliminar={torneoAEliminar}
                 handleConfirmDelete={handleConfirmDelete}
                 handleCancelDelete={handleCancelDelete}
               />

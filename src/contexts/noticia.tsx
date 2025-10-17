@@ -12,6 +12,7 @@ export interface NoticiaContextType {
   loading: boolean;
   error: string | null;
   getNoticias: () => void;
+  filtrarNoticias: (fechaDesde?: string, fechaHasta?: string) => Promise<void>;
   borrarNoticia: (id: number) => Promise<void>;
   modificarNoticia: (noticia: Noticia) => Promise<void>;
   crearNoticia: (noticia: Noticia) => Promise<void>;

@@ -23,6 +23,21 @@ const NoticiasProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(false);
   };
 
+  const filtrarNoticias = async (fechaDesde?: string, fechaHasta?: string) => {
+    setLoading(true);
+    try {
+      const res = await apiAxios.get('/noticias/filter', {
+        params: { fechaDesde, fechaHasta },
+      });
+      setNoticias(Array.isArray(res.data.data) ? res.data.data : []);
+      setError(null);
+    } catch (error) {
+      setNoticias([]);
+      setError('No se pudieron cargar las noticias filtradas' + error);
+    }
+    setLoading(false);
+  };
+
   const borrarNoticia = async (id: number) => {
     try {
       await apiAxios.delete(`/noticias/${id}`);
@@ -51,7 +66,6 @@ const NoticiasProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    console.log('useEffect ejecutado del provider');
     getNoticias();
   }, []);
 
@@ -62,6 +76,7 @@ const NoticiasProvider = ({ children }: { children: React.ReactNode }) => {
         loading,
         error,
         getNoticias,
+        filtrarNoticias,
         borrarNoticia,
         modificarNoticia,
         crearNoticia,

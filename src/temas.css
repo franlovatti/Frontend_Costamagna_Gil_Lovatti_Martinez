@@ -1,0 +1,83 @@
+/* themes.css - Sistema de Temas */
+
+/* Tema Oscuro (por defecto) */
+:root {
+  --text: #e5f5f7;
+  --background: #0f0f0f;
+  --background-secondary: #1a1a1a;
+  --primary: #006de2;
+  --secondary: #021666;
+  --accent: #2e2e8a;
+  
+  /* Colores adicionales para componentes */
+  --header:rgba(229, 245, 247, 0.1); 
+  --border: rgba(0, 109, 226, 0.2);
+  --border-hover: rgba(0, 109, 226, 0.5);
+  --text-muted: rgba(229, 245, 247, 0.6);
+  --text-muted-light: rgba(229, 245, 247, 0.4);
+  --hover-bg: rgba(0, 109, 226, 0.1);
+  --hover-bg-strong: rgba(0, 109, 226, 0.15);
+  
+  /* Colores de estado */
+  --success: #28a745;
+  --danger: #e74c3c;
+  --warning: #f39c12;
+  --info: #3498db;
+}
+
+/* Tema Claro */
+[data-theme="light"] {
+  --text: #1a1a1a;
+  --background: #f5f5f5;
+  --background-secondary: #ffffff;
+  --primary: #006de2;
+  --secondary: #0052a3;
+  --accent: #5a5abf;
+  
+  /* Colores adicionales ajustados para tema claro */
+  --header: rgba(26, 26, 26, 0.1);
+  --border: rgba(0, 109, 226, 0.2);
+  --border-hover: rgba(0, 109, 226, 0.4);
+  --text-muted: rgba(26, 26, 26, 0.6);
+  --text-muted-light: rgba(26, 26, 26, 0.4);
+  --hover-bg: rgba(0, 109, 226, 0.08);
+  --hover-bg-strong: rgba(0, 109, 226, 0.12);
+  
+  /* Colores de estado (mismos) */
+  --success: #28a745;
+  --danger: #e74c3c;
+  --warning: #f39c12;
+  --info: #3498db;
+}
+
+/* Estilos base que usan las variables */
+body {
+  background-color: var(--background);
+  color: var(--text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Clases útiles que usan variables */
+.bg-primary {
+  background-color: var(--primary) !important;
+}
+
+.bg-secondary {
+  background-color: var(--background-secondary) !important;
+}
+
+.text-primary {
+  color: var(--primary) !important;
+}
+
+.text-muted-custom {
+  color: var(--text-muted) !important;
+}
+
+.border-custom {
+  border-color: var(--border) !important;
+}
+
+.hover-bg:hover {
+  background-color: var(--hover-bg) !important;
+}

@@ -1,10 +1,13 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import './App.css';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import "./temas.css";
+import "./App.css";
 // Context and Providers
 import AuthProvider from './providers/AuthProvider.tsx';
 import DeportesProvider from './providers/DeporteProvider.tsx';
 import ProtectedRoute from './components/ProtectedRoute.tsx';
-import TorneosProvider from './providers/TorneoProvider.tsx';
+import TorneosProvider from "./providers/TorneoProvider.tsx";
+import UsuariosProvider from "./providers/UsuarioProvider.tsx";
+import NoticiasProvider from "./providers/NoticiaProvider.tsx";
 
 // Layouts and Components
 import NotFound from './pages/NotFound.js';
@@ -41,7 +44,9 @@ import EditarEquipo from './pages/EditarEquipo.tsx';
 import CrearParticipacion from './pages/CrearParticipacion.tsx';
 import EditarParticipacion from './pages/EditarParticipacion.tsx';
 import NoticiaPage from './pages/NoticiaPage.tsx';
-import NoticiasProvider from './providers/NoticiaProvider.tsx';
+import NoticiasProvider from './providers/NoticiaProvider.tsx';import UsuariosAdmin from "./pages/UsuariosAdmin.tsx";
+import NoticiasAdmin from "./pages/NoticiasAdmin.tsx";
+
 function App() {
   return (
     <AuthProvider>
@@ -133,7 +138,7 @@ function App() {
                 >
                   <Route path="admin" element={<AuthLayout />}>
                     <Route index element={<Dashboard />} />
-                    {/* <Route path="/admin/usuarios" element={<UsuariosAdmin />} /> */}
+                    <Route path="/admin/usuarios" element={<UsuariosProvider><UsuariosAdmin /></UsuariosProvider>} />
                     <Route
                       path="/admin/deportes"
                       element={
@@ -146,7 +151,7 @@ function App() {
                       path="/admin/noticias"
                       element={
                         <NoticiasProvider>
-                          <NoticiaPage />
+                          <NoticiasAdmin />
                         </NoticiasProvider>
                       }
                     />
@@ -158,7 +163,8 @@ function App() {
                         </TorneosProvider>
                       }
                     />
-                  </Route>
+                    <Route path="/admin/noticias" element={<NoticiasProvider><NoticiasAdmin /></NoticiasProvider>} />
+              </Route>
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>
