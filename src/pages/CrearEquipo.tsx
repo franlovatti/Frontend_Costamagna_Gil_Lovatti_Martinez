@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Form, Row, Col } from 'react-bootstrap';
+import { Form, Row, Col, Modal, Button as RBButton } from 'react-bootstrap';
 import { useAuth } from '../hooks/useAuth';
 import axios from 'axios';
 import { Submit } from '../components/ButtonField';
@@ -16,6 +16,8 @@ export default function CrearEquipo() {
     contraseña: '',
   });
   const [error, setError] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [createdTeamId, setCreatedTeamId] = useState<number | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -61,9 +63,10 @@ export default function CrearEquipo() {
         }
       );
       console.log('Equipo creado con éxito', res.data);
-      // use returned data (avoid full reload)
-      alert('Equipo creado con éxito');
-      navigate(`/home/torneos/${id}`);
+      const newTeamId: number | undefined =
+        res?.data?.data?.id ?? res?.data?.id;
+      setCreatedTeamId(typeof newTeamId === 'number' ? newTeamId : null);
+      setShowSuccess(true);
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         console.error('Axios error response data:', err.response?.data);
@@ -134,6 +137,39 @@ export default function CrearEquipo() {
           <Submit>Crear Equipo</Submit>
         </div>
       </Form>
+
+      <Modal show={showSuccess} onHide={() => setShowSuccess(false)} centered>
+        <Modal.Header className="text-bg-dark border-primary">
+          <Modal.Title>Equipo creado</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-bg-dark">
+          ¡El equipo se creó correctamente!
+        </Modal.Body>
+        <Modal.Footer className="text-bg-dark border-primary">
+          <RBButton
+            variant="secondary"
+            onClick={() => {
+              setShowSuccess(false);
+              navigate(`/home/torneos/${id}`);
+            }}
+          >
+            Ir al torneo
+          </RBButton>
+          <RBButton
+            variant="primary"
+            onClick={() => {
+              setShowSuccess(false);
+              if (createdTeamId) {
+                navigate(`/home/equipos/${createdTeamId}`);
+              } else {
+                navigate(`/home/torneos/${id}`);
+              }
+            }}
+          >
+            Ver equipo
+          </RBButton>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

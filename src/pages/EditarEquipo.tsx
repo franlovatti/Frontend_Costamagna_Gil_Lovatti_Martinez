@@ -13,6 +13,7 @@ import {
   Row,
   Spinner,
   Alert,
+  Modal,
 } from 'react-bootstrap';
 
 export default function EditarEquipo() {
@@ -27,6 +28,11 @@ export default function EditarEquipo() {
   const [passwordInput, setPasswordInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState<string | number | null>(
+    null
+  );
+  const [removing, setRemoving] = useState(false);
 
   const fetchEquipo = useCallback(async () => {
     if (!id) return;
@@ -54,39 +60,26 @@ export default function EditarEquipo() {
     }
   }, [equipo]);
 
-  const normalizeId = (v: unknown): string | undefined => {
-    if (v === null || v === undefined) return undefined;
-    if (typeof v === 'number' || typeof v === 'string') return String(v);
-    if (typeof v === 'object') {
-      const obj = v as Record<string, unknown>;
-      if (
-        'id' in obj &&
-        (typeof obj.id === 'number' || typeof obj.id === 'string')
-      )
-        return String(obj.id);
-      if (
-        'usuario' in obj &&
-        (typeof obj.usuario === 'number' || typeof obj.usuario === 'string')
-      )
-        return String(obj.usuario);
-    }
-    return undefined;
-  };
-
   const userIdStr = user ? String(user.id) : undefined;
-  const capId = equipo ? normalizeId(equipo.capitan as unknown) : undefined;
-  const isCaptain = userIdStr ? capId === userIdStr : false;
+  const capId = String(equipo?.capitan.id);
 
-  async function handleRemoveMember(memberId: string | number) {
-    if (!id) return;
-    if (!confirm('¿Eliminar este miembro del equipo?')) return;
+  function handleRemoveMember(memberId: string | number) {
+    setMemberToRemove(memberId);
+    setShowRemoveModal(true);
+  }
+
+  async function confirmRemoveMember() {
+    if (!id || memberToRemove == null) return;
+    setRemoving(true);
     try {
-      const usuarioId = Number(memberId);
+      const usuarioId = Number(memberToRemove);
       const res = await apiAxios.patch(`/equipos/${id}/miembros`, {
         usuarioId,
       });
       const payload = res.data && res.data.data ? res.data.data : res.data;
       setEquipo(payload as Equipo);
+      setShowRemoveModal(false);
+      setMemberToRemove(null);
     } catch (err: unknown) {
       const errorObj = err as {
         response?: { data?: { message?: string } };
@@ -97,6 +90,8 @@ export default function EditarEquipo() {
           (err as Error).message ??
           'Error al eliminar miembro.'
       );
+    } finally {
+      setRemoving(false);
     }
   }
 
@@ -162,7 +157,7 @@ export default function EditarEquipo() {
         <p>Puntos: {equipo.puntos}</p>
       </Row>
 
-      {isCaptain ? (
+      {capId === userIdStr ? (
         <>
           <Form onSubmit={handleSaveAll} className="mb-3">
             <Form.Group className="mb-2" controlId="equipoNombre">
@@ -185,9 +180,7 @@ export default function EditarEquipo() {
                   <InputGroup.Text
                     style={{ cursor: 'pointer' }}
                     onClick={() => setShowPassword((s) => !s)}
-                  >
-                    {showPassword ? '🙈' : '👁️'}
-                  </InputGroup.Text>
+                  ></InputGroup.Text>
                 </InputGroup>
               </Form.Group>
             )}
@@ -212,7 +205,7 @@ export default function EditarEquipo() {
             {(equipo.miembros as Usuario[]).map((miembro, idx) => {
               const memberId = miembro.id ?? miembro.usuario ?? '';
               const memberIdStr = String(memberId);
-              const capIdLocal = normalizeId(equipo.capitan as unknown);
+              const capIdLocal = String(equipo.capitan.id);
               const isMemberCaptain = capIdLocal === memberIdStr;
               return (
                 <tr key={memberIdStr}>
@@ -222,7 +215,7 @@ export default function EditarEquipo() {
                     {isMemberCaptain ? ' (Capitán)' : ''}
                   </td>
                   <td>
-                    {isCaptain && !isMemberCaptain ? (
+                    {capId === userIdStr && !isMemberCaptain ? (
                       <RBButton
                         size="sm"
                         variant="danger"
@@ -259,6 +252,43 @@ export default function EditarEquipo() {
           )}
         </RBButton>
       </div>
+
+      <Modal
+        show={showRemoveModal}
+        onHide={() => {
+          if (!removing) {
+            setShowRemoveModal(false);
+            setMemberToRemove(null);
+          }
+        }}
+        centered
+      >
+        <Modal.Header closeButton className="text-bg-dark border-primary">
+          <Modal.Title>Eliminar miembro</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-bg-dark">
+          ¿Seguro que querés eliminar a este miembro del equipo?
+        </Modal.Body>
+        <Modal.Footer className="text-bg-dark border-primary">
+          <RBButton
+            variant="secondary"
+            onClick={() => {
+              setShowRemoveModal(false);
+              setMemberToRemove(null);
+            }}
+            disabled={removing}
+          >
+            Cancelar
+          </RBButton>
+          <RBButton
+            variant="danger"
+            onClick={confirmRemoveMember}
+            disabled={removing}
+          >
+            {removing ? 'Eliminando...' : 'Eliminar'}
+          </RBButton>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

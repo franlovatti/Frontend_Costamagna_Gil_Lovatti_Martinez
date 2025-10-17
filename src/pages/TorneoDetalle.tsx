@@ -534,6 +534,8 @@ export default function TorneoDetalle() {
       <Modal
         show={showEnrollModal}
         onHide={() => setShowEnrollModal(false)}
+        contentClassName="bg-dark text-light"
+        backdropClassName="bg-dark bg-opacity-20"
         centered
         backdrop="static"
       >

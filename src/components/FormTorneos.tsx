@@ -15,7 +15,7 @@ export default function FormTorneos() {
     fechaInicioTorneo: '',
     fechaFinTorneo: '',
     localidad: 0,
-    privado: false,
+    esPublico: true,
     contraseña: '',
   });
   const [cantidadEquipos, setCantidadEquipos] = useState<number>(32);
@@ -64,8 +64,8 @@ export default function FormTorneos() {
         fechaInicioTorneo: torneo.fechaInicioEvento.split('T')[0],
         fechaFinTorneo: torneo.fechaFinEvento.split('T')[0],
         localidad: torneo.localidad.id,
-        privado: torneo.privado,
-        contraseña: torneo.contraseña,
+        esPublico: torneo.esPublico,
+        contraseña: torneo.esPublico ? '' : torneo.contraseña,
       });
       setCantidadEquipos(torneo.cantEquiposMax);
     });
@@ -77,10 +77,12 @@ export default function FormTorneos() {
     >
   ) => {
     const { name, value, type } = e.target;
-    if (name === 'privado' && type === 'checkbox') {
+    if (name === 'esPublico' && type === 'checkbox') {
+      const isChecked = (e.target as HTMLInputElement).checked;
       setForm((prev) => ({
         ...prev,
-        privado: (e.target as HTMLInputElement).checked,
+        esPublico: isChecked,
+        contraseña: isChecked ? '' : prev.contraseña,
       }));
     } else {
       setForm((prev) => ({
@@ -92,24 +94,12 @@ export default function FormTorneos() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const payload: {
-      nombre: string;
-      descripcion: string;
-      deporte: number;
-      localidad: number;
-      esPublico: boolean;
-      cantEquiposMax: number;
-      fechaInicioInscripcion: string;
-      fechaFinInscripcion: string;
-      fechaInicioEvento: string;
-      fechaFinEvento: string;
-      contraseña: string | null;
-    } = {
+    const payload = {
       nombre: form.nombre,
       descripcion: form.descripcion,
       deporte: Number(form.deporte),
       localidad: Number(form.localidad),
-      esPublico: !form.privado,
+      esPublico: form.esPublico,
       cantEquiposMax: cantidadEquipos,
       fechaInicioInscripcion: new Date(
         form.fechaInicioInscripcion
@@ -117,33 +107,23 @@ export default function FormTorneos() {
       fechaFinInscripcion: new Date(form.fechaFinInscripcion).toISOString(),
       fechaInicioEvento: new Date(form.fechaInicioTorneo).toISOString(),
       fechaFinEvento: new Date(form.fechaFinTorneo).toISOString(),
-      contraseña: null,
+      contraseña: form.esPublico ? null : form.contraseña || '', // Contraseña solo si es privado
     };
-    if (form.privado) {
-      payload.contraseña = form.contraseña || '';
-    } else {
-      payload.contraseña = null;
-    }
+
     console.log(payload);
-    if (id !== undefined) {
-      try {
+
+    try {
+      if (id !== undefined) {
         await apiAxios.put(`/eventos/${id}`, payload);
         navigate(`/home/torneos/${id}`);
-      } catch (error) {
-        console.error(error);
-        setError(true);
+      } else {
+        const response = await apiAxios.post('/eventos', payload);
+        console.log('Torneo creado:', response.data);
+        navigate(`/home/torneos/${response.data.data.id}`);
       }
-    } else {
-      apiAxios
-        .post('/eventos', payload)
-        .then((response) => {
-          console.log('Torneo creado:', response.data);
-          navigate(`/home/torneos/${response.data.data.id}`);
-        })
-        .catch((error) => {
-          console.error('Error al crear el torneo:', error);
-          setError(true);
-        });
+    } catch (error) {
+      console.error('Error al procesar el formulario:', error);
+      setError(true);
     }
   };
   return (
@@ -285,15 +265,15 @@ export default function FormTorneos() {
         <Form.Group className="mb-3" controlId="formBasicCheckbox">
           <Form.Check
             type="checkbox"
-            label="Privado"
-            name="privado"
-            checked={form.privado}
+            label="Público"
+            name="esPublico"
+            checked={form.esPublico}
             onChange={handleChange}
           />
         </Form.Group>
-        {form.privado && (
+        {!form.esPublico && (
           <Form.Group className="mb-3" controlId="contraseña">
-            <Form.Label>contraseña</Form.Label>
+            <Form.Label>Contraseña</Form.Label>
             <Form.Control
               type="text"
               placeholder="Ingrese la contraseña"

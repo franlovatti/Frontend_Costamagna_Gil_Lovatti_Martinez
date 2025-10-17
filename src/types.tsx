@@ -29,12 +29,12 @@ type Equipo = {
   id: number;
   nombre: string;
   nombreCapitan: string;
-  capitan: number | Usuario;
+  capitan: Usuario;
   puntos: number;
   esPublico: boolean;
   contraseña: string;
   miembros: Usuario[];
-  evento: Torneo | number;
+  evento: Torneo;
   partidoVisitante: Partido[];
   partidoLocal: Partido[];
 };

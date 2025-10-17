@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Modal, Button as RBButton } from 'react-bootstrap';
 
 import apiAxios from '../helpers/api';
 import { useAuth } from '../hooks/useAuth';
@@ -14,6 +15,16 @@ export default function VerEquipo() {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const idtorneo = equipo
+    ? typeof equipo.evento === 'number'
+      ? (equipo.evento as number)
+      : (equipo.evento as { id: number }).id
+    : undefined;
 
   const fetchEquipo = useCallback(async () => {
     setLoading(true);
@@ -37,13 +48,14 @@ export default function VerEquipo() {
   }, [fetchEquipo]);
 
   async function handleLeave() {
+    setLeaving(true);
     try {
       const usuarioIdToRemove = user?.id;
       const payload = usuarioIdToRemove ? { usuarioId: usuarioIdToRemove } : {};
 
       const res = await apiAxios.patch(`/equipos/${id}/miembros`, payload);
-      // actualizar estado con la respuesta (si devuelves el equipo actualizado)
       setEquipo(res.data.data);
+      navigate(`/home/torneos/${idtorneo}`);
     } catch (err: unknown) {
       const error = err as {
         response?: { data?: { message?: string } };
@@ -54,59 +66,45 @@ export default function VerEquipo() {
           error?.message ??
           'Error al eliminar usuario.'
       );
+    } finally {
+      setLeaving(false);
+      setShowLeaveModal(false);
     }
   }
 
   async function handleDeleteTeam(equipoId: string | number) {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este equipo?')) {
-      try {
-        await apiAxios.delete(`/equipos/${equipoId}`);
-        navigate('/home/torneos'); // o a donde quieras redirigir
-      } catch (err) {
-        const error = err as {
-          response?: { data?: { message?: string } };
-          message?: string;
-        };
-        setError(
-          error?.response?.data?.message ??
-            error?.message ??
-            'Error al eliminar el equipo.'
-        );
-      }
+    setDeleting(true);
+    try {
+      await apiAxios.delete(`/equipos/${equipoId}`);
+      navigate('/home/torneos');
+    } catch (err) {
+      const error = err as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
+      setError(
+        error?.response?.data?.message ??
+          error?.message ??
+          'Error al eliminar el equipo.'
+      );
+    } finally {
+      setDeleting(false);
+      setShowDeleteModal(false);
     }
   }
-
+  // Guardas tempranas mientras cargamos o si hay error
   if (loading) return <div>Cargando...</div>;
   if (error) return <div>{error}</div>;
   if (!equipo) return <div>Equipo no encontrado.</div>;
 
-  const normalizeId = (v: unknown): string | undefined => {
-    if (v === null || v === undefined) return undefined;
-    if (typeof v === 'number' || typeof v === 'string') return String(v);
-    if (typeof v === 'object') {
-      const obj = v as Record<string, unknown>;
-      if (
-        'id' in obj &&
-        (typeof obj.id === 'number' || typeof obj.id === 'string')
-      )
-        return String(obj.id);
-      if (
-        'usuario' in obj &&
-        (typeof obj.usuario === 'number' || typeof obj.usuario === 'string')
-      )
-        return String(obj.usuario);
-    }
-    return undefined;
-  };
-
+  // Con equipo no nulo, podemos calcular estados derivados
   const userIdStr = user ? String(user.id) : undefined;
-  const capId = normalizeId(equipo.capitan as unknown);
+  const capId = equipo.capitan.id;
   const isMember =
     Array.isArray(equipo.miembros) &&
-    equipo.miembros.some((m) => normalizeId(m as unknown) === userIdStr);
-  const isCaptain = userIdStr ? capId === userIdStr : false;
+    equipo.miembros.some((m) => String(m.id) === userIdStr);
+  const isCaptain = userIdStr ? String(capId) === userIdStr : false;
   const canLeave = isMember && !isCaptain;
-
   return (
     <div className="container mt-4">
       <div className="row justify-content-center">
@@ -140,7 +138,8 @@ export default function VerEquipo() {
               <div className="d-flex gap-2 justify-content-end">
                 <Button
                   className="btn-outline-light"
-                  onClick={() => navigate(-1)}
+                  onClick={() => navigate(`/home/torneos/${idtorneo}`)}
+                  disabled={typeof idtorneo === 'undefined'}
                 >
                   Volver
                 </Button>
@@ -148,7 +147,7 @@ export default function VerEquipo() {
                 {user && canLeave && (
                   <Button
                     className="btn-outline-danger"
-                    onClick={() => handleLeave()}
+                    onClick={() => setShowLeaveModal(true)}
                   >
                     Darse de baja
                   </Button>
@@ -166,7 +165,7 @@ export default function VerEquipo() {
                     </Button>
                     <Button
                       className="btn-danger"
-                      onClick={() => handleDeleteTeam(equipo.id)}
+                      onClick={() => setShowDeleteModal(true)}
                     >
                       Eliminar
                     </Button>
@@ -177,6 +176,64 @@ export default function VerEquipo() {
           </div>
         </div>
       </div>
+      {/* Modales de confirmación */}
+      <Modal
+        show={showLeaveModal}
+        onHide={() => setShowLeaveModal(false)}
+        centered
+      >
+        <Modal.Header closeButton className="text-bg-dark border-primary">
+          <Modal.Title>Confirmar baja</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-bg-dark">
+          ¿Querés darte de baja de este equipo?
+        </Modal.Body>
+        <Modal.Footer className="text-bg-dark border-primary">
+          <RBButton
+            variant="secondary"
+            onClick={() => setShowLeaveModal(false)}
+            disabled={leaving}
+          >
+            Cancelar
+          </RBButton>
+          <RBButton
+            variant="danger"
+            onClick={() => handleLeave()}
+            disabled={leaving}
+          >
+            {leaving ? 'Procesando...' : 'Confirmar baja'}
+          </RBButton>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
+        centered
+      >
+        <Modal.Header closeButton className="text-bg-dark border-primary">
+          <Modal.Title>Eliminar equipo</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-bg-dark">
+          Esta acción no se puede deshacer. ¿Eliminar el equipo?
+        </Modal.Body>
+        <Modal.Footer className="text-bg-dark border-primary">
+          <RBButton
+            variant="secondary"
+            onClick={() => setShowDeleteModal(false)}
+            disabled={deleting}
+          >
+            Cancelar
+          </RBButton>
+          <RBButton
+            variant="danger"
+            onClick={() => handleDeleteTeam(equipo.id)}
+            disabled={deleting}
+          >
+            {deleting ? 'Eliminando...' : 'Eliminar'}
+          </RBButton>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

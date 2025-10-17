@@ -47,23 +47,27 @@ export default function CardTorneos({
           <ListGroup.Item className="bg-dark text-white border-primary"></ListGroup.Item>
         </ListGroup>
         <div className="d-flex justify-content-center">
-          <Button
-            variant="outline-info"
-            className="align-self-center"
-            onClick={() => handleClick(torneo.id)}
-          >
-            Mas Informacion
-          </Button>
+          {isMember && (
+            <Button
+              variant="outline-info"
+              className="align-self-center"
+              onClick={() => handleClick(torneo.id)}
+            >
+              Mas Informacion
+            </Button>
+          )}
+          {!isMember && (
+            <Button
+              variant="outline-primary"
+              onClick={() =>
+                onEnroll ? onEnroll(torneo) : handleClick(torneo.id)
+              }
+            >
+              Inscribirse
+            </Button>
+          )}
         </div>
       </Card.Body>
-      {!isMember && (
-        <Button
-          variant="outline-primary"
-          onClick={() => (onEnroll ? onEnroll(torneo) : handleClick(torneo.id))}
-        >
-          Inscribirse
-        </Button>
-      )}
     </Card>
   );
 }
