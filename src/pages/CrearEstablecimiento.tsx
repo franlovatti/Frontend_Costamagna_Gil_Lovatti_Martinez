@@ -64,6 +64,7 @@ export default function CrearEstablecimiento() {
             <Form.Group controlId="formNombre" className="mb-3">
               <Form.Label>Nombre</Form.Label>
               <Form.Control
+                className="bg-bs-dark text-bg-dark border border-primary"
                 type="text"
                 placeholder="Ingrese el nombre del establecimiento"
                 name="nombre"
@@ -78,6 +79,7 @@ export default function CrearEstablecimiento() {
             <Form.Group controlId="formDireccion" className="mb-3">
               <Form.Label>Dirección</Form.Label>
               <Form.Control
+                className="bg-bs-dark text-bg-dark border border-primary"
                 type="text"
                 placeholder="Ingrese la dirección"
                 name="direccion"

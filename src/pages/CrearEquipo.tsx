@@ -90,6 +90,7 @@ export default function CrearEquipo() {
             <Form.Group controlId="formNombre" className="mb-3">
               <Form.Label>Nombre del Equipo</Form.Label>
               <Form.Control
+                className="bg-bs-dark text-bg-dark border border-primary"
                 type="text"
                 placeholder="Ingrese el nombre del equipo"
                 name="nombre"
@@ -119,6 +120,7 @@ export default function CrearEquipo() {
               <Form.Group controlId="formContraseña" className="mb-3">
                 <Form.Label>Contraseña del Equipo</Form.Label>
                 <Form.Control
+                  className="bg-bs-dark text-bg-dark border border-primary"
                   type="password"
                   placeholder="Ingrese la contraseña"
                   name="contraseña"

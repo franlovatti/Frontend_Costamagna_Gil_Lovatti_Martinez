@@ -163,6 +163,7 @@ export default function EditarEquipo() {
             <Form.Group className="mb-2" controlId="equipoNombre">
               <Form.Label>Nombre del equipo</Form.Label>
               <Form.Control
+                className="bg-bs-dark text-bg-dark border border-primary"
                 value={nameInput}
                 onChange={(e) => setNameInput(e.target.value)}
               />
@@ -172,6 +173,7 @@ export default function EditarEquipo() {
                 <Form.Label>Nueva contraseña (opcional)</Form.Label>
                 <InputGroup>
                   <Form.Control
+                    className="bg-bs-dark text-bg-dark border border-primary"
                     type={showPassword ? 'text' : 'password'}
                     placeholder="Dejar vacío para no cambiar"
                     value={passwordInput}

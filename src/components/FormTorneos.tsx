@@ -3,6 +3,7 @@ import { Form, Button, Row, Col } from 'react-bootstrap';
 import apiAxios from '../helpers/api';
 import type { Localidad, Deporte } from '../types';
 import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
 
 export default function FormTorneos() {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ export default function FormTorneos() {
   const [dataLocalidades, setDataLocalidades] = useState<Localidad[]>([]);
   const { id } = useParams<{ id: string }>();
   const [error, setError] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string>('');
   const [errorConexion, setErrorConexion] = useState<boolean>(false);
 
   useEffect(() => {
@@ -110,8 +112,6 @@ export default function FormTorneos() {
       contraseña: form.esPublico ? null : form.contraseña || '', // Contraseña solo si es privado
     };
 
-    console.log(payload);
-
     try {
       if (id !== undefined) {
         await apiAxios.put(`/eventos/${id}`, payload);
@@ -121,8 +121,15 @@ export default function FormTorneos() {
         console.log('Torneo creado:', response.data);
         navigate(`/home/torneos/${response.data.data.id}`);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error al procesar el formulario:', error);
+
+      if (axios.isAxiosError(error)) {
+        setErrorMsg(error.response?.data?.message || '');
+      } else {
+        setErrorMsg('Ocurrió un error inesperado');
+      }
+
       setError(true);
     }
   };
@@ -131,7 +138,7 @@ export default function FormTorneos() {
       {error && (
         <div className="alert alert-danger" role="alert">
           Ocurrió un error al procesar el formulario. Por favor, inténtelo de
-          nuevo.
+          nuevo. {errorMsg}
         </div>
       )}
       {errorConexion && (
@@ -150,8 +157,10 @@ export default function FormTorneos() {
                 type="text"
                 placeholder="Ingrese el nombre del torneo"
                 name="nombre"
+                className="bg-bs-dark text-bg-dark border border-primary"
                 value={form.nombre}
                 onChange={handleChange}
+                required
               />
             </Form.Group>
           </Col>
@@ -160,8 +169,10 @@ export default function FormTorneos() {
             <Form.Select
               aria-label="Deporte"
               name="deporte"
+              className="bg-bs-dark text-bg-dark border border-primary"
               value={form.deporte}
               onChange={handleChange}
+              required
             >
               <option value="">Seleccione el deporte</option>
               {dataDeportes.map((deporte) => (
@@ -175,12 +186,14 @@ export default function FormTorneos() {
         <Form.Group className="mb-3" controlId="formTournamentDescription">
           <Form.Label>Descripción</Form.Label>
           <Form.Control
+            className="bg-bs-dark text-bg-dark border border-primary"
             as="textarea"
             rows={3}
             placeholder="Ingrese una descripción del torneo"
             name="descripcion"
             value={form.descripcion}
             onChange={handleChange}
+            required
           />
         </Form.Group>
 
@@ -189,6 +202,7 @@ export default function FormTorneos() {
             <Form.Group className="mb-3" controlId={`fechaInicioInscripcion`}>
               <Form.Label>Inicio Inscripcion</Form.Label>
               <Form.Control
+                className="bg-bs-dark text-bg-dark border border-primary"
                 type="date"
                 name="fechaInicioInscripcion"
                 value={form.fechaInicioInscripcion}
@@ -201,6 +215,7 @@ export default function FormTorneos() {
             <Form.Group className="mb-3" controlId={`fechaFinInscripcion`}>
               <Form.Label>Fin Inscripcion</Form.Label>
               <Form.Control
+                className="bg-bs-dark text-bg-dark border border-primary"
                 type="date"
                 name="fechaFinInscripcion"
                 value={form.fechaFinInscripcion}
@@ -213,6 +228,7 @@ export default function FormTorneos() {
             <Form.Group className="mb-3" controlId={`fechaInicioTorneo`}>
               <Form.Label>Inicio del Torneo</Form.Label>
               <Form.Control
+                className="bg-bs-dark text-bg-dark border border-primary"
                 type="date"
                 name="fechaInicioTorneo"
                 value={form.fechaInicioTorneo}
@@ -225,6 +241,7 @@ export default function FormTorneos() {
             <Form.Group className="mb-3" controlId={`fechaFinTorneo`}>
               <Form.Label>Fin del Torneo</Form.Label>
               <Form.Control
+                className="bg-bs-dark text-bg-dark border border-primary"
                 type="date"
                 name="fechaFinTorneo"
                 value={form.fechaFinTorneo}
@@ -235,9 +252,10 @@ export default function FormTorneos() {
           </Col>
         </Row>
         <Row>
-          <Col md={6}>
+          <Col md={6} className="mb-3">
             <Form.Label>Localidad</Form.Label>
             <Form.Select
+              className="bg-bs-dark text-bg-dark border border-primary"
               aria-label="Localidad"
               name="localidad"
               value={form.localidad}
@@ -254,9 +272,9 @@ export default function FormTorneos() {
           <Col md={6}>
             <Form.Label>Cantidad de Equipos: {cantidadEquipos}</Form.Label>
             <Form.Range
-              min={0}
+              min={2}
               max={64}
-              step={2}
+              step={Math.pow(2, 1)}
               value={cantidadEquipos}
               onChange={(e) => setCantidadEquipos(Number(e.target.value))}
             />
@@ -280,6 +298,7 @@ export default function FormTorneos() {
               name="contraseña"
               value={form.contraseña}
               onChange={handleChange}
+              className="bg-bs-dark text-bg-dark border border-primary"
             />
           </Form.Group>
         )}

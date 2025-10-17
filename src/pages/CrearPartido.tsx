@@ -117,6 +117,7 @@ export default function CrearPartido() {
             <Form.Group className="mb-3" controlId="formHomeTeam">
               <Form.Label>Seleccione el equipo local</Form.Label>
               <Form.Select
+                className="bg-bs-dark text-bg-dark border border-primary"
                 name="equipoLocal"
                 value={form.equipoLocal}
                 onChange={handleChange}
@@ -136,6 +137,7 @@ export default function CrearPartido() {
             <Form.Group className="mb-3" controlId="formAwayTeam">
               <Form.Label>Seleccione el equipo Visitante</Form.Label>
               <Form.Select
+                className="bg-bs-dark text-bg-dark border border-primary"
                 name="equipoVisitante"
                 value={form.equipoVisitante}
                 onChange={handleChange}
@@ -156,6 +158,7 @@ export default function CrearPartido() {
             <Form.Group className="mb-3" controlId="formMatchDate">
               <Form.Label>Fecha</Form.Label>
               <Form.Control
+                className="bg-bs-dark text-bg-dark border border-primary"
                 type="date"
                 name="fecha"
                 value={form.fecha}
@@ -168,6 +171,7 @@ export default function CrearPartido() {
             <Form.Group className="mb-3" controlId="formMatchTime">
               <Form.Label>Hora</Form.Label>
               <Form.Control
+                className="bg-bs-dark text-bg-dark border border-primary"
                 type="time"
                 name="hora"
                 value={form.hora}
@@ -183,6 +187,7 @@ export default function CrearPartido() {
             <Form.Group className="mb-3" controlId="formMatchReferee">
               <Form.Label>Juez</Form.Label>
               <Form.Control
+                className="bg-bs-dark text-bg-dark border border-primary"
                 type="text"
                 placeholder="Ingrese el nombre del juez"
                 name="juez"
@@ -195,6 +200,7 @@ export default function CrearPartido() {
             <Form.Group className="mb-3" controlId="formResultadoLocal">
               <Form.Label>Goles Local</Form.Label>
               <Form.Control
+                className="bg-bs-dark text-bg-dark border border-primary"
                 type="number"
                 min={0}
                 name="resultadoLocal"
@@ -207,6 +213,7 @@ export default function CrearPartido() {
             <Form.Group className="mb-3" controlId="formResultadoVisitante">
               <Form.Label>Goles Visitante</Form.Label>
               <Form.Control
+                className="bg-bs-dark text-bg-dark border border-primary"
                 type="number"
                 min={0}
                 name="resultadoVisitante"
@@ -222,6 +229,7 @@ export default function CrearPartido() {
             <Form.Group className="mb-3" controlId="establecimiento">
               <Form.Label>Seleccione el establecimiento</Form.Label>
               <Form.Select
+                className="bg-bs-dark text-bg-dark border border-primary"
                 name="establecimiento"
                 value={form.establecimiento}
                 onChange={handleChange}

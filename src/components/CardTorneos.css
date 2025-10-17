@@ -1,0 +1,6 @@
+.torneos-card-styles:hover {
+  scale: 1.02;
+  transition: scale 0.2s ease-in-out;
+  cursor: pointer;
+  outline: 1px solid #006de2;
+}

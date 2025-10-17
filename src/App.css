@@ -88,3 +88,8 @@
   background-color: rgba(46, 46, 138, 0.2);
   color: #7c7cdb;
 }
+
+.form-control::placeholder {
+  color: #aaa;
+  opacity: 1;
+}

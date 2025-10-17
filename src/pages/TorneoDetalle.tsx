@@ -282,7 +282,7 @@ export default function TorneoDetalle() {
       <Row>
         <Col
           xs={12}
-          md={4}
+          md={6}
           className="d-flex justify-content-center mb-2 mb-md-0"
         >
           {Number(user?.id) === torneo.creador && (
@@ -293,19 +293,12 @@ export default function TorneoDetalle() {
         </Col>
         <Col
           xs={12}
-          md={4}
+          md={6}
           className="d-flex justify-content-center mb-2 mb-md-0"
         >
           {Number(user?.id) === torneo.creador && (
             <Link to={`/home/torneos/${torneo.id}/CrearPartido`}>
               <Button variant="outline-primary">Crear Partidos</Button>
-            </Link>
-          )}
-        </Col>
-        <Col xs={12} md={4} className="d-flex justify-content-center">
-          {Number(user?.id) === torneo.creador && (
-            <Link to={`/home/Participaciones/${torneo.id}`}>
-              <Button variant="outline-primary">Cargar Participaciones</Button>
             </Link>
           )}
         </Col>
@@ -497,6 +490,7 @@ export default function TorneoDetalle() {
               <Form.Group>
                 <Form.Label>Goles Local</Form.Label>
                 <Form.Control
+                  className="bg-bs-dark text-bg-dark border border-primary form-control"
                   type="number"
                   min={0}
                   value={resultadoLocal}
@@ -510,6 +504,7 @@ export default function TorneoDetalle() {
               <Form.Group>
                 <Form.Label>Goles Visitante</Form.Label>
                 <Form.Control
+                  className="bg-bs-dark text-bg-dark border border-primary form-control"
                   type="number"
                   min={0}
                   value={resultadoVisitante}
