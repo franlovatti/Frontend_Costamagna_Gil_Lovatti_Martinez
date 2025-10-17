@@ -4,7 +4,7 @@ import React, { useState} from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEstablecimientosEvento } from '../hooks/useEstablecimientos.tsx';
-import alert from '../components/Alert.tsx';
+import alert from '../components/alert.tsx';
 import { useEquiposEvento } from '../hooks/useEquipos.tsx';
 
 export default function CrearPartido() {
