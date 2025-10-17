@@ -43,7 +43,7 @@ const Login = () => {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2 className="auth-title">Iniciar Sesión</h2>
+        <h2 className="auth-title mb-4">Iniciar Sesión</h2>
         
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="auth-form-group">

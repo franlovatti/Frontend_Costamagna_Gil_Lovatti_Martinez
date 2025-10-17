@@ -53,7 +53,7 @@ export default function Registro() {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2 className="auth-title">Crear Cuenta</h2>
+        <h2 className="auth-title  mb-4">Crear Cuenta</h2>
         
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="row g-3">
