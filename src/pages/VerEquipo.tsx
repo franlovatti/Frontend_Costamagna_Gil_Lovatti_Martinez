@@ -182,7 +182,11 @@ export default function VerEquipo() {
         onHide={() => setShowLeaveModal(false)}
         centered
       >
-        <Modal.Header closeButton className="text-bg-dark border-primary">
+        <Modal.Header
+          data-bs-theme="dark"
+          closeButton
+          className="text-bg-dark border-primary"
+        >
           <Modal.Title>Confirmar baja</Modal.Title>
         </Modal.Header>
         <Modal.Body className="text-bg-dark">
@@ -211,7 +215,11 @@ export default function VerEquipo() {
         onHide={() => setShowDeleteModal(false)}
         centered
       >
-        <Modal.Header closeButton className="text-bg-dark border-primary">
+        <Modal.Header
+          data-bs-theme="dark"
+          closeButton
+          className="text-bg-dark border-primary"
+        >
           <Modal.Title>Eliminar equipo</Modal.Title>
         </Modal.Header>
         <Modal.Body className="text-bg-dark">

@@ -141,7 +141,10 @@ export default function CrearEquipo() {
       </Form>
 
       <Modal show={showSuccess} onHide={() => setShowSuccess(false)} centered>
-        <Modal.Header className="text-bg-dark border-primary">
+        <Modal.Header
+          data-bs-theme="dark"
+          className="text-bg-dark border-primary"
+        >
           <Modal.Title>Equipo creado</Modal.Title>
         </Modal.Header>
         <Modal.Body className="text-bg-dark">

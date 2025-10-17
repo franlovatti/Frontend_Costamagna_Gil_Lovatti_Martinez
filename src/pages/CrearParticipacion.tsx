@@ -352,7 +352,11 @@ export default function CrearParticipacion() {
         contentClassName="bg-bs-dark text-bg-dark border border-primary"
       >
         <Form onSubmit={handleEditSubmit}>
-          <Modal.Header closeButton className="border-primary">
+          <Modal.Header
+            data-bs-theme="dark"
+            closeButton
+            className="border-primary"
+          >
             <Modal.Title>Editar participación</Modal.Title>
           </Modal.Header>
           <Modal.Body>

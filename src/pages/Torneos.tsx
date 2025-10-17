@@ -130,7 +130,11 @@ export default function Torneos() {
         onHide={() => setShowCodeModal(false)}
         centered
       >
-        <Modal.Header closeButton className="text-bg-dark border-primary">
+        <Modal.Header
+          data-bs-theme="dark"
+          closeButton
+          className="text-bg-dark border-primary"
+        >
           <Modal.Title>Ingresar código de torneo</Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleResolveCode}>

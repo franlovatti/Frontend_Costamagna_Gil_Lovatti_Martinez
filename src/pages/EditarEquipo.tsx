@@ -265,7 +265,11 @@ export default function EditarEquipo() {
         }}
         centered
       >
-        <Modal.Header closeButton className="text-bg-dark border-primary">
+        <Modal.Header
+          data-bs-theme="dark"
+          closeButton
+          className="text-bg-dark border-primary"
+        >
           <Modal.Title>Eliminar miembro</Modal.Title>
         </Modal.Header>
         <Modal.Body className="text-bg-dark">
