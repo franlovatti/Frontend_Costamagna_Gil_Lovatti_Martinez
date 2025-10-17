@@ -76,7 +76,7 @@ function App() {
                     element={<EditarEstablecimiento />}
                   />
                   <Route
-                    path="EditarPartido/:eventoId"
+                    path="EditarPartido/:eventoId/:partidoId"
                     element={<EditarPartido />}
                   />
                   <Route path="Registro" element={<Registro />}></Route>

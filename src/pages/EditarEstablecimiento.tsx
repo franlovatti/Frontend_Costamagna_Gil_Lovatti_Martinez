@@ -2,11 +2,14 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
 import { Submit } from '../components/ButtonField.tsx';
-import { useEstablecimientos } from '../hooks/useEstablecimientos.tsx';
+import { useEstablecimientosEvento} from '../hooks/useEstablecimientos.tsx';
+import alert from '../components/Alert.tsx';
 
 export default function EditarEstablecimiento() {
   const navigate = useNavigate();
   const { eventoId } = useParams();
+  const [message, setMessage] = useState<string>();
+  const [success, setSuccess] = useState(false);
 
   const [form, setForm] = useState({
     nombre: '',
@@ -15,7 +18,7 @@ export default function EditarEstablecimiento() {
     id: 0,
   });
 
-  const {establecimientos, loadingEstablecimientos, errorEstablecimientos} = useEstablecimientos(eventoId);
+  const {establecimientos, loadingEstablecimientos, errorEstablecimientos} = useEstablecimientosEvento(eventoId);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -40,15 +43,18 @@ export default function EditarEstablecimiento() {
         }
       );
       console.log('Respuesta del backend:', response.data);
-      alert('Establecimiento modificado con éxito');
+      setMessage('Establecimiento modificado con éxito');
+      setSuccess(true);
+      setTimeout(() => {
       navigate(-1);
+      }, 2000);
     } catch (error: unknown) {
       if (error instanceof Error === false) {
         console.error('Error desconocido:', error);
-        alert('Ocurrió un error desconocido.');
+        setMessage('Ocurrió un error desconocido.');
       } else {
         console.error('Error al modificar establecimiento: ', error.message);
-        alert('Error al modificar establecimiento: ' + error.message);
+        setMessage('Error al modificar establecimiento: ' + error.message);
       }
     }
   };
@@ -56,10 +62,10 @@ export default function EditarEstablecimiento() {
     <div className="container mt-4 text-bg-dark p-4 rounded-3 shadow-lg">
       <h2>Editar Establecimiento</h2>
       {errorEstablecimientos && (
-        <div className ="alet alert-danger" role="alert">
-          Error al cargar los establecimientos: {errorEstablecimientos.message}
-        </div>
+        alert({message: 'Error al cargar los establecimientos: ' + errorEstablecimientos.message, success: false})
         )}
+
+        {alert({message, success})}
 
       {/* Selección del establecimiento */}
       <div className="mb-3">

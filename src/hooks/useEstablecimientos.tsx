@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import type { Establecimiento } from "../types"; // ajustá el import según tu proyecto
 
-export function useEstablecimientos(eventoId?: string) {
+export function useEstablecimientosEvento(eventoId?: string) {
   const [establecimientos, setEstablecimientos] = useState<Establecimiento[]>([]);
   const [loadingEstablecimientos, setLoadingEstablecimientos] = useState(false);
   const [errorEstablecimientos, setErrorEstablecimientos] = useState<Error | null>(null);
