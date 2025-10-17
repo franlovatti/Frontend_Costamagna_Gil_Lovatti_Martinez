@@ -1,0 +1,219 @@
+/* Estilos para el componente Filtros */
+
+.filtros-container {
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* Botón toggle */
+.filtros-toggle {
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 300;
+  transition: all 0.2s ease;
+}
+
+.filtros-toggle:hover {
+  background-color: var(--hover-bg);
+}
+
+.filtros-icon {
+  font-size: 1.1rem;
+  opacity: 0.8;
+}
+
+.filtros-arrow {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  transition: transform 0.3s ease;
+}
+
+/* Grid de inputs */
+.filtros-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.filtro-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filtro-label {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filtro-input {
+  padding: 0.75rem 1rem;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 300;
+  transition: all 0.3s ease;
+}
+
+.filtro-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 109, 226, 0.1);
+}
+
+.filtro-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+  cursor: pointer;
+}
+
+
+/* Grid adaptable para los filtros */
+
+.filtros-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  padding: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.filtro-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.filtro-group-title {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--text);
+  margin: 0 0 0.5rem 0;
+}
+
+.filtro-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.filtro-checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filtro-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text);
+  font-weight: 300;
+}
+
+.filtro-checkbox-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
+
+/* Acciones */
+.filtros-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.btn-filtro-limpiar,
+.btn-filtro-aplicar {
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.btn-filtro-limpiar {
+  background-color: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.btn-filtro-limpiar:hover {
+  background-color: var(--hover-bg);
+  border-color: var(--border-hover);
+}
+
+.btn-filtro-aplicar {
+  background-color: var(--primary);
+  color: #fff;
+}
+
+.btn-filtro-aplicar:hover {
+  background-color: var(--secondary);
+}
+
+.btn-filtro-aplicar:disabled,
+.btn-filtro-limpiar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .filtros-toggle {
+    padding: 0.875rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .filtros-form {
+    padding: 1rem;
+  }
+
+  .filtros-inputs {
+    grid-template-columns: 1fr;
+  }
+
+  .filtros-actions {
+    flex-direction: column;
+  }
+
+  .btn-filtro-limpiar,
+  .btn-filtro-aplicar {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .filtros-grid {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+  
+  .filtro-row {
+    grid-template-columns: 1fr;
+  }
+}
+

@@ -22,6 +22,21 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(false);
   };
 
+  const filtrarUsuarios = async (rol?: string, estado?: string) => {
+    setLoading(true);
+    try {
+      const res = await apiAxios.get('/usuarios/filter', {
+        params: { rol, estado },
+      });
+      setUsuarios(Array.isArray(res.data.data) ? res.data.data : []);
+      setError(null);
+    } catch (error) {
+      setUsuarios([]);
+      setError('No se pudieron cargar los usuarios filtrados' + error);
+    }
+    setLoading(false);
+  };
+
   const modificarUsuario = async (usuario: User) => {
     try {
       await apiAxios.put(`/usuarios/${usuario.id}`, usuario);
@@ -36,7 +51,7 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <UsuarioContext.Provider value={{ usuarios, loading, error, getUsuarios, modificarUsuario }}>
+    <UsuarioContext.Provider value={{ usuarios, loading, error, getUsuarios, modificarUsuario, filtrarUsuarios }}>
       {children}
     </UsuarioContext.Provider>
   );

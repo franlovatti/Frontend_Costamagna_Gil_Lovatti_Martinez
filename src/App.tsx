@@ -7,6 +7,7 @@ import DeportesProvider from "./providers/DeporteProvider.tsx";
 import ProtectedRoute from './components/ProtectedRoute.tsx';
 import TorneosProvider from "./providers/TorneoProvider.tsx";
 import UsuariosProvider from "./providers/UsuarioProvider.tsx";
+import NoticiasProvider from "./providers/NoticiaProvider.tsx";
 
 // Layouts and Components
 import NotFound from './pages/NotFound.js';
@@ -26,6 +27,7 @@ import AuthLayout from "./components/layout/AuthLayout.tsx";
 import DeportesAdmin from "./pages/DeportesAdmin.tsx";
 import TorneosAdmin from "./pages/TorneosAdmin.tsx";
 import UsuariosAdmin from "./pages/UsuariosAdmin.tsx";
+import NoticiasAdmin from "./pages/NoticiasAdmin.tsx";
 
 function App() {
   return (
@@ -55,6 +57,7 @@ function App() {
                 <Route path="/admin/usuarios" element={<UsuariosProvider><UsuariosAdmin /></UsuariosProvider>} />
                 <Route path="/admin/deportes" element={<DeportesProvider><DeportesAdmin /></DeportesProvider>} />
                 <Route path="/admin/torneos" element={<TorneosProvider><TorneosAdmin /></TorneosProvider>} />
+                <Route path="/admin/noticias" element={<NoticiasProvider><NoticiasAdmin /></NoticiasProvider>} />
               </Route>
             </Route>
             <Route path="*" element={<NotFound />} />

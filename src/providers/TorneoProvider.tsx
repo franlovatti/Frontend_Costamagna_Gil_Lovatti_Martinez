@@ -37,6 +37,21 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(false);
   };
 
+  const filtrarTorneos = async (fechaDesde?: string, fechaHasta?: string, deporte?: string, modalidad?: string, equiposDesde?: number, equiposHasta?: number) => {
+    setLoading(true);
+    try {
+      const res = await apiAxios.get('/eventos/filter', {
+        params: { fechaDesde, fechaHasta, deporte, modalidad, equiposDesde, equiposHasta },
+      });
+      setTorneos(Array.isArray(res.data.data) ? res.data.data : []);
+      setError(null);
+    } catch (error) {
+      setTorneos([]);
+      setError('No se pudieron cargar los torneos filtrados' + error);
+    }
+    setLoading(false);
+  };
+
   const borrarTorneo = async (id: number) => {
     try {
       await apiAxios.delete(`/eventos/${id}`);
@@ -75,7 +90,7 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <TorneoContext.Provider value={{ torneos, loading, error, getTorneos, borrarTorneo, modificarTorneo, crearTorneo }}>
+    <TorneoContext.Provider value={{ torneos, loading, error, getTorneos, borrarTorneo, modificarTorneo, crearTorneo, filtrarTorneos }}>
       {children}
     </TorneoContext.Provider>
   );

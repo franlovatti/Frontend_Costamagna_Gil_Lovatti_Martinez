@@ -6,6 +6,7 @@ type UsuarioContextType = {
   loading: boolean;
   error: string | null;
   getUsuarios: (opts?: { q?: string; page?: number }) => Promise<void>;
+  filtrarUsuarios: (rol?: string, estado?: string) => Promise<void>;
   modificarUsuario: (usuario: User) => Promise<void>;
 };
 

@@ -6,9 +6,11 @@ import SearchBar from '../components/SearchBar.tsx';
 import ConfirmModal from '../components/ConfirmModal.tsx';
 import UserTable from '../components/UserTable.tsx';
 import { useAuth } from '../hooks/useAuth.tsx';
+import Filtros from '../components/filtros/Filtros.tsx';
+import FiltroSelect from '../components/filtros/FiltroSelect.tsx';
 
 const UsuariosAdmin = () => {
-  const { usuarios, modificarUsuario, getUsuarios } = useUsuario();
+  const { usuarios, modificarUsuario, getUsuarios, filtrarUsuarios } = useUsuario();
   const { bajaUsuario } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [usuarioAEditar, setUsuarioAEditar] = useState<User | null>(null);
@@ -63,6 +65,22 @@ const UsuariosAdmin = () => {
     setUsuarioAEliminar(null);
   };
 
+  const [filtros, setFiltros] = useState({
+    rol: '',
+    estado: ''
+  });
+
+  const handleFiltros = () => {
+    filtrarUsuarios(filtros.rol, filtros.estado);
+  };
+
+  const handleLimpiarFiltros = () => {
+    setFiltros({
+      rol: '',
+      estado: ''
+    });
+    getUsuarios();
+  };
 
   return (
     <div className="deportes-page">
@@ -78,6 +96,34 @@ const UsuariosAdmin = () => {
         onCreate={() => {}}
         crear="Usuario"
       />
+
+      <Filtros
+        onAplicar={handleFiltros}
+        onLimpiar={handleLimpiarFiltros}
+      >
+        <FiltroSelect
+          title="Rol del usuario"
+          label='Rol'
+          value={filtros.rol}
+          onChange={(value) => setFiltros({...filtros, rol: value})}
+          options={[
+            { value: 'Usuario', label: 'Usuario' },
+            { value: 'Administrador', label: 'Administrador' }
+          ]}
+          placeholder="Todos los roles"
+        />
+        <FiltroSelect
+          title="Estado del usuario"
+          label='Estado'
+          value={filtros.estado}
+          onChange={(value) => setFiltros({...filtros, estado: value})}
+          options={[
+            { value: 'Activo', label: 'Activo' },
+            { value: 'Inactivo', label: 'Inactivo' }
+          ]}
+          placeholder="Todos los estados"
+        />
+      </Filtros>
 
       <UserTable
         usuarios={usuariosFiltrados}

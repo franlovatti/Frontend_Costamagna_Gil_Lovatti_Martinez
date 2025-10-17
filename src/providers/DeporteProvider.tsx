@@ -23,6 +23,21 @@ const DeportesProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
+  const filtrarDeportes = useCallback(async (cantMaxJug?: number, cantMinJug?: number, minDesde?: number, maxHasta?: number) => {
+    setLoading(true);
+    try {
+      const res = await apiAxios.get('/deportes/filter', {
+        params: { cantMaxJug, cantMinJug, minDesde, maxHasta },
+      });
+      setDeportes(Array.isArray(res.data.data) ? res.data.data : []);
+      setError(null);
+    } catch (error) {
+      setDeportes([]);
+      setError('No se pudieron cargar los deportes filtrados' + error);
+    }
+    setLoading(false);
+  }, []);
+
   const borrarDeporte = useCallback(async (id: number) => {
     try {
       await apiAxios.delete(`/deportes/${id}`);
@@ -59,10 +74,11 @@ const DeportesProvider = ({ children }: { children: React.ReactNode }) => {
     loading,
     error,
     getDeportes,
+    filtrarDeportes,
     borrarDeporte,
     modificarDeporte,
     crearDeporte
-  }), [deportes, loading, error, getDeportes, borrarDeporte, modificarDeporte, crearDeporte]);
+  }), [deportes, loading, error, getDeportes, filtrarDeportes, borrarDeporte, modificarDeporte, crearDeporte]);
 
 
   return (
