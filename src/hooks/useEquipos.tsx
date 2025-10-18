@@ -8,8 +8,11 @@ export function useEquiposEvento(eventoId?: string) {
   const [errorEquipos, setErrorEquipos] = useState<Error | null>(null);
 
    useEffect(() => {
+    if (!eventoId) return;
     const fetchItems = async () => {
+      console.log(eventoId);
       setLoadingEquipos(true);
+      setErrorEquipos(null);
       try {
         const response = await axios.get(
           'http://localhost:3000/api/equipos/evento/' + eventoId

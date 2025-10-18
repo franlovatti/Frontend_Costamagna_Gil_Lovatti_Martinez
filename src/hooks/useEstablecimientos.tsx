@@ -9,7 +9,6 @@ export function useEstablecimientosEvento(eventoId?: string) {
 
   useEffect(() => {
     if (!eventoId) return;
-
     const fetchData = async () => {
       setLoadingEstablecimientos(true);
       setErrorEstablecimientos(null);
