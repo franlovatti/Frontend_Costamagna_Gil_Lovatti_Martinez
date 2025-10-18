@@ -43,10 +43,11 @@ import VerEquipo from './pages/VerEquipo.tsx';
 import EditarEquipo from './pages/EditarEquipo.tsx';
 import CrearParticipacion from './pages/CrearParticipacion.tsx';
 import EditarParticipacion from './pages/EditarParticipacion.tsx';
-import NoticiaPage from './pages/NoticiaPage.tsx';
+//import NoticiaPage from './pages/NoticiaPage.tsx';
 import MisTorneos from './pages/misTorneos.tsx';
 import UsuariosAdmin from './pages/admin/UsuariosAdmin.tsx';
 import NoticiasAdmin from './pages/admin/NoticiasAdmin.tsx';
+import PartidoDetalle from './pages/PartidoDetalle.tsx';
 
 function App() {
   return (
@@ -146,6 +147,10 @@ function App() {
                       path="editarparticipacion/:id"
                       element={<EditarParticipacion />}
                     />
+                    <Route
+                      path="partido-detalle"
+                      element={<PartidoDetalle />}
+                    ></Route>
 
                     <Route path="perfil" element={<Perfil />} />
                   </Route>

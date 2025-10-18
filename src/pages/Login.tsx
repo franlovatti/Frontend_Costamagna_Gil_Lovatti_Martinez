@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { useAuth } from "../hooks/useAuth.tsx";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
-import "./Auth.css";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useAuth } from '../hooks/useAuth.tsx';
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import './Auth.css';
 
 const Login = () => {
   const { login, loading: cargandoAuth, error, setError } = useAuth();
@@ -30,11 +30,11 @@ const Login = () => {
     try {
       const success = await login(data.usuario, data.contraseña, data.remember);
       if (!success) {
-        throw new Error("Credenciales inválidas");
+        throw new Error('Credenciales inválidas');
       }
-      navigate("/");
+      navigate('/home');
     } catch (error) {
-      console.error("Error al iniciar sesion:", error);
+      console.error('Error al iniciar sesion:', error);
     } finally {
       setLoading(false);
     }
@@ -44,7 +44,7 @@ const Login = () => {
     <div className="auth-container">
       <div className="auth-card">
         <h2 className="auth-title mb-4">Iniciar Sesión</h2>
-        
+
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="auth-form-group">
             <input
@@ -75,7 +75,7 @@ const Login = () => {
               type="checkbox"
               id="remember"
               className="auth-checkbox"
-              {...register("remember")}
+              {...register('remember')}
             />
             <label htmlFor="remember" className="auth-checkbox-label">
               Recordarme
@@ -86,7 +86,10 @@ const Login = () => {
             <button
               type="button"
               className="auth-btn auth-btn-secondary"
-              onClick={() => { setError(null); navigate('/Registro'); }}
+              onClick={() => {
+                setError(null);
+                navigate('/Registro');
+              }}
             >
               Registrarse
             </button>
@@ -95,7 +98,7 @@ const Login = () => {
               className="auth-btn auth-btn-primary"
               disabled={loading || cargandoAuth}
             >
-              {loading ? "Iniciando..." : "Iniciar Sesión"}
+              {loading ? 'Iniciando...' : 'Iniciar Sesión'}
             </button>
           </div>
 
@@ -105,9 +108,7 @@ const Login = () => {
             </div>
           )}
 
-          {error && (
-            <div className="auth-error-alert">{error}</div>
-          )}
+          {error && <div className="auth-error-alert">{error}</div>}
 
           <div className="auth-link-container">
             <Link to="/ForgotPassword" className="auth-link">

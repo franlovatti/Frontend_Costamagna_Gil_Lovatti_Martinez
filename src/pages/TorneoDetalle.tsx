@@ -405,11 +405,7 @@ export default function TorneoDetalle() {
                   <tr key={partido.id}>
                     <td>{i + 1}</td>
                     <td>{new Date(partido.fecha).toLocaleDateString()}</td>
-                    <td>
-                      {partido.hora instanceof Date
-                        ? partido.hora.toLocaleTimeString()
-                        : partido.hora}
-                    </td>
+                    <td>{partido.hora}</td>
                     <td>{partido.establecimiento?.nombre}</td>
                     <td>{partido.equipoLocal.nombre}</td>
                     <td>{partido.equipoVisitante.nombre}</td>
@@ -421,7 +417,7 @@ export default function TorneoDetalle() {
                     </td>
                     <td>
                       <div className="d-flex gap-2 align-items-start">
-                        <Link to={`/home/Participaciones/${partido.id}`}>
+                        <Link to={`/home/partido-detalle`}>
                           <Button variant="outline-primary">Ver Partido</Button>
                         </Link>
                         {Number(user?.id) === torneo.creador && (

@@ -55,22 +55,15 @@ export default function MainLayout() {
                         ? 'lista-noticias'
                         : 'noticias'
                     }
-                  ></Nav.Link>
-                  <Nav.Link as={Link} to="/home/torneos" className="nav-link">
-                    Torneos
-                  </Nav.Link>
-                  <Nav.Link as={Link} to="/home/noticias" className="nav-link">
+                  >
                     Noticias
                   </Nav.Link>
+                  {/*
+                  <Nav.Link as={Link} to="/home/noticias" className="nav-link">
+                    Noticias
+                  </Nav.Link>*/}
                   <Nav.Link as={Link} to="/home/perfil" className="nav-link">
                     Perfil
-                  </Nav.Link>
-                  <Nav.Link
-                    as={Link}
-                    to="participaciones/crear"
-                    className="nav-link"
-                  >
-                    Crear Participación
                   </Nav.Link>
                   {user?.role === 'Administrador' && (
                     <Nav.Link as={Link} to="/admin" className="nav-link">

@@ -1,5 +1,5 @@
 import { Col, Row, Tab, Tabs } from 'react-bootstrap';
-import CardTorneos from '../components/layout/CardTorneos.tsx';
+import CardTorneos from '../components/CardTorneos.tsx';
 import { useNavigate } from 'react-router';
 import apiAxios from '../helpers/api';
 import { useEffect, useState } from 'react';
