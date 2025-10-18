@@ -1,5 +1,5 @@
 import React from "react";
-import "./cssComponentes/StatCard.css";
+import "../cssComponentes/StatCard.css";
 
 interface StatCardProps {
   icon: React.ReactNode;

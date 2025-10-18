@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { useDeporte } from '../hooks/useDeporte.tsx';
+import { useDeporte } from '../../hooks/useDeporte.tsx';
 import './DeportesAdmin.css';
-import type { Deporte } from '../contexts/deporte.tsx';
-import SearchBar from '../components/SearchBar.tsx';
-import DeportesTable from '../components/DeporteTable.tsx';
-import DeporteFormModal from '../components/DeporteFormModal.tsx';
-import ConfirmModal from '../components/ConfirmModal.tsx';
-import Filtros from '../components/filtros/Filtros.tsx';
-import FiltroRango from '../components/filtros/FiltroRango.tsx';
+import type { Deporte } from '../../contexts/deporte.tsx';
+import SearchBar from '../../components/SearchBar.tsx';
+import DeportesTable from '../../components/admin/DeporteTable.tsx';
+import DeporteFormModal from '../../components/admin/DeporteFormModal.tsx';
+import ConfirmModal from '../../components/ConfirmModal.tsx';
+import Filtros from '../../components/filtros/Filtros.tsx';
+import FiltroRango from '../../components/filtros/FiltroRango.tsx';
 
 const DeportesAdmin = () => {
   const { deportes, borrarDeporte, modificarDeporte, crearDeporte, filtrarDeportes, getDeportes } = useDeporte();

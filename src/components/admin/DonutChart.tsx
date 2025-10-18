@@ -1,4 +1,4 @@
-import "./cssComponentes/DonutChart.css";
+import "../cssComponentes/DonutChart.css";
 
 interface DonutChartProps {
   publicos: number;

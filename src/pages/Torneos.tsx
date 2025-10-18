@@ -1,6 +1,6 @@
 import { Button, Col, Row, Form } from 'react-bootstrap';
 import { useState } from 'react';
-import CardTorneos from '../components/layout/CardTorneos';
+import CardTorneos from '../components/CardTorneos';
 import { Link, useNavigate } from 'react-router-dom';
 import apiAxios from '../helpers/api';
 import { useEffect } from 'react';

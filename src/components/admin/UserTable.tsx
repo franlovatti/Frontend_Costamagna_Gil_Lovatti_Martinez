@@ -1,6 +1,6 @@
-import type { User } from "../contexts/auth.tsx";
+import type { User } from "../../contexts/auth.tsx";
 import UserRow from "./UserRow";
-import "./cssComponentes/DeporteTable.css";
+import "../cssComponentes/DeporteTable.css";
 
 export default function UserTable({
   usuarios,

@@ -22,9 +22,9 @@ import Login from './pages/Login.tsx';
 import Registro from './pages/Registro.tsx';
 import ForgottenPassword from './pages/ForgottenPassword.tsx';
 import ChangePassword from './pages/ChangePassword.tsx';
-import Dashboard from './pages/Dashboard.tsx';
-import DeportesAdmin from './pages/DeportesAdmin.tsx';
-import TorneosAdmin from './pages/TorneosAdmin.tsx';
+import Dashboard from './pages/admin/Dashboard.tsx';
+import DeportesAdmin from './pages/admin/DeportesAdmin.tsx';
+import TorneosAdmin from './pages/admin/TorneosAdmin.tsx';
 import AuthLayout from './components/layout/AuthLayout.tsx';
 import CrearTorneo from './pages/CrearTorneo.tsx';
 import CrearPartido from './pages/CrearPartido.tsx';
@@ -43,8 +43,8 @@ import VerEquipo from './pages/VerEquipo.tsx';
 import EditarEquipo from './pages/EditarEquipo.tsx';
 import CrearParticipacion from './pages/CrearParticipacion.tsx';
 import EditarParticipacion from './pages/EditarParticipacion.tsx';
-import UsuariosAdmin from "./pages/UsuariosAdmin.tsx";
-import NoticiasAdmin from "./pages/NoticiasAdmin.tsx";
+import UsuariosAdmin from "./pages/admin/UsuariosAdmin.tsx";
+import NoticiasAdmin from "./pages/admin/NoticiasAdmin.tsx";
 
 function App() {
   return (
@@ -162,7 +162,14 @@ function App() {
                         </TorneosProvider>
                       }
                     />
-                    <Route path="/admin/noticias" element={<NoticiasProvider><NoticiasAdmin /></NoticiasProvider>} />
+                    <Route
+                      path="/admin/noticias"
+                      element={
+                        <NoticiasProvider>
+                          <NoticiasAdmin />
+                        </NoticiasProvider>
+                      }
+                    />
               </Route>
                 </Route>
                 <Route path="*" element={<NotFound />} />

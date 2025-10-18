@@ -1,4 +1,4 @@
-import type { Deporte } from "../contexts/deporte";
+import type { Deporte } from "../../contexts/deporte";
 
 export default function DeporteRow({
   deporte,

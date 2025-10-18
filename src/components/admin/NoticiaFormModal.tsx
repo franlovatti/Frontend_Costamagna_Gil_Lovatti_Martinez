@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
-import type { Noticia } from '../contexts/noticia.tsx';
-import './cssComponentes/DeporteFormModal.css';
-import './cssComponentes/ConfirmModal.css';
+import type { Noticia } from '../../contexts/noticia.tsx';
+import '../cssComponentes/DeporteFormModal.css';
+import '../cssComponentes/ConfirmModal.css';
 
 type NoticiaFormFields = {
   titulo: string;

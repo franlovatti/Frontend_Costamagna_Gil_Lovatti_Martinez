@@ -1,4 +1,4 @@
-import type { Noticia } from '../contexts/noticia.tsx';
+import type { Noticia } from '../../contexts/noticia.tsx';
 
 export default function NoticiaRow({
   noticia,

@@ -3,6 +3,7 @@ import { TorneoContext } from "../contexts/torneo";
 import apiAxios from "../helpers/api";
 import type { Torneo } from "../contexts/torneo";
 import type { Deporte } from "../contexts/deporte";
+import { AxiosError } from "axios";
 
 
 const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
@@ -57,7 +58,10 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
       await apiAxios.delete(`/eventos/${id}`);
       await getTorneos();
     } catch (error) {
-      setError("Error al borrar el torneo:" + error);
+      const axiosError = error as AxiosError<{ message?: string }>
+      const errorMsg = axiosError.response?.data?.message || "Error desconocido";
+      console.error("Error al borrar el torneo:", errorMsg);
+      setError("Error al borrar el torneo:" + errorMsg);
     }
   };
 

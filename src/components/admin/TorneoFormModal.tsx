@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import type { Torneo } from "../contexts/torneo";
-import { useDeporte } from "../hooks/useDeporte.tsx";
-import { toDatetimeLocal, parseDatetimeLocal } from "../helpers/convertirFechas.tsx";
-import "./cssComponentes/DeporteFormModal.css";
-import "./cssComponentes/ConfirmModal.css";
+import type { Torneo } from "../../contexts/torneo.tsx";
+import { useDeporte } from "../../hooks/useDeporte.tsx";
+import { toDatetimeLocal, parseDatetimeLocal } from "../../helpers/convertirFechas.tsx";
+import "../cssComponentes/ConfirmModal.css";
+import "../cssComponentes/DeporteFormModal.css";
 
 type TorneoFormFields = {
   nombre: string;

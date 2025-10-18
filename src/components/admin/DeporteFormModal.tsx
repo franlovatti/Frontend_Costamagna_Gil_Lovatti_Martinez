@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
-import type { Deporte } from "../contexts/deporte";
-import "./cssComponentes/DeporteFormModal.css";
-import "./cssComponentes/ConfirmModal.css";
+import type { Deporte } from "../../contexts/deporte";
+import "../cssComponentes/DeporteFormModal.css";
+import "../cssComponentes/ConfirmModal.css";
 
 type DeporteFormFields = {
   nombre: string;

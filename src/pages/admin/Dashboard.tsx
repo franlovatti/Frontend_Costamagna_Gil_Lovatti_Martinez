@@ -1,7 +1,7 @@
-import DonutChart from '../components/DonutChart.tsx';
-import StatCard from '../components/StatCard.tsx';
-import DeportePopular from '../components/DeportePopular.tsx';
-import { useStats } from '../hooks/useStats.tsx';
+import DonutChart from '../../components/admin/DonutChart.tsx';
+import StatCard from '../../components/admin/StatCard.tsx';
+import DeportePopular from '../../components/admin/DeportePopular.tsx';
+import { useStats } from '../../hooks/useStats.tsx';
 import './Dashboard.css';
 
 const statCards = [

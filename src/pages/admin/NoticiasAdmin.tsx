@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { useNoticia } from '../hooks/useNoticia';
+import { useNoticia } from '../../hooks/useNoticia';
 import './DeportesAdmin.css';
-import ConfirmModal from '../components/ConfirmModal';
-import SearchBar from '../components/SearchBar';
-import type { Noticia } from '../contexts/noticia.tsx';
-import NoticiasTable from '../components/NoticiaTable';
-import NoticiaFormModal from '../components/NoticiaFormModal';
-import FiltroFecha from '../components/filtros/FiltroFecha.tsx';
-import Filtros from '../components/filtros/Filtros.tsx';
+import ConfirmModal from '../../components/ConfirmModal';
+import SearchBar from '../../components/SearchBar';
+import type { Noticia } from '../../contexts/noticia.tsx';
+import NoticiasTable from '../../components/admin/NoticiaTable.tsx';
+import NoticiaFormModal from '../../components/admin/NoticiaFormModal.tsx';
+import FiltroFecha from '../../components/filtros/FiltroFecha.tsx';
+import Filtros from '../../components/filtros/Filtros.tsx';
 
 export default function NoticiaPage() {
   const { noticias, borrarNoticia, modificarNoticia, crearNoticia, filtrarNoticias, getNoticias } = useNoticia();

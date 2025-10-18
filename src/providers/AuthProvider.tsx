@@ -10,7 +10,7 @@ import { AxiosError } from 'axios';
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const login = useCallback(async (usuario: string, contraseña: string, remember: boolean) => {
@@ -108,59 +108,65 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   // Al renderizar verifica si hay un token o cookie "recuerdame" válida y restaura la sesión
   useEffect(() => {
     const restaurarSesion = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        try {
-          const decoded = jwtDecode<{ id: string; usuario: string; role: string; nombre?: string; apellido?: string; exp?: number; email: string; estado: boolean }>(token);
-          // Verificamos expiración
-          if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-            // Token expirado
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('token');
+        if (token) {
+          try {
+            const decoded = jwtDecode<{ id: string; usuario: string; role: string; nombre?: string; apellido?: string; exp?: number; email: string; estado: boolean }>(token);
+            // Verificamos expiración
+            if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+              // Token expirado
+              localStorage.removeItem('token');
+              setIsAuthenticated(false);
+              setUser(null);
+            } else {
+              const userFromToken: User = {
+                id: decoded.id,
+                nombre: decoded.nombre,
+                apellido: decoded.apellido,
+                usuario: decoded.usuario,
+                email: decoded.email,
+                role: decoded.role,
+                estado: decoded.estado
+              };
+              setUser(userFromToken);
+              setIsAuthenticated(true);
+              setLoading(false);
+              return;
+            }
+          } catch {
+            // Si el token es inválido, lo borramos
             localStorage.removeItem('token');
             setIsAuthenticated(false);
             setUser(null);
-          } else {
+          }
+        }
+        // Si no hay token válido, intentamos restaurar con cookie recuerdame
+        try {
+          const response = await apiAxios.post('/usuarios/restaurar');
+          const data = response.data;
+          if (data.token) {
+            localStorage.setItem('token', data.token);
             const userFromToken: User = {
-              id: decoded.id,
-              nombre: decoded.nombre,
-              apellido: decoded.apellido,
-              usuario: decoded.usuario,
-              email: decoded.email,
-              role: decoded.role,
-              estado: decoded.estado
-            };
+                id: data.id,
+                nombre: data.nombre,
+                apellido: data.apellido,
+                usuario: data.usuario,
+                email: data.email,
+                role: data.role,
+                estado: data.estado
+              };
             setUser(userFromToken);
             setIsAuthenticated(true);
-            return;
           }
         } catch {
-          // Si el token es inválido, lo borramos
-          localStorage.removeItem('token');
+          // No se pudo restaurar sesión con cookie
           setIsAuthenticated(false);
           setUser(null);
         }
-      }
-      // Si no hay token válido, intentamos restaurar con cookie recuerdame
-      try {
-        const response = await apiAxios.post('/usuarios/restaurar');
-        const data = response.data;
-        if (data.token) {
-          localStorage.setItem('token', data.token);
-          const userFromToken: User = {
-              id: data.id,
-              nombre: data.nombre,
-              apellido: data.apellido,
-              usuario: data.usuario,
-              email: data.email,
-              role: data.role,
-              estado: data.estado
-            };
-          setUser(userFromToken);
-          setIsAuthenticated(true);
-        }
-      } catch {
-        // No se pudo restaurar sesión con cookie
-        setIsAuthenticated(false);
-        setUser(null);
+      } finally {
+        setLoading(false);
       }
     };
     restaurarSesion();

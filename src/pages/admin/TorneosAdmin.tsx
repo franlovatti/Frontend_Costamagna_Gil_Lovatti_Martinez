@@ -1,20 +1,20 @@
 import { useState } from 'react';
 import './TorneosAdmin.css';
-import SearchBar from '../components/SearchBar.tsx';
-import type { Torneo } from '../contexts/torneo.tsx';
+import SearchBar from '../../components/SearchBar.tsx';
+import type { Torneo } from '../../contexts/torneo.tsx';
 // import type { Deporte } from '../contexts/deporte.tsx';
-import { useTorneo } from '../hooks/useTorneo.tsx';
-import { useDeporte } from '../hooks/useDeporte.tsx';
-import TorneoCard from '../components/TorneoCard.tsx';
-import ConfirmModal from '../components/ConfirmModal.tsx';
-import TorneoFormModal from '../components/TorneoFormModal.tsx';
-import FiltroFecha from '../components/filtros/FiltroFecha.tsx';
-import FiltroSelect from '../components/filtros/FiltroSelect.tsx';
-import FiltroRango from '../components/filtros/FiltroRango.tsx';
-import Filtros from '../components/filtros/Filtros.tsx';
+import { useTorneo } from '../../hooks/useTorneo.tsx';
+import { useDeporte } from '../../hooks/useDeporte.tsx';
+import TorneoCard from '../../components/TorneoCard.tsx';
+import ConfirmModal from '../../components/ConfirmModal.tsx';
+import TorneoFormModal from '../../components/admin/TorneoFormModal.tsx';
+import FiltroFecha from '../../components/filtros/FiltroFecha.tsx';
+import FiltroSelect from '../../components/filtros/FiltroSelect.tsx';
+import FiltroRango from '../../components/filtros/FiltroRango.tsx';
+import Filtros from '../../components/filtros/Filtros.tsx';
 
 const TorneosAdmin = () => {
-  const { torneos, borrarTorneo, modificarTorneo, crearTorneo, filtrarTorneos, getTorneos } = useTorneo();
+  const { torneos, borrarTorneo, modificarTorneo, crearTorneo, filtrarTorneos, getTorneos, error } = useTorneo();
   const [searchTerm, setSearchTerm] = useState('');
   const [editingTorneo, setEditingTorneo] = useState<Torneo | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -171,6 +171,13 @@ const TorneosAdmin = () => {
                 handleCancelDelete={handleCancelDelete}
               />
             )}
+
+      {error && (
+        <div className="alert alert-danger mt-4" role="alert">
+          {error}
+        </div>
+      )}
+      
     </div>
   );
 };

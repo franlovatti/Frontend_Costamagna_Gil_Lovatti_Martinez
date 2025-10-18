@@ -1,4 +1,4 @@
-import type { User } from "../contexts/auth";
+import type { User } from "../../contexts/auth";
 
 export default function UserRow({
   user,

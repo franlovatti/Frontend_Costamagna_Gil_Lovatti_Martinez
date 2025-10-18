@@ -1,6 +1,5 @@
 import { useAuth } from '../hooks/useAuth';
-
-import CardsMainHome from '../components/layout/CardsMainHome.tsx';
+import CardsMainHome from '../components/CardsMainHome.tsx';
 export default function MainHome() {
   const { user } = useAuth();
   return (

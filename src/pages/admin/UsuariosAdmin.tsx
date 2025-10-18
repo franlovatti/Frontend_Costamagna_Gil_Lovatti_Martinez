@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { useUsuario } from '../hooks/useUsuario.tsx';
-import type { User } from '../contexts/auth.tsx';
+import { useUsuario } from '../../hooks/useUsuario.tsx';
+import type { User } from '../../contexts/auth.tsx';
 import './DeportesAdmin.css';
-import SearchBar from '../components/SearchBar.tsx';
-import ConfirmModal from '../components/ConfirmModal.tsx';
-import UserTable from '../components/UserTable.tsx';
-import { useAuth } from '../hooks/useAuth.tsx';
-import Filtros from '../components/filtros/Filtros.tsx';
-import FiltroSelect from '../components/filtros/FiltroSelect.tsx';
+import SearchBar from '../../components/SearchBar.tsx';
+import ConfirmModal from '../../components/ConfirmModal.tsx';
+import UserTable from '../../components/admin/UserTable.tsx';
+import { useAuth } from '../../hooks/useAuth.tsx';
+import Filtros from '../../components/filtros/Filtros.tsx';
+import FiltroSelect from '../../components/filtros/FiltroSelect.tsx';
 
 const UsuariosAdmin = () => {
   const { usuarios, modificarUsuario, getUsuarios, filtrarUsuarios } = useUsuario();
