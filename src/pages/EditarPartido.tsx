@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router';
 import { Submit } from '../components/ButtonField.tsx';
 import axios from 'axios';
 import { useEstablecimientosEvento } from '../hooks/useEstablecimientos.tsx';
-import alert from '../components/alert.tsx';
+import alert from '../components/Alert.tsx';
 import { useOnePartido } from '../hooks/usePartidos.tsx';
 
 export default function EditarPartido() {
