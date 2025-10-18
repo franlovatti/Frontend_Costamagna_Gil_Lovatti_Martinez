@@ -130,7 +130,7 @@ function App() {
                       element={<EditarEstablecimiento />}
                     />
                     <Route
-                      path="torneos/:id/EditarPartido"
+                      path="torneos/:id/EditarPartido/:partidoId"
                       element={<EditarPartido />}
                     />
                     <Route path="mis-torneos" element={<MisTorneos />} />

@@ -12,14 +12,13 @@ export default function CrearPartido() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   //const [loading, setLoading] = useState(false);
-  const { eventoId } = useParams();
   const [success, setSuccess] = useState(false);
   const [message, setMessage] = useState<string>();
 
   const { establecimientos, loadingEstablecimientos, errorEstablecimientos } =
-    useEstablecimientosEvento(eventoId);
+    useEstablecimientosEvento(id);
 
-  const { equipos, loadingEquipos, errorEquipos } = useEquiposEvento(eventoId);
+  const { equipos, loadingEquipos, errorEquipos } = useEquiposEvento(id);
 
   const [form, setForm] = useState({
     fecha: '',

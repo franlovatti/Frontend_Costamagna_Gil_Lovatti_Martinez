@@ -175,6 +175,15 @@ export default function TorneoDetalle() {
     return acc;
   }, {} as Record<string, Partido[]>);
 
+  async function handleDeletePartido(id: number) {
+    try {
+      await apiAxios.delete(`/partidos/${id}`);
+      fetchTorneo();
+    } catch (error) {
+      console.error('Error eliminando partido:', error);
+    }
+  }
+
   if (!torneo) return <p>Cargando...</p>;
 
   return (
@@ -428,7 +437,7 @@ export default function TorneoDetalle() {
                               </Button>
                             </Link>
                             <Link
-                              to={`/home/torneos/${torneo.id}/EditarPartido`}
+                              to={`/home/torneos/${torneo.id}/EditarPartido/${partido.id}`}
                             >
                               <Button variant="outline-primary">
                                 Editar Partido
@@ -453,7 +462,14 @@ export default function TorneoDetalle() {
                             >
                               Editar Resultado
                             </Button>
-                            <Button variant="danger">Eliminar</Button>
+                            <Button
+                              variant="danger"
+                              onClick={() => {
+                                handleDeletePartido(partido.id);
+                              }}
+                            >
+                              Eliminar
+                            </Button>
                           </div>
                         )}
                       </div>

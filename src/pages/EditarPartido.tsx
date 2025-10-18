@@ -8,10 +8,12 @@ import { useOnePartido } from '../hooks/usePartidos.tsx';
 
 export default function EditarPartido() {
   const navigate = useNavigate();
-  const { eventoId, partidoId } = useParams();
+  const { id, partidoId } = useParams<{
+    id: string;
+    partidoId: string;
+  }>();
   const [message, setMessage] = useState<string>();
   const [success, setSuccess] = useState(false);
-
   const [form, setForm] = useState({
     fecha: '2023-12-31',
     hora: '12:00',
@@ -20,13 +22,13 @@ export default function EditarPartido() {
     resultadoVisitante: '',
     equipoLocal: 0,
     equipoVisitante: 0,
-    evento: eventoId ?? 0,
+    evento: id ?? 0,
     establecimiento: 0,
     id: 0,
   });
 
   const { establecimientos, loadingEstablecimientos, errorEstablecimientos } =
-    useEstablecimientosEvento(eventoId);
+    useEstablecimientosEvento(id);
   const {
     partido,
     loadingPartido,
