@@ -4,9 +4,10 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { NavDropdown } from 'react-bootstrap';
+import ThemeToggle from '../ThemeToggle.tsx';
+import '../cssComponentes/Layout.css';
 
 export default function MainLayout() {
-  /**Con logica de logeo <Navbar.Brand href="/">React-Bootstrap</Navbar.Brand> tendria el href="/home" */
   const { isAuthenticated, logout, user } = useAuth();
   const navigate = useNavigate();
 
@@ -15,15 +16,28 @@ export default function MainLayout() {
     navigate('/');
   };
   return (
-    <div className="bg-dark d-flex flex-column min-vh-100">
-      <Navbar expand="lg" fixed="top" bg="dark" data-bs-theme="dark">
+    <div className="main-layout">
+      <Navbar
+        expand="lg"
+        fixed="top"
+        data-bs-theme="dark"
+        className="main-navbar"
+      >
         <Container>
-          <Navbar.Brand as={Link} to={isAuthenticated ? '/home' : '/'}>
-            React-Bootstrap
+          <Navbar.Brand
+            as={Link}
+            to={isAuthenticated ? '/home' : '/'}
+            className="brand-text"
+          >
+            Gestor de Torneos
           </Navbar.Brand>
+          <div className="navbar-theme-navbar d-none d-lg-block">
+            <ThemeToggle />
+          </div>
+
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="ms-auto fw-bold">
+            <Nav className="ms-auto fw-bold navbar-nav">
               {isAuthenticated ? (
                 <>
                   <NavDropdown title="Torneos" id="torneos-nav-dropdown">
@@ -41,30 +55,44 @@ export default function MainLayout() {
                         ? 'lista-noticias'
                         : 'noticias'
                     }
-                  >
+                  ></Nav.Link>
+                  <Nav.Link as={Link} to="/home/torneos" className="nav-link">
+                    Torneos
+                  </Nav.Link>
+                  <Nav.Link as={Link} to="/home/noticias" className="nav-link">
                     Noticias
                   </Nav.Link>
-                  <Nav.Link as={Link} to="perfil">
+                  <Nav.Link as={Link} to="/home/perfil" className="nav-link">
                     Perfil
                   </Nav.Link>
+                  <Nav.Link
+                    as={Link}
+                    to="participaciones/crear"
+                    className="nav-link"
+                  >
+                    Crear Participación
+                  </Nav.Link>
                   {user?.role === 'Administrador' && (
-                    <Nav.Link as={Link} to="admin">
+                    <Nav.Link as={Link} to="/admin" className="nav-link">
                       Admin
                     </Nav.Link>
                   )}
+                  <div className="navbar-theme-mobile d-lg-none">
+                    <ThemeToggle />
+                  </div>
                   <button
                     onClick={handleLogout}
-                    className="btn btn-link nav-link"
+                    className="btn nav-link-logout"
                   >
                     Cerrar sesión
                   </button>
                 </>
               ) : (
                 <>
-                  <Nav.Link as={Link} to="login">
+                  <Nav.Link as={Link} to="login" className="nav-link">
                     Iniciar sesión
                   </Nav.Link>
-                  <Nav.Link as={Link} to="registro">
+                  <Nav.Link as={Link} to="registro" className="nav-link">
                     Registro
                   </Nav.Link>
                 </>
@@ -73,14 +101,30 @@ export default function MainLayout() {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <div style={{ height: '56px' }}></div>
 
       <main className="flex-fill">
         <Outlet />
       </main>
 
-      <footer className="text-bg-dark text-center py-3">
-        <p>Creado por: Estudiantes de DSW</p>
+      <footer className="main-footer">
+        <div className="footer-container">
+          <p className="footer-text mb-0">
+            Creado por: Estudiantes de DSW - Desarrollo de Software
+          </p>
+          <div className="footer-links">
+            <a href="#" className="footer-link">
+              Sobre nosotros
+            </a>
+            <span className="footer-separator">•</span>
+            <a href="#" className="footer-link">
+              Contacto
+            </a>
+            <span className="footer-separator">•</span>
+            <a href="#" className="footer-link">
+              Términos
+            </a>
+          </div>
+        </div>
       </footer>
     </div>
   );

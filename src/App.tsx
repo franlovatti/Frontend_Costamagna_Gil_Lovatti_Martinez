@@ -1,10 +1,13 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import './temas.css';
 import './App.css';
 // Context and Providers
 import AuthProvider from './providers/AuthProvider.tsx';
 import DeportesProvider from './providers/DeporteProvider.tsx';
 import ProtectedRoute from './components/ProtectedRoute.tsx';
 import TorneosProvider from './providers/TorneoProvider.tsx';
+import UsuariosProvider from './providers/UsuarioProvider.tsx';
+import NoticiasProvider from './providers/NoticiaProvider.tsx';
 
 // Layouts and Components
 import NotFound from './pages/NotFound.js';
@@ -19,9 +22,9 @@ import Login from './pages/Login.tsx';
 import Registro from './pages/Registro.tsx';
 import ForgottenPassword from './pages/ForgottenPassword.tsx';
 import ChangePassword from './pages/ChangePassword.tsx';
-import Dashboard from './pages/Dashboard.tsx';
-import DeportesAdmin from './pages/DeportesAdmin.tsx';
-import TorneosAdmin from './pages/TorneosAdmin.tsx';
+import Dashboard from './pages/admin/Dashboard.tsx';
+import DeportesAdmin from './pages/admin/DeportesAdmin.tsx';
+import TorneosAdmin from './pages/admin/TorneosAdmin.tsx';
 import AuthLayout from './components/layout/AuthLayout.tsx';
 import CrearTorneo from './pages/CrearTorneo.tsx';
 import CrearPartido from './pages/CrearPartido.tsx';
@@ -41,8 +44,10 @@ import EditarEquipo from './pages/EditarEquipo.tsx';
 import CrearParticipacion from './pages/CrearParticipacion.tsx';
 import EditarParticipacion from './pages/EditarParticipacion.tsx';
 import NoticiaPage from './pages/NoticiaPage.tsx';
-import NoticiasProvider from './providers/NoticiaProvider.tsx';
 import MisTorneos from './pages/misTorneos.tsx';
+import UsuariosAdmin from './pages/admin/UsuariosAdmin.tsx';
+import NoticiasAdmin from './pages/admin/NoticiasAdmin.tsx';
+
 function App() {
   return (
     <AuthProvider>
@@ -55,6 +60,27 @@ function App() {
                 <Route path="/" element={<MainLayout />}>
                   <Route index element={<NoLoggedHome />} />
                   <Route path="Login" element={<Login />} />
+                  <Route path="CrearPartido" element={<CrearPartido />} />
+                  <Route
+                    path="CrearPartido/:eventoId"
+                    element={<CrearPartido />}
+                  />
+                  <Route
+                    path="CrearEstablecimiento"
+                    element={<CrearEstablecimiento />}
+                  />
+                  <Route
+                    path="CrearEstablecimiento/:eventoId"
+                    element={<CrearEstablecimiento />}
+                  />
+                  <Route
+                    path="EditarEstablecimiento/:eventoId"
+                    element={<EditarEstablecimiento />}
+                  />
+                  <Route
+                    path="EditarPartido/:eventoId/:partidoId"
+                    element={<EditarPartido />}
+                  />
                   <Route path="Registro" element={<Registro />}></Route>
                   <Route
                     path="ForgottenPassword"
@@ -131,7 +157,14 @@ function App() {
                 >
                   <Route path="admin" element={<AuthLayout />}>
                     <Route index element={<Dashboard />} />
-                    {/* <Route path="/admin/usuarios" element={<UsuariosAdmin />} /> */}
+                    <Route
+                      path="/admin/usuarios"
+                      element={
+                        <UsuariosProvider>
+                          <UsuariosAdmin />
+                        </UsuariosProvider>
+                      }
+                    />
                     <Route
                       path="/admin/deportes"
                       element={
@@ -144,7 +177,7 @@ function App() {
                       path="/admin/noticias"
                       element={
                         <NoticiasProvider>
-                          <NoticiaPage />
+                          <NoticiasAdmin />
                         </NoticiasProvider>
                       }
                     />
@@ -154,6 +187,14 @@ function App() {
                         <TorneosProvider>
                           <TorneosAdmin />
                         </TorneosProvider>
+                      }
+                    />
+                    <Route
+                      path="/admin/noticias"
+                      element={
+                        <NoticiasProvider>
+                          <NoticiasAdmin />
+                        </NoticiasProvider>
                       }
                     />
                   </Route>

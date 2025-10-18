@@ -1,6 +1,6 @@
-import type { Deporte } from "../contexts/deporte";
+import type { Deporte } from "../../contexts/deporte";
 import DeporteRow from "./DeporteRow";
-import "./cssComponentes/DeporteTable.css";
+import "../cssComponentes/DeporteTable.css";
 
 export default function DeportesTable({
   deportes,

@@ -6,8 +6,8 @@ import ConfirmModal from '../components/ConfirmModal';
 import SearchBar from '../components/SearchBar';
 import './NoticiaPage.css';
 import type { Noticia } from '../contexts/noticia.tsx';
-import NoticiasTable from '../components/NoticiaTable.tsx';
-import NoticiaFormModal from '../components/NoticiaFormModal.tsx';
+import NoticiasTable from '../components/admin/NoticiaTable.tsx';
+import NoticiaFormModal from '../components/admin/NoticiaFormModal.tsx';
 
 export default function NoticiaPage() {
   const { noticias, borrarNoticia, modificarNoticia, crearNoticia } =

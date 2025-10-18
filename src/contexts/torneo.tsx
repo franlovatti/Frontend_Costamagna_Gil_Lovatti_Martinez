@@ -19,6 +19,7 @@ export interface TorneoContextType {
   loading: boolean;
   error: string | null;
   getTorneos: () => void;
+  filtrarTorneos: (fechaDesde?: string, fechaHasta?: string, deporte?: string, modalidad?: string, equiposDesde?: number, equiposHasta?: number) => Promise<void>;
   borrarTorneo: (id: number) => Promise<void>;
   modificarTorneo: (torneo: Torneo) => Promise<void>;
   crearTorneo: (torneo: Torneo) => Promise<void>;

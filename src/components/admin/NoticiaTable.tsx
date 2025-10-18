@@ -1,6 +1,6 @@
-import type { Noticia } from '../types';
+import type { Noticia } from '../../contexts/noticia.tsx';
 import NoticiaRow from './NoticiaRow';
-import './cssComponentes/DeporteTable.css';
+import '../cssComponentes/DeporteTable.css';
 
 export default function NoticiaTable({
   noticias,

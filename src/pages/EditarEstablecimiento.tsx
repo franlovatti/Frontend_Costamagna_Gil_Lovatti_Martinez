@@ -1,14 +1,15 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
-import type { Establecimiento } from '../types.tsx';
 import { Submit } from '../components/ButtonField.tsx';
+import { useEstablecimientosEvento} from '../hooks/useEstablecimientos.tsx';
+import alert from '../components/alert.tsx';
 
 export default function EditarEstablecimiento() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
   const { eventoId } = useParams();
-  const [establecimientos, setEstablecimientos] = useState<Establecimiento[]>();
+  const [message, setMessage] = useState<string>();
+  const [success, setSuccess] = useState(false);
 
   const [form, setForm] = useState({
     nombre: '',
@@ -17,23 +18,7 @@ export default function EditarEstablecimiento() {
     id: 0,
   });
 
-  useEffect(() => {
-    const fetchItems = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(
-          'http://localhost:3000/api/establecimientos/evento/' + eventoId
-        );
-        setEstablecimientos(response.data.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchItems();
-  }, [eventoId]);
+  const {establecimientos, loadingEstablecimientos, errorEstablecimientos} = useEstablecimientosEvento(eventoId);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -58,21 +43,29 @@ export default function EditarEstablecimiento() {
         }
       );
       console.log('Respuesta del backend:', response.data);
-      alert('Establecimiento modificado con éxito');
+      setMessage('Establecimiento modificado con éxito');
+      setSuccess(true);
+      setTimeout(() => {
       navigate(-1);
+      }, 2000);
     } catch (error: unknown) {
       if (error instanceof Error === false) {
         console.error('Error desconocido:', error);
-        alert('Ocurrió un error desconocido.');
+        setMessage('Ocurrió un error desconocido.');
       } else {
         console.error('Error al modificar establecimiento: ', error.message);
-        alert('Error al modificar establecimiento: ' + error.message);
+        setMessage('Error al modificar establecimiento: ' + error.message);
       }
     }
   };
   return (
     <div className="container mt-4 text-bg-dark p-4 rounded-3 shadow-lg">
       <h2>Editar Establecimiento</h2>
+      {errorEstablecimientos && (
+        alert({message: 'Error al cargar los establecimientos: ' + errorEstablecimientos.message, success: false})
+        )}
+
+        {alert({message, success})}
 
       {/* Selección del establecimiento */}
       <div className="mb-3">
@@ -82,7 +75,7 @@ export default function EditarEstablecimiento() {
         <select
           id="selectEstablecimiento"
           className="form-select"
-          value={form.nombre} // temporalmente usamos nombre para detectar selección
+          value={form.id} 
           onChange={(e) => {
             const selectedId = Number(e.target.value);
             const selected = establecimientos?.find(
@@ -99,7 +92,7 @@ export default function EditarEstablecimiento() {
           }}
         >
           <option value="">Seleccione un establecimiento</option>
-          {!loading &&
+          {!loadingEstablecimientos &&
             establecimientos &&
             establecimientos.map((est) => (
               <option key={est.id} value={est.id}>
@@ -109,7 +102,7 @@ export default function EditarEstablecimiento() {
         </select>
       </div>
 
-      {form.nombre && (
+      {form.id != 0 && (
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="nombre" className="form-label">

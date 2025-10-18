@@ -1,13 +1,12 @@
-import { useState } from 'react';
-import { InputField } from '../components/InputField.tsx';
-import { Button, Submit } from '../components/ButtonField.tsx';
-import { useForm } from 'react-hook-form';
-import { useAuth } from '../hooks/useAuth.tsx';
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useAuth } from "../hooks/useAuth.tsx";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import "./Auth.css";
 
 const Login = () => {
-  const { login, loading: cargandoAuth, error } = useAuth();
+  const { login, loading: cargandoAuth, error, setError } = useAuth();
   const navigate = useNavigate();
 
   type LoginFormFields = {
@@ -26,77 +25,94 @@ const Login = () => {
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  //Falta la logica del remember
   const onSubmit = async (data: LoginFormFields) => {
     setLoading(true);
     try {
       const success = await login(data.usuario, data.contraseña, data.remember);
       if (!success) {
-        throw new Error('Credenciales inválidas');
+        throw new Error("Credenciales inválidas");
       }
-      navigate('/home');
+      navigate("/");
     } catch (error) {
-      console.error('Error al iniciar sesion:', error);
+      console.error("Error al iniciar sesion:", error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="vh-100 d-flex justify-content-center align-items-center bg-light">
-      <div
-        className="bg-white p-4 rounded shadow w-50"
-        style={{ maxWidth: '400px' }}
-      >
-        <h2 className="text-center mb-4">Iniciar Sesión</h2>
+    <div className="auth-container">
+      <div className="auth-card">
+        <h2 className="auth-title mb-4">Iniciar Sesión</h2>
+        
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="mb-3">
-            <InputField
+          <div className="auth-form-group">
+            <input
               type="text"
+              className="auth-input"
               placeholder="Usuario o Dirección de correo electrónico"
               {...register('usuario', { required: true })}
             />
             {errors.usuario && (
-              <span className="text-danger">Este campo es obligatorio</span>
+              <span className="auth-error-text">Este campo es obligatorio</span>
             )}
           </div>
-          <div className="mb-3">
-            <InputField
+
+          <div className="auth-form-group">
+            <input
               type="password"
+              className="auth-input"
               placeholder="Contraseña"
               {...register('contraseña', { required: true })}
             />
             {errors.contraseña && (
-              <span className="text-danger">Este campo es obligatorio</span>
+              <span className="auth-error-text">Este campo es obligatorio</span>
             )}
           </div>
-          <div className="mb-3">
-            <label className="checkbox-label">
-              <input type="checkbox" {...register('remember')} />
-              <span>Recordarme</span>
+
+          <div className="auth-checkbox-container">
+            <input
+              type="checkbox"
+              id="remember"
+              className="auth-checkbox"
+              {...register("remember")}
+            />
+            <label htmlFor="remember" className="auth-checkbox-label">
+              Recordarme
             </label>
           </div>
-          <div className="d-flex justify-content-between">
-            <Button
-              className="btn btn-primary"
-              onClick={() => (window.location.href = '/Registro')}
+
+          <div className="auth-button-group">
+            <button
+              type="button"
+              className="auth-btn auth-btn-secondary"
+              onClick={() => { setError(null); navigate('/Registro'); }}
             >
               Registrarse
-            </Button>
-            <Submit className="btn btn-primary" disabled={loading}>
-              {loading ? 'Enviando...' : 'Aceptar'}
-            </Submit>
+            </button>
+            <button
+              type="submit"
+              className="auth-btn auth-btn-primary"
+              disabled={loading || cargandoAuth}
+            >
+              {loading ? "Iniciando..." : "Iniciar Sesión"}
+            </button>
           </div>
+
           {cargandoAuth && (
-            <div className="d-flex justify-content-center my-3">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Cargando...</span>
-              </div>
+            <div className="auth-spinner-container">
+              <div className="auth-spinner"></div>
             </div>
           )}
-          {error && <div className="alert alert-danger mt-3">{error}</div>}
-          <div className="text-center mt-3">
-            <Link to="/ForgotPassword">¿Olvidaste tu contraseña?</Link>
+
+          {error && (
+            <div className="auth-error-alert">{error}</div>
+          )}
+
+          <div className="auth-link-container">
+            <Link to="/ForgotPassword" className="auth-link">
+              ¿Olvidaste tu contraseña?
+            </Link>
           </div>
         </form>
       </div>

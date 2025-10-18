@@ -47,7 +47,7 @@ type Partido = {
   maxAnotador?: Usuario;
   evento: Torneo;
   fecha: Date;
-  hora: Date;
+  hora: string;
   establecimiento?: Establecimiento;
   participations?: Participation[];
   resultadoLocal: number | null;

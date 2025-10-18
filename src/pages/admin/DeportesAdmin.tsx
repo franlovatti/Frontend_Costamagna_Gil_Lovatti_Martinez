@@ -1,24 +1,19 @@
 import { useState } from 'react';
-import { useDeporte } from '../hooks/useDeporte.tsx';
+import { useDeporte } from '../../hooks/useDeporte.tsx';
 import './DeportesAdmin.css';
-import type { Deporte } from '../contexts/deporte.tsx';
-import SearchBar from '../components/SearchBar.tsx';
-import DeportesTable from '../components/DeporteTable.tsx';
-import DeporteFormModal from '../components/DeporteFormModal.tsx';
-import ConfirmModal from '../components/ConfirmModal.tsx';
+import type { Deporte } from '../../contexts/deporte.tsx';
+import SearchBar from '../../components/SearchBar.tsx';
+import DeportesTable from '../../components/admin/DeporteTable.tsx';
+import DeporteFormModal from '../../components/admin/DeporteFormModal.tsx';
+import ConfirmModal from '../../components/ConfirmModal.tsx';
+import Filtros from '../../components/filtros/Filtros.tsx';
+import FiltroRango from '../../components/filtros/FiltroRango.tsx';
 
 const DeportesAdmin = () => {
-  const { deportes, borrarDeporte, modificarDeporte, crearDeporte } =
-    useDeporte();
+  const { deportes, borrarDeporte, modificarDeporte, crearDeporte, filtrarDeportes, getDeportes } = useDeporte();
   const [searchTerm, setSearchTerm] = useState('');
   const [editingDeporte, setEditingDeporte] = useState<Deporte | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({
-    nombre: '',
-    cantMinJugadores: 0,
-    cantMaxJugadores: 0,
-    duracion: 0,
-  });
 
   // Filtrar deportes
   const deportesFiltrados = deportes.filter((deporte) =>
@@ -28,48 +23,23 @@ const DeportesAdmin = () => {
   // Abrir modal para crear
   const handleCreate = () => {
     setEditingDeporte(null);
-    setFormData({
-      nombre: '',
-      cantMinJugadores: 0,
-      cantMaxJugadores: 0,
-      duracion: 0,
-    });
     setShowModal(true);
   };
 
   // Abrir modal para editar
   const handleEdit = (deporte: Deporte) => {
     setEditingDeporte(deporte);
-    setFormData({
-      nombre: deporte.nombre,
-      cantMinJugadores: deporte.cantMinJugadores,
-      cantMaxJugadores: deporte.cantMaxJugadores,
-      duracion: deporte.duracion,
-    });
     setShowModal(true);
   };
 
   // Guardar (crear o editar)
-  const handleSave = () => {
+  const handleSave = (deporteData: Partial<Deporte>) => {
     if (editingDeporte) {
       // Editar
-      const deporte: Deporte = {
-        id: editingDeporte.id,
-        nombre: formData.nombre,
-        cantMinJugadores: formData.cantMinJugadores,
-        cantMaxJugadores: formData.cantMaxJugadores,
-        duracion: formData.duracion,
-      };
-      modificarDeporte(deporte);
+      modificarDeporte({ ...deporteData, id: editingDeporte.id } as Deporte);
     } else {
       // Crear
-      const newDeporte = {
-        nombre: formData.nombre,
-        cantMinJugadores: formData.cantMinJugadores,
-        cantMaxJugadores: formData.cantMaxJugadores,
-        duracion: formData.duracion,
-      };
-      crearDeporte(newDeporte as Deporte);
+      crearDeporte(deporteData as Deporte);
     }
 
     setShowModal(false);
@@ -98,6 +68,27 @@ const DeportesAdmin = () => {
     setDeporteAEliminar(null);
   };
 
+    const [filtros, setFiltros] = useState({
+    cantMaxJug: 0,
+    cantMinJug: 0,
+    minDesde: 0,
+    minHasta: 0
+  });
+
+  const handleFiltros = () => {
+    filtrarDeportes(filtros.cantMaxJug, filtros.cantMinJug, filtros.minDesde, filtros.minHasta);
+  };
+
+  const handleLimpiarFiltros = () => {
+    setFiltros({
+      cantMaxJug: 0,
+      cantMinJug: 0,
+      minDesde: 0,
+      minHasta: 0
+    });
+    getDeportes();
+  };
+
   return (
     <div className="deportes-page">
       <div className="page-header mb-4 pb-3">
@@ -110,9 +101,35 @@ const DeportesAdmin = () => {
       <SearchBar
         value={searchTerm}
         onChange={setSearchTerm}
+        hayBoton={true}
         onCreate={handleCreate}
         crear="Deporte"
       />
+
+      <Filtros
+        onAplicar={handleFiltros}
+        onLimpiar={handleLimpiarFiltros}
+      >
+        <FiltroRango
+          title="Cantidad de Jugadores"
+          min={1}
+          max={100}
+          valueMin={filtros.cantMinJug}
+          valueMax={filtros.cantMaxJug}
+          onMinChange={(value) => setFiltros({ ...filtros, cantMinJug: value })}
+          onMaxChange={(value) => setFiltros({ ...filtros, cantMaxJug: value })}
+        />
+        <FiltroRango
+          title="Minutos de Juego"
+          min={0}
+          max={240}
+          valueMin={filtros.minDesde}
+          valueMax={filtros.minHasta}
+          onMinChange={(value) => setFiltros({ ...filtros, minDesde: value })}
+          onMaxChange={(value) => setFiltros({ ...filtros, minHasta: value })}
+        />
+
+      </Filtros>
 
       <DeportesTable
         deportes={deportesFiltrados}
@@ -124,17 +141,14 @@ const DeportesAdmin = () => {
         <DeporteFormModal
           setShowModal={setShowModal}
           editingDeporte={editingDeporte}
-          formData={formData}
-          setFormData={setFormData}
-          handleSave={handleSave}
+          onSave={handleSave}
         />
       )}
 
       {showConfirm && (
         <ConfirmModal
-          objeto="deporte"
+          objeto={"eliminar el deporte " + deporteAEliminar?.nombre}
           setShowConfirm={setShowConfirm}
-          objetoAEliminar={deporteAEliminar}
           handleConfirmDelete={handleConfirmDelete}
           handleCancelDelete={handleCancelDelete}
         />

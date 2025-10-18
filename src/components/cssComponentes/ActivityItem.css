@@ -4,14 +4,14 @@
   align-items: flex-start;
   gap: 1rem;
   padding: 1rem;
-  background-color: rgba(0, 109, 226, 0.05);
+  background-color: var(--hover-bg-strong);
   border-radius: 6px;
   border-left: 2px solid var(--primary);
   transition: all 0.2s ease;
 }
 
 .activity-item:hover {
-  background-color: rgba(0, 109, 226, 0.1);
+  background-color: var(--hover-bg);
 }
 
 .activity-icon {
@@ -28,6 +28,6 @@
 
 .activity-time {
   font-size: 0.8rem;
-  color: rgba(229, 245, 247, 0.5);
+  color: var(--text-muted);
   font-weight: 300;
 }

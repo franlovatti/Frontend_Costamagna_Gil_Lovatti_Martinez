@@ -1,12 +1,3 @@
-/* Variables de color */
-:root {
-  --text: #e5f5f7;
-  --background: #0f0f0f;
-  --primary: #006de2;
-  --secondary: #021666;
-  --accent: #2e2e8a;
-}
-
 /* Layout principal */
 .auth-layout {
   min-height: 100vh;
@@ -16,8 +7,8 @@
 /* Sidebar */
 .auth-sidebar {
   width: 280px;
-  background-color: #1a1a1a;
-  border-right: 1px solid rgba(0, 109, 226, 0.2);
+  background-color: var(--background-secondary);
+  border-right: 1px solid var(--border);
   color: var(--text);
   height: 100vh;
   position: sticky;
@@ -25,7 +16,9 @@
 }
 
 .sidebar-header {
-  border-bottom: 1px solid rgba(0, 109, 226, 0.1);
+  border-bottom: 1px solid var(--hover-bg);
+  position: relative;
+  padding-right: 70px !important;
 }
 
 .sidebar-header h2 {
@@ -56,13 +49,13 @@
 }
 
 .sidebar-link:hover {
-  background-color: rgba(0, 109, 226, 0.1);
+  background-color: var(--hover-bg);
   border-left-color: var(--primary);
   color: var(--text);
 }
 
 .sidebar-link.active {
-  background-color: rgba(0, 109, 226, 0.15);
+  background-color: var(--hover-bg-strong);
   border-left-color: var(--primary);
   color: var(--primary);
   font-weight: 400;
@@ -77,13 +70,19 @@
 
 /* Sidebar Footer */
 .sidebar-footer {
-  border-top: 1px solid rgba(0, 109, 226, 0.1);
+  border-top: 1px solid var(--hover-bg);
+}
+
+.theme-toggle-wrapper {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
 }
 
 .logout-btn {
   background-color: transparent;
   border: 1px solid rgba(231, 76, 60, 0.4);
-  color: #e74c3c;
+  color: var(--danger);
   padding: 0.875rem 1rem;
   border-radius: 6px;
   cursor: pointer;
@@ -94,7 +93,7 @@
 
 .logout-btn:hover {
   background-color: rgba(231, 76, 60, 0.1);
-  border-color: #e74c3c;
+  border-color: var(--danger);
 }
 
 .logout-btn .icon {
@@ -109,8 +108,8 @@
 }
 
 .auth-header {
-  background-color: #1a1a1a;
-  border-bottom: 1px solid rgba(0, 109, 226, 0.1);
+  background-color: var(--background-secondary);
+  border-bottom: 1px solid var(--hover-bg);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -127,6 +126,40 @@
   overflow-y: auto;
 }
 
+/* contenedor: no wrap */
+.auth-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+/* título: una sola línea, que trunque si no entra */
+.auth-title {
+  flex: 1 1 auto;
+  min-width: 0;              /* clave para permitir truncado en flex */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+/* acciones: ancho estable para el toggle */
+.auth-actions {
+  flex: 0 0 auto;
+}
+
+/* botón del toggle con tamaño fijo para no empujar el título */
+.auth-actions .theme-toggle-btn {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+
 /* Responsive Design */
 @media (max-width: 900px) {
   .auth-layout {
@@ -138,7 +171,7 @@
     height: auto;
     position: relative;
     border-right: none;
-    border-bottom: 1px solid rgba(0, 109, 226, 0.2);
+    border-bottom: 1px solid var(--border);
   }
   
   .sidebar-nav {

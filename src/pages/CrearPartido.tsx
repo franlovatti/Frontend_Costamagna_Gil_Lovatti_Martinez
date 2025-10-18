@@ -1,56 +1,25 @@
 import { Form, Row, Col } from 'react-bootstrap';
 import { Submit } from '../components/ButtonField.tsx';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-import apiAxios from '../helpers/api.tsx';
-import type { Equipo } from '../types.tsx';
+
+import { useEstablecimientosEvento } from '../hooks/useEstablecimientos.tsx';
+import alert from '../components/alert.tsx';
+import { useEquiposEvento } from '../hooks/useEquipos.tsx';
 
 export default function CrearPartido() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const [equipos, setEquipos] = useState<Equipo[]>([]);
+  //const [loading, setLoading] = useState(false);
+  const { eventoId } = useParams();
+  const [success, setSuccess] = useState(false);
+  const [message, setMessage] = useState<string>();
 
-  const [loading, setLoading] = useState(false);
-  interface Establecimiento {
-    id: number;
-    nombre: string;
-    direccion: string;
-  }
-  const [establecimientos, setEstablecimientos] = useState<Establecimiento[]>(
-    []
-  );
+  const { establecimientos, loadingEstablecimientos, errorEstablecimientos } =
+    useEstablecimientosEvento(eventoId);
 
-  useEffect(() => {
-    const fetchItems = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(
-          'http://localhost:3000/api/establecimientos/evento/' + id
-        );
-        setEstablecimientos(response.data.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchItems();
-  }, [id]);
-
-  useEffect(() => {
-    console.log('Fetching equipos for eventoId:', id);
-    apiAxios
-      .get(`/eventos/${id}`)
-      .then((response) => {
-        const torneo = response.data.data;
-        setEquipos(torneo.equipos);
-      })
-      .catch((error) => {
-        console.error('Error fetching evento:', error);
-      });
-  }, [id]);
+  const { equipos, loadingEquipos, errorEquipos } = useEquiposEvento(eventoId);
 
   const [form, setForm] = useState({
     fecha: '',
@@ -96,21 +65,39 @@ export default function CrearPartido() {
         }
       );
       console.log('Respuesta del backend:', response.data);
-      alert('Partido creado con éxito');
-      navigate(-1);
+      setMessage('Partido creado con éxito');
+      setSuccess(true);
+      setTimeout(() => {
+        navigate(-1);
+      }, 2000);
     } catch (error: unknown) {
       if (error instanceof Error === false) {
         console.error('Error desconocido:', error);
-        alert('Ocurrió un error desconocido.');
+        setMessage('Ocurrió un error desconocido.');
       } else {
         console.error('Error al crear establecimiento: ', error.message);
-        alert('Error al crear establecimiento: ' + error.message);
+        setMessage('Error al crear establecimiento: ' + error.message);
       }
     }
   };
 
   return (
     <div className="text-bg-dark container">
+      {errorEstablecimientos &&
+        alert({
+          message:
+            'Error al cargar los establecimientos: ' +
+            errorEstablecimientos.message,
+          success: false,
+        })}
+
+      {errorEquipos &&
+        alert({
+          message: 'Error al cargar los equipos: ' + errorEquipos.message,
+          success: false,
+        })}
+
+      {alert({ message, success })}
       <Form onSubmit={handleSubmit}>
         <Row>
           <Col md={6}>
@@ -123,12 +110,17 @@ export default function CrearPartido() {
                 onChange={handleChange}
                 required
               >
-                <option value="">Seleccione el equipo local</option>
-                {equipos.map((equipo) => (
-                  <option key={equipo.id} value={equipo.id}>
-                    {equipo.nombre}
-                  </option>
-                ))}
+                <option value="">
+                  {loadingEquipos
+                    ? 'Cargando equipos...'
+                    : 'Seleccione el equipo local'}
+                </option>
+                {!loadingEquipos &&
+                  equipos.map((equipo) => (
+                    <option key={equipo.id} value={equipo.id}>
+                      {equipo.nombre}
+                    </option>
+                  ))}
               </Form.Select>
             </Form.Group>
           </Col>
@@ -236,14 +228,14 @@ export default function CrearPartido() {
                 required
               >
                 <option value="">
-                  {loading
+                  {loadingEstablecimientos
                     ? 'Cargando establecimientos...'
                     : establecimientos.length === 0
                     ? 'No hay establecimientos disponibles'
                     : 'Seleccione el establecimiento'}
                 </option>
 
-                {!loading &&
+                {!loadingEstablecimientos &&
                   establecimientos.map((establecimiento) => (
                     <option key={establecimiento.id} value={establecimiento.id}>
                       {establecimiento.nombre +

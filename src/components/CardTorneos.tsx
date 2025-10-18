@@ -1,7 +1,7 @@
 import { Button, Card, ListGroup } from 'react-bootstrap';
-import type { Torneo } from '../../types';
 import '../CardTorneos.css';
 
+import type { Torneo } from '../types';
 interface CardTorneosProps {
   torneo: Torneo;
   handleClick: (id: number) => void;
@@ -21,6 +21,8 @@ export default function CardTorneos({
   const fechaFinEvento = new Date(torneo.fechaFinEvento).toLocaleDateString(
     'es-AR'
   );
+  const deporteNombre = torneo.deporte?.nombre ?? 'Sin deporte';
+  const localidadNombre = torneo.localidad?.nombre ?? 'Sin localidad';
   return (
     <div className="torneos-card-styles">
       <Card
@@ -43,13 +45,13 @@ export default function CardTorneos({
           </Card.Text>
           <ListGroup variant="flush">
             <ListGroup.Item className="bg-dark text-white border-primary">
-              {torneo.deporte.nombre}
+              {deporteNombre}
             </ListGroup.Item>
             <ListGroup.Item className="bg-dark text-white border-primary">
               {fechaInicioEvento} - {fechaFinEvento}
             </ListGroup.Item>
             <ListGroup.Item className="bg-dark text-white border-primary">
-              {torneo.localidad.nombre}
+              {localidadNombre}
             </ListGroup.Item>
             <ListGroup.Item className="bg-dark text-white border-primary"></ListGroup.Item>
           </ListGroup>

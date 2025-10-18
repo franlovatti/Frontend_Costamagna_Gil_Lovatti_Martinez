@@ -1,4 +1,4 @@
-import type { Noticia } from '../types';
+import type { Noticia } from '../../contexts/noticia.tsx';
 
 export default function NoticiaRow({
   noticia,
@@ -9,14 +9,24 @@ export default function NoticiaRow({
   onEdit: (n: Noticia) => void;
   onDelete: (n: Noticia) => void;
 }) {
-  const fechaStr = noticia.fecha
-    ? new Date(noticia.fecha).toLocaleDateString()
-    : '';
+  
+  const toDate = (v?: string | Date | null): Date | null => {
+    if (!v) return null;
+    const d = typeof v === "string" ? new Date(v) : v;
+    return isNaN(d.getTime()) ? null : d;
+  };
+
+  const fmtDate = (v?: string | Date | null) => {
+    const d = toDate(v);
+    return d ? d.toLocaleDateString() : "";
+  };
+
+
   return (
     <tr>
       <td>{noticia.titulo}</td>
       <td>{noticia.descripcion}</td>
-      <td>{fechaStr || '—'}</td>
+      <td>{fmtDate(noticia.fecha)}</td>
       <td>
         <button className="btn-action me-2" onClick={() => onEdit(noticia)}>
           ✏️ Editar
