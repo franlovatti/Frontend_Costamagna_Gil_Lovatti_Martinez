@@ -42,6 +42,7 @@ import CrearParticipacion from './pages/CrearParticipacion.tsx';
 import EditarParticipacion from './pages/EditarParticipacion.tsx';
 import NoticiaPage from './pages/NoticiaPage.tsx';
 import NoticiasProvider from './providers/NoticiaProvider.tsx';
+import MisTorneos from './pages/misTorneos.tsx';
 function App() {
   return (
     <AuthProvider>
@@ -105,6 +106,7 @@ function App() {
                       path="torneos/:id/EditarPartido"
                       element={<EditarPartido />}
                     />
+                    <Route path="mis-torneos" element={<MisTorneos />} />
                     <Route path="equipos/:id" element={<VerEquipo />} />
                     <Route
                       path="equipos/:id/editar"

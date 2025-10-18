@@ -180,7 +180,33 @@ export default function TorneoDetalle() {
   return (
     <div className="container text-bg-dark p-3">
       <Row>
-        <h2>{torneo.nombre}</h2>
+        <Col>
+          <h2>{torneo.nombre}</h2>
+        </Col>
+        <Col className="d-flex justify-content-center mb-2 mb-md-0">
+          {Number(user?.id) === torneo.creador && (
+            <Button
+              variant="outline-light"
+              onClick={() => {
+                navigate(`/home/torneos/${id}/editar`);
+              }}
+            >
+              Editar
+            </Button>
+          )}
+        </Col>
+        <Col className="d-flex justify-content-center">
+          {Number(user?.id) === torneo.creador && (
+            <Button
+              variant="danger"
+              onClick={() => {
+                handleDelete();
+              }}
+            >
+              Eliminar
+            </Button>
+          )}
+        </Col>
       </Row>
       <Row>
         <p style={{ opacity: 0.8 }}>{torneo.deporte.nombre}</p>
@@ -241,14 +267,9 @@ export default function TorneoDetalle() {
           className="d-flex justify-content-center mb-2 mb-md-0"
         >
           {Number(user?.id) === torneo.creador && (
-            <Button
-              variant="outline-light"
-              onClick={() => {
-                navigate(`/home/torneos/${id}/editar`);
-              }}
-            >
-              Editar
-            </Button>
+            <Link to={`CrearEstablecimiento`}>
+              <Button variant="outline-primary">Crear Establecimientos</Button>
+            </Link>
           )}
         </Col>
         <Col
@@ -266,34 +287,9 @@ export default function TorneoDetalle() {
             </Button>
           )}
         </Col>
-        <Col xs={12} md={4} className="d-flex justify-content-center">
-          {Number(user?.id) === torneo.creador && (
-            <Button
-              variant="danger"
-              onClick={() => {
-                handleDelete();
-              }}
-            >
-              Eliminar
-            </Button>
-          )}
-        </Col>
-      </Row>
-      <Row>
         <Col
           xs={12}
-          md={6}
-          className="d-flex justify-content-center mb-2 mb-md-0"
-        >
-          {Number(user?.id) === torneo.creador && (
-            <Link to={`CrearEstablecimiento`}>
-              <Button variant="outline-primary">Crear Establecimientos</Button>
-            </Link>
-          )}
-        </Col>
-        <Col
-          xs={12}
-          md={6}
+          md={4}
           className="d-flex justify-content-center mb-2 mb-md-0"
         >
           {Number(user?.id) === torneo.creador && (
@@ -424,40 +420,47 @@ export default function TorneoDetalle() {
                         : '-'}
                     </td>
                     <td>
-                      {Number(user?.id) === torneo.creador && (
-                        <div className="d-flex gap-2 align-items-start">
-                          <Link to={`/home/Participaciones/${partido.id}`}>
-                            <Button variant="outline-primary">
-                              Cargar Participaciones
+                      <div className="d-flex gap-2 align-items-start">
+                        <Link to={`/home/Participaciones/${partido.id}`}>
+                          <Button variant="outline-primary">Ver Partido</Button>
+                        </Link>
+                        {Number(user?.id) === torneo.creador && (
+                          <div className="d-flex gap-2 align-items-start">
+                            <Link to={`/home/Participaciones/${partido.id}`}>
+                              <Button variant="outline-primary">
+                                Cargar Participaciones
+                              </Button>
+                            </Link>
+                            <Link
+                              to={`/home/torneos/${torneo.id}/EditarPartido`}
+                            >
+                              <Button variant="outline-primary">
+                                Editar Partido
+                              </Button>
+                            </Link>
+                            <Button
+                              variant="outline-primary"
+                              onClick={() => {
+                                setPartidoSeleccionado(partido);
+                                setResultadoLocal(
+                                  partido.resultadoLocal == null
+                                    ? ''
+                                    : String(partido.resultadoLocal)
+                                );
+                                setResultadoVisitante(
+                                  partido.resultadoVisitante == null
+                                    ? ''
+                                    : String(partido.resultadoVisitante)
+                                );
+                                setResultadoModal(true);
+                              }}
+                            >
+                              Editar Resultado
                             </Button>
-                          </Link>
-                          <Link to={`/home/torneos/${torneo.id}/EditarPartido`}>
-                            <Button variant="outline-primary">
-                              Editar Partido
-                            </Button>
-                          </Link>
-                          <Button
-                            variant="outline-primary"
-                            onClick={() => {
-                              setPartidoSeleccionado(partido);
-                              setResultadoLocal(
-                                partido.resultadoLocal == null
-                                  ? ''
-                                  : String(partido.resultadoLocal)
-                              );
-                              setResultadoVisitante(
-                                partido.resultadoVisitante == null
-                                  ? ''
-                                  : String(partido.resultadoVisitante)
-                              );
-                              setResultadoModal(true);
-                            }}
-                          >
-                            Editar Resultado
-                          </Button>
-                          <Button variant="danger">Eliminar</Button>
-                        </div>
-                      )}
+                            <Button variant="danger">Eliminar</Button>
+                          </div>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}

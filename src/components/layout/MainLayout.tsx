@@ -3,6 +3,7 @@ import { useAuth } from '../../hooks/useAuth.tsx';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
+import { NavDropdown } from 'react-bootstrap';
 
 export default function MainLayout() {
   /**Con logica de logeo <Navbar.Brand href="/">React-Bootstrap</Navbar.Brand> tendria el href="/home" */
@@ -25,9 +26,14 @@ export default function MainLayout() {
             <Nav className="ms-auto fw-bold">
               {isAuthenticated ? (
                 <>
-                  <Nav.Link as={Link} to="torneos">
-                    Torneos
-                  </Nav.Link>
+                  <NavDropdown title="Torneos" id="torneos-nav-dropdown">
+                    <NavDropdown.Item as={Link} to="mis-torneos">
+                      Mis Torneos
+                    </NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="torneos">
+                      Lista de Torneos
+                    </NavDropdown.Item>
+                  </NavDropdown>
                   <Nav.Link
                     as={Link}
                     to={

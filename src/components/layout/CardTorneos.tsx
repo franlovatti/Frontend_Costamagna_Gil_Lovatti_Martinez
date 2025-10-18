@@ -55,12 +55,8 @@ export default function CardTorneos({
           </ListGroup>
           <div className="d-flex justify-content-center">
             {isMember && (
-              <Button
-                variant="outline-info"
-                className="align-self-center"
-                onClick={() => handleClick(torneo.id)}
-              >
-                Mas Informacion
+              <Button variant="outline-primary" disabled>
+                Inscribirse
               </Button>
             )}
             {!isMember && (
