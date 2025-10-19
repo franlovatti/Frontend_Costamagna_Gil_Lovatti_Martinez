@@ -2,10 +2,10 @@ import FormPartido from '../components/FormPartido.tsx';
 import { useParams } from 'react-router';
 
 export default function EditarPartido() {
-  const { eventoId, partidoId} = useParams<{ eventoId: string, partidoId: string}>();
+  const { id, partidoId} = useParams<{ id: string, partidoId: string}>();
   return(
     <FormPartido
-    id = {eventoId!}
+    id = {id!}
     createMode = {false}
     partidoId = {partidoId}
     />

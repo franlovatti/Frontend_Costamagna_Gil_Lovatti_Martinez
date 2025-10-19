@@ -96,14 +96,20 @@ export default function FormPartido({id, createMode, partidoId}: FormPartidoProp
     e.preventDefault();
     try {
       const payload = {
-        ...form,
-        resultadoLocal:
-          form.resultadoLocal === '' ? null : Number(form.resultadoLocal),
-        resultadoVisitante:
-          form.resultadoVisitante === ''
-            ? null
-            : Number(form.resultadoVisitante),
+        ...( !createMode && { id: form.id } ),
+      fecha: form.fecha,
+      hora: form.hora,
+      juez: form.juez,
+      resultadoLocal:
+        form.resultadoLocal === '' ? null : Number(form.resultadoLocal),
+      resultadoVisitante:
+        form.resultadoVisitante === '' ? null : Number(form.resultadoVisitante),
+      equipoLocal: form.equipoLocal,
+      equipoVisitante: form.equipoVisitante,
+      evento: form.evento,
+      establecimiento: form.establecimiento,
       };
+      console.log('Payload a enviar:', payload);
       let response;
       if(createMode){
         response = await axios.post(
