@@ -47,7 +47,7 @@ export default function EditarEstablecimiento() {
       setSuccess(true);
       setTimeout(() => {
       navigate(-1);
-      }, 2000);
+      }, 1000);
     } catch (error: unknown) {
       if (error instanceof Error === false) {
         console.error('Error desconocido:', error);
