@@ -127,7 +127,7 @@ export default function FormPartido({id, createMode, partidoId}: FormPartidoProp
       setSuccess(true);
       setTimeout(() => {
         navigate(-1);
-      }, 2000);
+      }, 1000);
     } catch (error: unknown) {
       if (error instanceof Error === false) {
         console.error('Error desconocido:', error);
