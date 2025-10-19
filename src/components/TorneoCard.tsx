@@ -1,4 +1,5 @@
 import type { Torneo } from "../contexts/torneo.tsx";
+import { useNavigate } from "react-router-dom";
 import "./cssComponentes/TorneoCard.css";
 
 export default function TorneoCard({
@@ -22,12 +23,13 @@ export default function TorneoCard({
     return d ? d.toLocaleDateString() : "";
   };
 
+  const navigate = useNavigate();
   const deporte = torneo.deporte ?? null;
   const isIndividual = deporte?.cantMaxJugadores === 1;
 
   return (
 
-<div key={torneo.id} className="col-12 col-md-6 col-lg-4">
+<div key={torneo.id} className="col-12 col-md-6 col-lg-4" role="button" onClick={() => navigate(`/home/torneos/${torneo.id}`)}>
   <div className="torneo-card h-100">
     <div className="d-flex justify-content-between align-items-start mb-3">
       <h3 className="torneo-nombre mb-0">{torneo.nombre}</h3>
@@ -54,10 +56,10 @@ export default function TorneoCard({
     </div>
     
     <div className="d-flex gap-2 mt-auto">
-      <button className="btn-action flex-grow-1" onClick={() => onEdit(torneo)}>
+      <button className="btn-action flex-grow-1" onClick={(e) =>{e.stopPropagation(); onEdit(torneo);}}>
         ✏️ Editar
       </button>
-      <button className="btn-action btn-delete flex-grow-1" onClick={() => onDelete(torneo)}>
+      <button className="btn-action btn-delete flex-grow-1" onClick={(e) =>{e.stopPropagation(); onDelete(torneo);}}>
         🗑️ Eliminar
       </button>
     </div>

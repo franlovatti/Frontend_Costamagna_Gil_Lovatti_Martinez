@@ -50,11 +50,7 @@ export default function MainLayout() {
                   </NavDropdown>
                   <Nav.Link
                     as={Link}
-                    to={
-                      user?.role === 'Administrador'
-                        ? 'lista-noticias'
-                        : 'noticias'
-                    }
+                    to={'noticias'}
                   >
                     Noticias
                   </Nav.Link>

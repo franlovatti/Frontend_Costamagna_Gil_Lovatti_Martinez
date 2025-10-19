@@ -1,0 +1,75 @@
+/* Perfil.css */
+
+.perfil-page {
+  min-height: 100vh;
+  background-color: var(--background);
+  padding: 2rem 0;
+}
+
+.container-perfil {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Header */
+.perfil-header h1 {
+  font-size: 2rem;
+  font-weight: 300;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+  .perfil-card {
+    margin-bottom: 2rem;
+  }
+
+  .torneo-details {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .container-perfil {
+    padding: 0 1rem;
+  }
+
+  .perfil-page {
+    padding: 1rem 0;
+  }
+
+  .perfil-card {
+    padding: 1.5rem;
+  }
+
+  .perfil-avatar {
+    width: 100px;
+    height: 100px;
+  }
+
+  .perfil-nombre {
+    font-size: 1.25rem;
+  }
+
+  .stat-card-small {
+    padding: 1rem;
+  }
+
+  .stat-icon-small {
+    font-size: 1.5rem;
+  }
+
+  .stat-number-small {
+    font-size: 1.5rem;
+  }
+
+  .torneos-section {
+    padding: 1rem;
+  }
+
+  .torneo-item {
+    padding: 1rem;
+  }
+}
