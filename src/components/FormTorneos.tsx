@@ -260,6 +260,7 @@ export default function FormTorneos() {
               name="localidad"
               value={form.localidad}
               onChange={handleChange}
+              required
             >
               <option value="">Seleccione la localidad</option>
               {dataLocalidades.map((localidad) => (
