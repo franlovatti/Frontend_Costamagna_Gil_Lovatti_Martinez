@@ -135,7 +135,22 @@ export default function FormPartido({id, createMode, partidoId}: FormPartidoProp
         navigate(-1);
       }, 1000);
     } catch (error: unknown) {
-      if (error instanceof Error === false) {
+      if(axios.isAxiosError(error)){
+        if(error.response){
+        console.error('Error del backend:', error.response.data);
+        setMessage(error.response.data.message || 'Error desconocido del servidor');
+          setSuccess(false);
+        } else if(error.request){
+          console.error('Sin respuesta del servidor:', error.request);
+          setMessage('No se recibió respuesta del servidor.');
+          setSuccess(false);
+        }else{
+        console.error('Error al configurar la petición:', error.message);
+        setMessage('Error al enviar la solicitud: ' + error.message);
+        setSuccess(false);
+        }
+      } 
+      else if (error instanceof Error === false) {
         console.error('Error desconocido:', error);
         setMessage('Ocurrió un error desconocido.');
       } else {
