@@ -1,0 +1,459 @@
+/* Torneos.css */
+
+.torneos-page-container {
+  min-height: 100vh;
+  background-color: var(--background);
+  padding: 2rem 0;
+}
+
+.torneos-inner-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Header */
+.torneos-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.torneos-header h1 {
+  font-size: 2rem;
+  font-weight: 300;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  margin: 0 0 0.5rem 0;
+}
+
+.torneos-subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 300;
+  margin: 0;
+}
+
+/* Toolbar */
+.torneos-toolbar {
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn-toolbar {
+  padding: 0.75rem 1.5rem;
+  background-color: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 300;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn-toolbar:hover {
+  background-color: var(--hover-bg);
+  border-color: var(--primary);
+}
+
+.btn-toolbar-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+.btn-toolbar-primary:hover {
+  background-color: var(--secondary);
+  border-color: var(--secondary);
+}
+
+.filtro-select-toolbar {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.75rem 1rem;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 300;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filtro-select-toolbar:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 109, 226, 0.1);
+}
+
+.filtro-select-toolbar option {
+  background-color: var(--background-secondary);
+  color: var(--text);
+}
+
+/* Grid de torneos */
+.torneos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Card de torneo */
+.torneo-card {
+  background-color: var(--background-secondary);
+  border: 1px solid var(--primary);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.torneo-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 109, 226, 0.3);
+}
+
+.torneo-card-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  background-color: var(--background);
+  border-bottom: 2px solid var(--primary);
+}
+
+.torneo-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.torneo-card-title {
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: var(--text);
+  margin: 0 0 0.75rem 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.torneo-card-description {
+  font-size: 1rem;
+  color: var(--text-muted);
+  font-weight: 300;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex-grow: 1;
+}
+
+.torneo-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background-color: var(--background);
+  border-radius: 6px;
+}
+
+.torneo-info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text);
+  font-weight: 300;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid var(--primary);
+}
+
+.info-text {
+  flex: 1;
+}
+
+.torneo-card-footer {
+  margin-top: auto;
+}
+
+.btn-inscribirse {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: var(--primary);
+  border: none;
+  border-radius: 6px;
+  color: #e5f5f7;
+  font-size: 0.95rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-inscribirse:hover:not(:disabled) {
+  background-color: var(--secondary);
+}
+
+.btn-inscribirse:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--text-muted);
+}
+
+/* Modal personalizado */
+.modal-custom-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 1rem;
+}
+
+.modal-custom-content {
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-custom-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-custom-title {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--text);
+  margin: 0;
+}
+
+.modal-custom-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  transition: all 0.3s ease;
+  line-height: 1;
+}
+
+.modal-custom-close:hover {
+  color: var(--text);
+}
+
+.modal-custom-body {
+  padding: 1.5rem;
+}
+
+.modal-custom-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.modal-form-group {
+  margin-bottom: 1.5rem;
+}
+
+.modal-form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.modal-form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 300;
+  transition: all 0.3s ease;
+}
+
+.modal-form-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 109, 226, 0.1);
+}
+
+.modal-info-text {
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 300;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.modal-error-text {
+  color: #e74c3c;
+  font-size: 0.85rem;
+  font-weight: 300;
+  margin-top: 0.5rem;
+}
+
+.modal-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-weight: 400;
+}
+
+.modal-btn-secondary {
+  background-color: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.modal-btn-secondary:hover:not(:disabled) {
+  background-color: var(--hover-bg);
+  border-color: var(--primary);
+}
+
+.modal-btn-primary {
+  background-color: var(--primary);
+  color: #e5f5f7;
+}
+
+.modal-btn-primary:hover:not(:disabled) {
+  background-color: var(--secondary);
+}
+
+.modal-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Alert de error */
+.alert-danger-custom {
+  background-color: rgba(231, 76, 60, 0.1);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  border-radius: 6px;
+  padding: 1rem;
+  color: #e74c3c;
+  font-size: 0.95rem;
+  font-weight: 300;
+  margin-bottom: 1.5rem;
+}
+
+/* Empty state */
+.torneos-empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.empty-state-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty-state-text {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  font-weight: 300;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .torneos-inner-container {
+    padding: 0 1rem;
+  }
+
+  .torneos-page-container {
+    padding: 1rem 0;
+  }
+
+  .torneos-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .torneos-toolbar {
+    padding: 1rem;
+  }
+
+  .toolbar-actions {
+    flex-direction: column;
+  }
+
+  .btn-toolbar,
+  .filtro-select-toolbar {
+    width: 100%;
+  }
+
+  .torneos-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .torneo-card-image {
+    height: 200px;
+  }
+
+  .modal-custom-content {
+    margin: 0;
+  }
+
+  .modal-custom-header,
+  .modal-custom-body,
+  .modal-custom-footer {
+    padding: 1rem;
+  }
+
+  .modal-custom-footer {
+    flex-direction: column;
+  }
+
+  .modal-btn {
+    width: 100%;
+  }
+}

@@ -28,10 +28,6 @@ import TorneosAdmin from './pages/admin/TorneosAdmin.tsx';
 import AuthLayout from './components/layout/AuthLayout.tsx';
 import CrearTorneo from './pages/CrearTorneo.tsx';
 import CrearPartido from './pages/CrearPartido.tsx';
-// import Listanoticias from './pages/Listanoticias.tsx';
-// import Crearnoticia from './pages/Crearnoticia.tsx';
-// import Editarnoticia from './pages/Editarnoticia.tsx';
-import NoLoggedHome from './pages/NoLoggedHome.tsx';
 import CrearEstablecimiento from './pages/CrearEstablecimiento.tsx';
 import EditarEstablecimiento from './pages/EditarEstablecimiento.tsx';
 import EditarPartido from './pages/EditarPartido.tsx';
@@ -43,7 +39,6 @@ import VerEquipo from './pages/VerEquipo.tsx';
 import EditarEquipo from './pages/EditarEquipo.tsx';
 import CrearParticipacion from './pages/CrearParticipacion.tsx';
 import EditarParticipacion from './pages/EditarParticipacion.tsx';
-//import NoticiaPage from './pages/NoticiaPage.tsx';
 import MisTorneos from './pages/misTorneos.tsx';
 import UsuariosAdmin from './pages/admin/UsuariosAdmin.tsx';
 import NoticiasAdmin from './pages/admin/NoticiasAdmin.tsx';
@@ -59,7 +54,7 @@ function App() {
               <Routes>
                 {/*Rutas con el MainLayout*/}
                 <Route path="/" element={<MainLayout />}>
-                  <Route index element={<NoLoggedHome />} />
+                  <Route index element={<MainHome />} />
                   <Route path="Login" element={<Login />} />
                   <Route path="CrearPartido" element={<CrearPartido />} />
                   <Route
