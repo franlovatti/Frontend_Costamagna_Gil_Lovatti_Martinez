@@ -1,5 +1,5 @@
 import { Button, Card, ListGroup } from 'react-bootstrap';
-import './CardTorneos.css';
+import './cssComponentes/CardTorneos.css';
 
 import type { Torneo } from '../types';
 interface CardTorneosProps {

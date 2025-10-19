@@ -8,6 +8,7 @@ export interface User {
   email: string;
   role: string;
   estado: boolean;
+  fechaNacimiento?: Date;
 }
 
 export interface AuthContextType {

@@ -150,7 +150,8 @@ const TorneosAdmin = () => {
             key={torneo.id}
             torneo={torneo} 
             onEdit={handleEdit} 
-            onDelete={handleDelete} />
+            onDelete={handleDelete}
+            />
           ))
         )}
       </div>
