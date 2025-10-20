@@ -10,8 +10,19 @@ import { AxiosError } from 'axios';
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  const fectchPerfil = useCallback(async (id: string) => {
+    try {
+      const res = await apiAxios.get(`/usuarios/perfil/${id}`);
+      const userData = res.data.data;
+      console.log('Datos del perfil obtenidos:', userData);
+      setUser(prevUser => ({ ...prevUser, ...userData }));
+    } catch (error) {
+      console.error("Error al obtener el perfil del usuario:", error);
+    }
+  }, []);
 
   const login = useCallback(async (usuario: string, contraseña: string, remember: boolean) => {
     try {
@@ -28,6 +39,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         }
         setIsAuthenticated(true);
         setUser({ usuario, role: data.role, id: data.id, nombre: data.nombre, apellido: data.apellido, email: data.email, estado: data.estado });
+        await fectchPerfil(data.id);
         return true;
       }
       setError("Usuario o contraseña incorrectos");
@@ -41,7 +53,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [fectchPerfil]);
 
   const logout = useCallback(async () => {
     localStorage.removeItem('token');
@@ -109,68 +121,64 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   useEffect(() => {
     const restaurarSesion = async () => {
       setLoading(true);
-      try {
-        const token = localStorage.getItem('token');
-        if (token) {
-          try {
-            const decoded = jwtDecode<{ id: string; usuario: string; role: string; nombre?: string; apellido?: string; exp?: number; email: string; estado: boolean }>(token);
-            // Verificamos expiración
-            if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-              // Token expirado
-              localStorage.removeItem('token');
-              setIsAuthenticated(false);
-              setUser(null);
-            } else {
-              const userFromToken: User = {
-                id: decoded.id,
-                nombre: decoded.nombre,
-                apellido: decoded.apellido,
-                usuario: decoded.usuario,
-                email: decoded.email,
-                role: decoded.role,
-                estado: decoded.estado
-              };
-              setUser(userFromToken);
-              setIsAuthenticated(true);
-              setLoading(false);
-              return;
-            }
-          } catch {
-            // Si el token es inválido, lo borramos
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const decoded = jwtDecode<{ id: string; usuario: string; role: string; exp?: number; email: string; estado: boolean }>(token);
+          // Verificamos expiración
+          if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+            // Token expirado
             localStorage.removeItem('token');
             setIsAuthenticated(false);
             setUser(null);
-          }
-        }
-        // Si no hay token válido, intentamos restaurar con cookie recuerdame
-        try {
-          const response = await apiAxios.post('/usuarios/restaurar');
-          const data = response.data;
-          if (data.token) {
-            localStorage.setItem('token', data.token);
+          } else {
             const userFromToken: User = {
-                id: data.id,
-                nombre: data.nombre,
-                apellido: data.apellido,
-                usuario: data.usuario,
-                email: data.email,
-                role: data.role,
-                estado: data.estado
-              };
+              id: decoded.id,
+              usuario: decoded.usuario,
+              email: decoded.email,
+              role: decoded.role,
+              estado: decoded.estado
+            };
             setUser(userFromToken);
             setIsAuthenticated(true);
+            await fectchPerfil(decoded.id);
+            setLoading(false);
+            return;
           }
         } catch {
-          // No se pudo restaurar sesión con cookie
+          // Si el token es inválido, lo borramos
+          localStorage.removeItem('token');
           setIsAuthenticated(false);
           setUser(null);
         }
+      }
+      // Si no hay token válido, intentamos restaurar con cookie recuerdame
+      try {
+        const response = await apiAxios.post('/usuarios/restaurar');
+        const data = response.data;
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+          const userFromToken: User = {
+              id: data.id,
+              role: data.role,
+              estado: data.estado,
+              usuario: data.usuario,
+              email: data.email
+            };
+          setUser(userFromToken);
+          setIsAuthenticated(true);
+          await fectchPerfil(data.id);
+        }
+      } catch {
+        // No se pudo restaurar sesión con cookie
+        setIsAuthenticated(false);
+        setUser(null);
       } finally {
         setLoading(false);
       }
     };
     restaurarSesion();
-  }, []);
+  }, [fectchPerfil]);
 
   return (
     <AuthContext.Provider value={authValue}>

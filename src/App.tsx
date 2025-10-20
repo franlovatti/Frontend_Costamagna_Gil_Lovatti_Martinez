@@ -63,10 +63,6 @@ function App() {
                   <Route path="Login" element={<Login />} />
                   <Route path="CrearPartido" element={<CrearPartido />} />
                   <Route
-                    path="CrearPartido/:eventoId"
-                    element={<CrearPartido />}
-                  />
-                  <Route
                     path="CrearEstablecimiento"
                     element={<CrearEstablecimiento />}
                   />
@@ -77,10 +73,6 @@ function App() {
                   <Route
                     path="EditarEstablecimiento/:eventoId"
                     element={<EditarEstablecimiento />}
-                  />
-                  <Route
-                    path="EditarPartido/:eventoId/:partidoId"
-                    element={<EditarPartido />}
                   />
                   <Route path="Registro" element={<Registro />}></Route>
                   <Route

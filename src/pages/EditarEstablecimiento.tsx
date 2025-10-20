@@ -3,7 +3,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { Submit } from '../components/ButtonField.tsx';
 import { useEstablecimientosEvento} from '../hooks/useEstablecimientos.tsx';
-import alert from '../components/alert.tsx';
+import alert from '../components/Alert.tsx';
 
 export default function EditarEstablecimiento() {
   const navigate = useNavigate();
@@ -47,7 +47,7 @@ export default function EditarEstablecimiento() {
       setSuccess(true);
       setTimeout(() => {
       navigate(-1);
-      }, 2000);
+      }, 1000);
     } catch (error: unknown) {
       if (error instanceof Error === false) {
         console.error('Error desconocido:', error);

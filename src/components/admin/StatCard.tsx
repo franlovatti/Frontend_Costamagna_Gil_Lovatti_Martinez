@@ -15,7 +15,9 @@ const StatCard: React.FC<StatCardProps> = ({ icon, title, value, subtitle, value
     <div>
       <p className="stat-label">{title}</p>
       <h3 className="stat-value">{value}</h3>
-      <p className="stat-subtext">{subtitle}: {value2}</p>
+      {subtitle && value2 !== undefined && (
+        <p className="stat-subtext">{subtitle}: {value2}</p>
+      )}
     </div>
   </div>
 );
