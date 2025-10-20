@@ -140,7 +140,7 @@ function App() {
                       element={<EditarParticipacion />}
                     />
                     <Route
-                      path="partido-detalle"
+                      path="partido-detalle/:id"
                       element={<PartidoDetalle />}
                     ></Route>
 

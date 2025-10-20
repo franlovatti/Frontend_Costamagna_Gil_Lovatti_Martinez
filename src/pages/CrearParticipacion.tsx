@@ -105,7 +105,6 @@ export default function CrearParticipacion() {
     };
 
     try {
-      // Crear nueva participación (la edición se maneja en el modal)
       await apiAxios.post('/participaciones', payload);
       await traerParticipaciones();
       setForm({ usuarioId: '', minutosjugados: '', faltas: '', puntos: '' });
