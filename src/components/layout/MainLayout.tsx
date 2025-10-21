@@ -3,7 +3,6 @@ import { useAuth } from '../../hooks/useAuth.tsx';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import { NavDropdown } from 'react-bootstrap';
 import ThemeToggle from '../ThemeToggle.tsx';
 import '../cssComponentes/Layout.css';
 
@@ -40,24 +39,24 @@ export default function MainLayout() {
             <Nav className="ms-auto fw-bold navbar-nav">
               {isAuthenticated ? (
                 <>
-                  <NavDropdown title="Torneos" id="torneos-nav-dropdown">
-                    <NavDropdown.Item as={Link} to="mis-torneos">
-                      Mis Torneos
-                    </NavDropdown.Item>
-                    <NavDropdown.Item as={Link} to="torneos">
-                      Lista de Torneos
-                    </NavDropdown.Item>
-                  </NavDropdown>
                   <Nav.Link
                     as={Link}
-                    to={'noticias'}
+                    to={'/home/torneos'}
+                  >
+                    Torneos
+                  </Nav.Link>
+                  <Nav.Link
+                    as={Link}
+                    to={'/home/mis-torneos'}
+                  >
+                    Mis torneos
+                  </Nav.Link>
+                  <Nav.Link
+                    as={Link}
+                    to={'/home/noticias'}
                   >
                     Noticias
                   </Nav.Link>
-                  {/*
-                  <Nav.Link as={Link} to="/home/noticias" className="nav-link">
-                    Noticias
-                  </Nav.Link>*/}
                   <Nav.Link as={Link} to="/home/perfil" className="nav-link">
                     Perfil
                   </Nav.Link>

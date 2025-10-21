@@ -38,7 +38,6 @@ import CrearEquipo from './pages/CrearEquipo.tsx';
 import VerEquipo from './pages/VerEquipo.tsx';
 import EditarEquipo from './pages/EditarEquipo.tsx';
 import CrearParticipacion from './pages/CrearParticipacion.tsx';
-import EditarParticipacion from './pages/EditarParticipacion.tsx';
 import MisTorneos from './pages/misTorneos.tsx';
 import UsuariosAdmin from './pages/admin/UsuariosAdmin.tsx';
 import NoticiasAdmin from './pages/admin/NoticiasAdmin.tsx';
@@ -117,10 +116,6 @@ function App() {
                     <Route
                       path="participaciones/:id"
                       element={<CrearParticipacion />}
-                    />
-                    <Route
-                      path="editarparticipacion/:id"
-                      element={<EditarParticipacion />}
                     />
                     <Route
                       path="partido-detalle/:id"

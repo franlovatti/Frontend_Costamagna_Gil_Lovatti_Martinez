@@ -122,7 +122,7 @@ export default function MainHome() {
 
       {/* Por que elegir nuestra plataforma */}
       <section className="features-section">
-        <h2 className="section-title">¿Por qué elegir nuestra plataforma?</h2>
+        <h2 className="section-title pb-4">¿Por qué elegir nuestra plataforma?</h2>
         <div className="features-grid">
           {features.map((feature, index) => (
             <div key={index} className="feature-card">
