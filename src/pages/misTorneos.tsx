@@ -3,11 +3,14 @@ import CardTorneos from '../components/CardTorneos.tsx';
 import { useNavigate } from 'react-router';
 import apiAxios from '../helpers/api';
 import { useEffect, useState } from 'react';
-import type { Torneo, Equipo, Usuario } from '../types';
+import type { Torneo } from '../types';
 import { useAuth } from '../hooks/useAuth.tsx';
 
 export default function MisTorneos() {
-  const [dataTorneos, setDataTorneos] = useState<Torneo[]>([]);
+  const [dataTorneosCreador, setDataTorneosCreador] = useState<Torneo[]>([]);
+  const [dataTorneosInscripto, setDataTorneosInscripto] = useState<Torneo[]>(
+    []
+  );
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -20,26 +23,26 @@ export default function MisTorneos() {
   lo hice asi con get all para hacerlo rapido */
   useEffect(() => {
     apiAxios
-      .get('/eventos')
+      .get('/eventos/creador/' + user?.id)
       .then((response) => {
-        setDataTorneos(response.data.data);
+        setDataTorneosCreador(response.data.data);
+        console.log('Torneos creados:', response.data.data);
       })
       .catch((error) => {
         console.error('Error fetching torneos:', error);
       });
-  }, []);
-  const userIsMemberOf = (torneo: Torneo): boolean => {
-    if (!user || !torneo?.equipos) return false;
-    const userIdStr = String(user.id);
-    return torneo.equipos.some((e: Equipo) => {
-      const miembros = (e.miembros as Usuario[]) ?? [];
-      return miembros.some((m) => String(m.id) === userIdStr);
-    });
-  };
-  const userIsCreatorOf = (torneo: Torneo): boolean => {
-    if (!user || !torneo) return false;
-    return String(torneo.creador) == String(user.id);
-  };
+  }, [user?.id]);
+
+  useEffect(() => {
+    apiAxios
+      .get('/eventos/participacion/' + user?.id)
+      .then((response) => {
+        setDataTorneosInscripto(response.data.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching torneos:', error);
+      });
+  }, [user?.id]);
 
   return (
     <div className="text-bg-dark container">
@@ -50,7 +53,7 @@ export default function MisTorneos() {
       >
         <Tab eventKey="created" title="Torneos Creados">
           <Row>
-            {dataTorneos.map((torneo) => (
+            {dataTorneosCreador.map((torneo) => (
               <Col
                 key={torneo.id}
                 xs={12}
@@ -59,16 +62,14 @@ export default function MisTorneos() {
                 lg={3}
                 className="mb-4"
               >
-                {userIsCreatorOf(torneo) && (
-                  <CardTorneos torneo={torneo} handleClick={handleClick} />
-                )}
+                <CardTorneos torneo={torneo} handleClick={handleClick} />
               </Col>
             ))}
           </Row>
         </Tab>
         <Tab eventKey="inscript" title="Torneos Inscripto">
           <Row>
-            {dataTorneos.map((torneo) => (
+            {dataTorneosInscripto.map((torneo) => (
               <Col
                 key={torneo.id}
                 xs={12}
@@ -77,9 +78,7 @@ export default function MisTorneos() {
                 lg={3}
                 className="mb-4"
               >
-                {userIsMemberOf(torneo) && (
-                  <CardTorneos torneo={torneo} handleClick={handleClick} />
-                )}
+                <CardTorneos torneo={torneo} handleClick={handleClick} />
               </Col>
             ))}
           </Row>

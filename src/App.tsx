@@ -57,18 +57,6 @@ function App() {
                   <Route index element={<MainHome />} />
                   <Route path="Login" element={<Login />} />
                   <Route path="CrearPartido" element={<CrearPartido />} />
-                  <Route
-                    path="CrearEstablecimiento"
-                    element={<CrearEstablecimiento />}
-                  />
-                  <Route
-                    path="CrearEstablecimiento/:eventoId"
-                    element={<CrearEstablecimiento />}
-                  />
-                  <Route
-                    path="EditarEstablecimiento/:eventoId"
-                    element={<EditarEstablecimiento />}
-                  />
                   <Route path="Registro" element={<Registro />}></Route>
                   <Route
                     path="ForgottenPassword"
@@ -135,7 +123,7 @@ function App() {
                       element={<EditarParticipacion />}
                     />
                     <Route
-                      path="partido-detalle"
+                      path="partido-detalle/:id"
                       element={<PartidoDetalle />}
                     ></Route>
 
