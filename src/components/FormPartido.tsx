@@ -1,5 +1,5 @@
-import { useState, useEffect} from 'react';
-import { useNavigate} from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useEstablecimientosEvento } from '../hooks/useEstablecimientos';
 import { useEquiposEvento } from '../hooks/useEquipos';
 import { useOnePartido } from '../hooks/usePartidos';
@@ -14,32 +14,42 @@ interface FormPartidoProps {
   partidoId?: string;
 }
 
-
-export default function FormPartido({id, createMode, partidoId}: FormPartidoProps) {
+export default function FormPartido({
+  id,
+  createMode,
+  partidoId,
+}: FormPartidoProps) {
   const navigate = useNavigate();
   const [message, setMessage] = useState<string>();
   const [success, setSuccess] = useState(false);
   const [form, setForm] = useState({
-      fecha: '',
-      hora: '',
-      juez: '',
-      resultadoLocal: '',
-      resultadoVisitante: '',
-      equipoLocal: 0,
-      equipoVisitante: 0,
-      evento: Number(id),
-      establecimiento: 0,
-      id: 0,
-    });
+    fecha: '',
+    hora: '',
+    juez: '',
+    resultadoLocal: '',
+    resultadoVisitante: '',
+    equipoLocal: 0,
+    equipoVisitante: 0,
+    evento: Number(id),
+    establecimiento: 0,
+    id: 0,
+  });
 
-    const { establecimientos, loadingEstablecimientos, errorEstablecimientos } =
-        useEstablecimientosEvento(id);
-    
-    const { equipos, loadingEquipos, errorEquipos } = useEquiposEvento(id);
+  const { establecimientos, loadingEstablecimientos, errorEstablecimientos } =
+    useEstablecimientosEvento(id);
 
-    const {partido, loadingPartido, errorPartido, setPartido, setLoadingPartido, setErrorPartido} = useOnePartido(partidoId);
+  const { equipos, loadingEquipos, errorEquipos } = useEquiposEvento(id);
 
-    useEffect(() => {
+  const {
+    partido,
+    loadingPartido,
+    errorPartido,
+    setPartido,
+    setLoadingPartido,
+    setErrorPartido,
+  } = useOnePartido(partidoId);
+
+  useEffect(() => {
     if (!partidoId || createMode) return;
 
     const fetchData = async () => {
@@ -57,7 +67,6 @@ export default function FormPartido({id, createMode, partidoId}: FormPartidoProp
         setLoadingPartido(false);
       }
     };
-    
 
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -80,7 +89,7 @@ export default function FormPartido({id, createMode, partidoId}: FormPartidoProp
     }
   }, [partido, createMode]);
 
-    const handleChange = (
+  const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
@@ -96,37 +105,39 @@ export default function FormPartido({id, createMode, partidoId}: FormPartidoProp
     e.preventDefault();
     try {
       const payload = {
-        ...( !createMode && { id: form.id } ),
-      fecha: form.fecha,
-      hora: form.hora,
-      juez: form.juez,
-      resultadoLocal:
-        form.resultadoLocal === '' ? null : Number(form.resultadoLocal),
-      resultadoVisitante:
-        form.resultadoVisitante === '' ? null : Number(form.resultadoVisitante),
-      equipoLocal: form.equipoLocal,
-      equipoVisitante: form.equipoVisitante,
-      evento: form.evento,
-      establecimiento: form.establecimiento,
+        ...(!createMode && { id: form.id }),
+        fecha: form.fecha,
+        hora: form.hora,
+        juez: form.juez,
+        resultadoLocal:
+          form.resultadoLocal === '' ? null : Number(form.resultadoLocal),
+        resultadoVisitante:
+          form.resultadoVisitante === ''
+            ? null
+            : Number(form.resultadoVisitante),
+        equipoLocal: form.equipoLocal,
+        equipoVisitante: form.equipoVisitante,
+        evento: form.evento,
+        establecimiento: form.establecimiento,
       };
       console.log('Payload a enviar:', payload);
       let response;
-      if(createMode){
+      if (createMode) {
         response = await axios.post(
-        'http://localhost:3000/api/partidos',
-        payload,
-        {
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
-      } else{
-       response = await axios.put(
-        'http://localhost:3000/api/partidos/' + form.id,
-        payload,
-        {
-          headers: { 'Content-Type': 'application/json' },
-        }
-      ); 
+          'http://localhost:3000/api/partidos',
+          payload,
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
+      } else {
+        response = await axios.put(
+          'http://localhost:3000/api/partidos/' + form.id,
+          payload,
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
       console.log('Respuesta del backend:', response.data);
       setMessage('Partido modificado con éxito');
@@ -135,22 +146,23 @@ export default function FormPartido({id, createMode, partidoId}: FormPartidoProp
         navigate(-1);
       }, 1000);
     } catch (error: unknown) {
-      if(axios.isAxiosError(error)){
-        if(error.response){
-        console.error('Error del backend:', error.response.data);
-        setMessage(error.response.data.message || 'Error desconocido del servidor');
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          console.error('Error del backend:', error.response.data);
+          setMessage(
+            error.response.data.message || 'Error desconocido del servidor'
+          );
           setSuccess(false);
-        } else if(error.request){
+        } else if (error.request) {
           console.error('Sin respuesta del servidor:', error.request);
           setMessage('No se recibió respuesta del servidor.');
           setSuccess(false);
-        }else{
-        console.error('Error al configurar la petición:', error.message);
-        setMessage('Error al enviar la solicitud: ' + error.message);
-        setSuccess(false);
+        } else {
+          console.error('Error al configurar la petición:', error.message);
+          setMessage('Error al enviar la solicitud: ' + error.message);
+          setSuccess(false);
         }
-      } 
-      else if (error instanceof Error === false) {
+      } else if (error instanceof Error === false) {
         console.error('Error desconocido:', error);
         setMessage('Ocurrió un error desconocido.');
       } else {
@@ -159,9 +171,9 @@ export default function FormPartido({id, createMode, partidoId}: FormPartidoProp
       }
     }
   };
-  
+
   return (
-  <div className="text-bg-dark container">
+    <div className="text-bg-dark container">
       {errorEstablecimientos &&
         alert({
           message:
@@ -176,16 +188,25 @@ export default function FormPartido({id, createMode, partidoId}: FormPartidoProp
           success: false,
         })}
 
-        {errorPartido &&
+      {errorPartido &&
         alert({
-            message: 'Error al cargar los datos del partido: ' + errorPartido.message,
-            success: false,
+          message:
+            'Error al cargar los datos del partido: ' + errorPartido.message,
+          success: false,
         })}
 
       {alert({ message, success })}
       <Form onSubmit={handleSubmit}>
         <Row>
-            <Col md={12}><h3>{createMode ? 'Crear Partido' : loadingPartido ? 'Cargando Partido...' : 'Editar Partido'}</h3></Col>
+          <Col md={12}>
+            <h3>
+              {createMode
+                ? 'Crear Partido'
+                : loadingPartido
+                ? 'Cargando Partido...'
+                : 'Editar Partido'}
+            </h3>
+          </Col>
           <Col md={6}>
             <Form.Group className="mb-3" controlId="formHomeTeam">
               <Form.Label>Seleccione el equipo local</Form.Label>
@@ -203,7 +224,11 @@ export default function FormPartido({id, createMode, partidoId}: FormPartidoProp
                 </option>
                 {!loadingEquipos &&
                   equipos.map((equipo) => (
-                    <option key={equipo.id} value={equipo.id}>
+                    <option
+                      key={equipo.id}
+                      value={equipo.id}
+                      disabled={equipo.id === form.equipoVisitante}
+                    >
                       {equipo.nombre}
                     </option>
                   ))}
@@ -223,7 +248,11 @@ export default function FormPartido({id, createMode, partidoId}: FormPartidoProp
               >
                 <option value="">Seleccione el equipo visitante</option>
                 {equipos.map((equipo) => (
-                  <option key={equipo.id} value={equipo.id}>
+                  <option
+                    key={equipo.id}
+                    value={equipo.id}
+                    disabled={equipo.id === form.equipoLocal}
+                  >
                     {equipo.nombre}
                   </option>
                 ))}
@@ -337,6 +366,5 @@ export default function FormPartido({id, createMode, partidoId}: FormPartidoProp
         <Submit>Cargar Partido</Submit>
       </Form>
     </div>
-    )
-
+  );
 }
