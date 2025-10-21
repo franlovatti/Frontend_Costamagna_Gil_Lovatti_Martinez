@@ -7,14 +7,17 @@ interface CardTorneosProps {
   handleClick: (id: number) => void;
   isMember?: boolean;
   onEnroll?: (torneo: Torneo) => void;
+  isCreador?: boolean;
 }
 
 export default function CardTorneos({
   torneo,
   handleClick,
-  isMember = false,
+  isMember,
   onEnroll,
+  isCreador,
 }: CardTorneosProps) {
+  const canAccess = Boolean(isMember || isCreador);
   const fechaInicioEvento = new Date(
     torneo.fechaInicioEvento
   ).toLocaleDateString('es-AR');
@@ -29,7 +32,10 @@ export default function CardTorneos({
         bg="dark"
         border="secondary"
         text="white"
-        onClick={() => handleClick(torneo.id)}
+        onClick={() => (canAccess ? handleClick(torneo.id) : undefined)}
+        role={canAccess ? 'button' : undefined}
+        aria-disabled={!canAccess}
+        style={{ cursor: canAccess ? 'pointer' : 'default' }}
       >
         <Card.Img variant="top" src={torneo.img} />
         <Card.Body>
@@ -56,12 +62,11 @@ export default function CardTorneos({
             <ListGroup.Item className="bg-dark text-white border-primary"></ListGroup.Item>
           </ListGroup>
           <div className="d-flex justify-content-center">
-            {isMember && (
+            {canAccess ? (
               <Button variant="outline-primary" disabled>
                 Inscribirse
               </Button>
-            )}
-            {!isMember && (
+            ) : (
               <Button
                 variant="outline-primary"
                 onClick={() =>

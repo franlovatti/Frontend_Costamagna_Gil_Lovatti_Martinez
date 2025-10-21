@@ -18,7 +18,7 @@ export default function Torneos() {
   const [code, setCode] = useState('');
   const [codeError, setCodeError] = useState<string | null>(null);
   const [resolving, setResolving] = useState(false);
-  // Modal de inscripción a evento
+
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Torneo | null>(null);
   const [eventPwd, setEventPwd] = useState('');
@@ -71,7 +71,7 @@ export default function Torneos() {
           return;
         }
       }
-      // Si es público o la contraseña coincide, navegamos al detalle
+
       setShowEventModal(false);
       navigate(`/home/torneos/${selectedEvent.id}`);
     } catch (err) {
@@ -89,6 +89,12 @@ export default function Torneos() {
       const miembros = (e.miembros as Usuario[]) ?? [];
       return miembros.some((m) => String(m.id) === userIdStr);
     });
+  };
+  const userIsCreadorOf = (torneo: Torneo): boolean => {
+    if (!user || !torneo?.equipos) return false;
+    const userIdStr = String(user.id);
+    const torneoCreadorId = String(torneo.creador);
+    return torneoCreadorId === userIdStr;
   };
 
   const openCodeModal = () => {
@@ -111,9 +117,8 @@ export default function Torneos() {
       );
       const evento = res.data?.data ?? res.data;
       if (evento && typeof evento.id === 'number') {
-        // Abrimos el mismo modal de inscripción para validar en cliente si es privado
+        navigate(`/home/torneos/${evento.id}`);
         setShowCodeModal(false);
-        handleEnrollFromCard(evento as Torneo);
       } else {
         setCodeError('Código inválido');
       }
@@ -288,6 +293,7 @@ export default function Torneos() {
                 handleClick={handleClick}
                 isMember={userIsMemberOf(torneo)}
                 onEnroll={handleEnrollFromCard}
+                isCreador={userIsCreadorOf(torneo)}
               />
             </Col>
           ))}

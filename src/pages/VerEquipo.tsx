@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Modal, Button as RBButton } from 'react-bootstrap';
+import { Modal, Button as RBButton, Table } from 'react-bootstrap';
 
 import apiAxios from '../helpers/api';
 import { useAuth } from '../hooks/useAuth';
@@ -20,11 +20,7 @@ export default function VerEquipo() {
   const [leaving, setLeaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  const idtorneo = equipo
-    ? typeof equipo.evento === 'number'
-      ? (equipo.evento as number)
-      : (equipo.evento as { id: number }).id
-    : undefined;
+  const idtorneo = equipo?.evento.id;
 
   const fetchEquipo = useCallback(async () => {
     setLoading(true);
@@ -92,12 +88,11 @@ export default function VerEquipo() {
       setShowDeleteModal(false);
     }
   }
-  // Guardas tempranas mientras cargamos o si hay error
+
   if (loading) return <div>Cargando...</div>;
   if (error) return <div>{error}</div>;
   if (!equipo) return <div>Equipo no encontrado.</div>;
 
-  // Con equipo no nulo, podemos calcular estados derivados
   const userIdStr = user ? String(user.id) : undefined;
   const capId = equipo.capitan.id;
   const isMember =
@@ -110,32 +105,51 @@ export default function VerEquipo() {
       <div className="row justify-content-center">
         <div className="col-12 col-md-8">
           <div className="card bg-dark text-white shadow">
-            <div className="card-body">
-              <h2 className="card-title">{equipo.nombre}</h2>
-              <p className="card-subtitle mb-2 text-muted">
+            <div className="card-body ">
+              <h1 className="card-title display-4 text-center">
+                {equipo.nombre}
+              </h1>
+
+              <hr className="border-primary" />
+              <p className="card-subtitle mb-2">
                 Capitán: {equipo.nombreCapitan}
               </p>
               <p className="mb-3">Puntos: {equipo.puntos}</p>
 
-              <h5>Miembros</h5>
+              <h5 className="mt-4">Miembros</h5>
               {Array.isArray(equipo.miembros) && equipo.miembros.length > 0 ? (
-                <ul className="list-group list-group-flush mb-3">
-                  {(equipo.miembros as Usuario[]).map((miembro) => (
-                    <li
-                      key={miembro.id}
-                      className="list-group-item bg-dark text-white border-primary"
-                    >
-                      {miembro.nombre ?? miembro.usuario ?? miembro.id}
-                    </li>
-                  ))}
-                </ul>
+                <Table
+                  striped
+                  bordered
+                  hover
+                  responsive
+                  size="sm"
+                  className="table-dark align-middle mt-3"
+                >
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Apellido</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(equipo.miembros as Usuario[]).map((miembro) => (
+                      <tr key={miembro.id}>
+                        <td>
+                          {miembro.nombre ?? miembro.usuario ?? miembro.id}
+                        </td>
+                        <td>{miembro.apellido ?? ''}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
               ) : (
                 <div className="alert alert-secondary">
                   No hay miembros listados.
                 </div>
               )}
 
-              <div className="d-flex gap-2 justify-content-end">
+              <div className="d-flex gap-2 justify-content-end mt-4">
                 <Button
                   className="btn-outline-light"
                   onClick={() => navigate(`/home/torneos/${idtorneo}`)}
