@@ -103,11 +103,6 @@ export default function FormPartido({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (form.equipoLocal === form.equipoVisitante) {
-      setMessage('El equipo local y visitante no pueden ser el mismo.');
-      setSuccess(false);
-      return;
-    }
     try {
       const payload = {
         ...(!createMode && { id: form.id }),
@@ -229,7 +224,11 @@ export default function FormPartido({
                 </option>
                 {!loadingEquipos &&
                   equipos.map((equipo) => (
-                    <option key={equipo.id} value={equipo.id}>
+                    <option
+                      key={equipo.id}
+                      value={equipo.id}
+                      disabled={equipo.id === form.equipoVisitante}
+                    >
                       {equipo.nombre}
                     </option>
                   ))}
@@ -249,7 +248,11 @@ export default function FormPartido({
               >
                 <option value="">Seleccione el equipo visitante</option>
                 {equipos.map((equipo) => (
-                  <option key={equipo.id} value={equipo.id}>
+                  <option
+                    key={equipo.id}
+                    value={equipo.id}
+                    disabled={equipo.id === form.equipoLocal}
+                  >
                     {equipo.nombre}
                   </option>
                 ))}
