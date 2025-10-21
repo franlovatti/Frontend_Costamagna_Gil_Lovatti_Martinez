@@ -74,7 +74,7 @@ export default function TorneoDetalle() {
   const handleDeleteTeam = async (teamId: number) => {
     if (!confirm('¿Estás seguro de eliminar este equipo?')) return;
     try {
-      await apiAxios.delete(`/equipos/${teamId}`);
+      await apiAxios.delete(`/equipos/${id}`);
       fetchTorneo();
     } catch (err) {
       console.error('Error eliminando equipo:', err);

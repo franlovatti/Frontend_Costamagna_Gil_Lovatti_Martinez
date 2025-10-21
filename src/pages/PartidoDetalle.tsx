@@ -12,6 +12,8 @@ import {
 } from 'react-bootstrap';
 import { useOnePartido } from '../hooks/usePartidos';
 import { useParticipaciones } from '../hooks/useParticipaciones';
+import { Button } from '../components/ButtonField.tsx';
+import { useNavigate } from 'react-router-dom';
 
 export default function PartidoDetalle() {
   const { id } = useParams<{ id: string }>();
@@ -21,6 +23,7 @@ export default function PartidoDetalle() {
     'local' | 'visitante'
   >('local');
   const [equipoid, setEquipoid] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (partido) {
@@ -163,6 +166,13 @@ export default function PartidoDetalle() {
           </Card.Body>
         </Card>
       )}
+      <Button
+        className="btn-outline-light"
+        onClick={() => navigate(`/home/torneos/${partido.evento.id}`)}
+        disabled={typeof partido.evento.id === 'undefined'}
+      >
+        Volver
+      </Button>
     </Container>
   );
 }

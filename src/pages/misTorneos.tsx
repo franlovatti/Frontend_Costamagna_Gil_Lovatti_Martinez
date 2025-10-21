@@ -62,7 +62,11 @@ export default function MisTorneos() {
                 lg={3}
                 className="mb-4"
               >
-                <CardTorneos torneo={torneo} handleClick={handleClick} />
+                <CardTorneos
+                  torneo={torneo}
+                  handleClick={handleClick}
+                  isCreador={true}
+                />
               </Col>
             ))}
           </Row>
@@ -78,7 +82,11 @@ export default function MisTorneos() {
                 lg={3}
                 className="mb-4"
               >
-                <CardTorneos torneo={torneo} handleClick={handleClick} />
+                <CardTorneos
+                  torneo={torneo}
+                  handleClick={handleClick}
+                  isMember={true}
+                />
               </Col>
             ))}
           </Row>
