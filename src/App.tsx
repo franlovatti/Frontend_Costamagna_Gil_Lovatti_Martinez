@@ -55,10 +55,6 @@ function App() {
                 <Route path="/" element={<MainLayout />}>
                   <Route index element={<MainHome />} />
                   <Route path="Login" element={<Login />} />
-                  <Route
-                    path="ListarEstablecimientos/:id"
-                    element={<ListarEstablecimientos />}
-                  />
                   <Route path="Registro" element={<Registro />}></Route>
                   <Route
                     path="ForgottenPassword"
