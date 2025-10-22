@@ -118,7 +118,7 @@ export default function CrearEstablecimiento() {
               <button
                 type="button"
                 className="btn-cancel-form"
-                onClick={() => navigate(`/home/torneos/${id}`)}
+                onClick={() => navigate(-1)}
                 disabled={isSubmitting}
               >
                 Cancelar
