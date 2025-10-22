@@ -40,13 +40,9 @@ export default function CrearEstablecimiento() {
     };
 
     try {
-      await axios.post(
-        'http://localhost:3000/api/establecimientos',
-        payload,
-        {
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
+      await axios.post('http://localhost:3000/api/establecimientos', payload, {
+        headers: { 'Content-Type': 'application/json' },
+      });
 
       setShowSuccess(true);
     } catch (error: unknown) {
@@ -64,95 +60,100 @@ export default function CrearEstablecimiento() {
 
   return (
     <div>
-    <div className="crear-equipo-container">
-      <div className="crear-equipo-inner">
-        {/* Header */}
-        <div className="form-header">
-          <button 
-            className="btn-back"
-            onClick={() => navigate(`/home/torneos/${id}`)}
-          >
-            ← Volver al torneo
-          </button>
-          <h1 className="form-title">Crear Nuevo Establecimiento</h1>
-          <p className="form-subtitle">
-            Completa la información para agregar tu establecimiento en el torneo
-          </p>
-        </div>
-        {/* Formulario */}
-        <form onSubmit={handleSubmit} className="crear-equipo-form">
-          <div className="form-group">
-            <label htmlFor="nombre" className="form-label">
-              Nombre del Establecimiento
-              <span className="required">*</span>
-            </label>
-            <input
-              id="nombre"
-              type="text"
-              name="nombre"
-              className="form-input"
-              placeholder="Ej: Estadio Unico de la Plata"
-              value={form.nombre}
-              onChange={handleChange}
-              required
-              minLength={3}
-              maxLength={50}
-            />
-            <span className="form-hint">Mínimo 3 caracteres</span>
-          </div>
-          <div className="form-group">
-            <label htmlFor="direccion" className="form-label">
-              Dirección del Establecimiento
-              <span className="required">*</span>
-            </label>
-            <input
-              id="direccion"
-              type="text"
-              name="direccion"
-              className="form-input"
-              placeholder="Ej: Av. Siempre Viva 742"
-              value={form.direccion}
-              onChange={handleChange}
-              required
-              minLength={3}
-              maxLength={100}
-            />
-            <span className="form-hint">Mínimo 3 caracteres</span>
-          </div>
-          {/* Botones */}
-          <div className="form-actions">
+      <div className="crear-equipo-container">
+        <div className="crear-equipo-inner">
+          {/* Header */}
+          <div className="form-header">
             <button
-              type="button"
-              className="btn-cancel-form"
+              className="btn-back"
               onClick={() => navigate(`/home/torneos/${id}`)}
-              disabled={isSubmitting}
             >
-              Cancelar
+              ← Volver al torneo
             </button>
-            <button
-              type="submit"
-              className="btn-submit-form"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <span className="spinner"></span>
-                  Creando equipo...
-                </>
-              ) : (
-                <>
-                  Crear Equipo
-                </>
-              )}
-            </button>
+            <h1 className="form-title">Crear Nuevo Establecimiento</h1>
+            <p className="form-subtitle">
+              Completa la información para agregar tu establecimiento en el
+              torneo
+            </p>
           </div>
-        </form>
+          {/* Formulario */}
+          <form onSubmit={handleSubmit} className="crear-equipo-form">
+            <div className="form-group">
+              <label htmlFor="nombre" className="form-label">
+                Nombre del Establecimiento
+                <span className="required">*</span>
+              </label>
+              <input
+                id="nombre"
+                type="text"
+                name="nombre"
+                className="form-input"
+                placeholder="Ej: Estadio Unico de la Plata"
+                value={form.nombre}
+                onChange={handleChange}
+                required
+                minLength={3}
+                maxLength={50}
+              />
+              <span className="form-hint">Mínimo 3 caracteres</span>
+            </div>
+            <div className="form-group">
+              <label htmlFor="direccion" className="form-label">
+                Dirección del Establecimiento
+                <span className="required">*</span>
+              </label>
+              <input
+                id="direccion"
+                type="text"
+                name="direccion"
+                className="form-input"
+                placeholder="Ej: Av. Siempre Viva 742"
+                value={form.direccion}
+                onChange={handleChange}
+                required
+                minLength={3}
+                maxLength={100}
+              />
+              <span className="form-hint">Mínimo 3 caracteres</span>
+            </div>
+            {/* Botones */}
+            <div className="form-actions">
+              <button
+                type="button"
+                className="btn-cancel-form"
+                onClick={() => navigate(`/home/torneos/${id}`)}
+                disabled={isSubmitting}
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                className="btn-submit-form"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="spinner"></span>
+                    Creando equipo...
+                  </>
+                ) : (
+                  <>Crear Equipo</>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
 
-    {showSuccess && (
-        <div className="modal-custom-overlay" onClick={() => setShowSuccess(false)}>
-          <div className="modal-custom-content modal-success" onClick={(e) => e.stopPropagation()}>
+      {showSuccess && (
+        <div
+          className="modal-custom-overlay"
+          onClick={() => setShowSuccess(false)}
+        >
+          <div
+            className="modal-custom-content modal-success"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-custom-header">
               <h2 className="modal-custom-title">Establecimiento Creado!</h2>
             </div>
@@ -166,18 +167,17 @@ export default function CrearEstablecimiento() {
                 className="btn-cancel-custom"
                 onClick={() => {
                   setShowSuccess(false);
-                  navigate(`/home/torneos/${id}`);
+                  navigate(-1);
                 }}
               >
-                Ir al torneo
+                Volver
               </button>
             </div>
           </div>
         </div>
       )}
-  </div>
+    </div>
   );
-
 
   // return (
   //   <div className="container mt-4 text-bg-dark p-4 rounded-3 shadow-lg">

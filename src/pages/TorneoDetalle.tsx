@@ -17,7 +17,8 @@ export default function TorneoDetalle() {
   const [resultadoModal, setResultadoModal] = useState(false);
   const [resultadoLocal, setResultadoLocal] = useState<string>('');
   const [resultadoVisitante, setResultadoVisitante] = useState<string>('');
-  const [partidoSeleccionado, setPartidoSeleccionado] = useState<Partido | null>(null);
+  const [partidoSeleccionado, setPartidoSeleccionado] =
+    useState<Partido | null>(null);
   const [tabKey, setTabKey] = useState<string>('');
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
@@ -105,9 +106,17 @@ export default function TorneoDetalle() {
       let message = 'Error al inscribirse';
       if (typeof err === 'object' && err !== null) {
         const errObj = err as Record<string, unknown>;
-        if ('response' in errObj && typeof errObj.response === 'object' && errObj.response !== null) {
+        if (
+          'response' in errObj &&
+          typeof errObj.response === 'object' &&
+          errObj.response !== null
+        ) {
           const resp = errObj.response as Record<string, unknown>;
-          if ('data' in resp && typeof resp.data === 'object' && resp.data !== null) {
+          if (
+            'data' in resp &&
+            typeof resp.data === 'object' &&
+            resp.data !== null
+          ) {
             const data = resp.data as Record<string, unknown>;
             if ('message' in data) message = String(data.message);
           }
@@ -128,7 +137,8 @@ export default function TorneoDetalle() {
     try {
       await apiAxios.put(`/partidos/${partidoSeleccionado.id}`, {
         resultadoLocal: resultadoLocal === '' ? null : Number(resultadoLocal),
-        resultadoVisitante: resultadoVisitante === '' ? null : Number(resultadoVisitante),
+        resultadoVisitante:
+          resultadoVisitante === '' ? null : Number(resultadoVisitante),
       });
       setResultadoModal(false);
       setResultadoLocal('');
@@ -141,7 +151,12 @@ export default function TorneoDetalle() {
   };
 
   const handleDelete = async () => {
-    if (!confirm('¿Estás seguro de eliminar este torneo? Esta acción no se puede deshacer.')) return;
+    if (
+      !confirm(
+        '¿Estás seguro de eliminar este torneo? Esta acción no se puede deshacer.'
+      )
+    )
+      return;
     if (!id) return;
     try {
       await apiAxios.delete(`/eventos/${id}`);
@@ -174,11 +189,12 @@ export default function TorneoDetalle() {
 
   const isCreator = Number(user?.id) === torneo?.creador;
 
-  if (!torneo) return (
-    <div className="torneo-detalle-container">
-      <div className="loading-state">Cargando torneo...</div>
-    </div>
-  );
+  if (!torneo)
+    return (
+      <div className="torneo-detalle-container">
+        <div className="loading-state">Cargando torneo...</div>
+      </div>
+    );
 
   return (
     <div className="torneo-detalle-container">
@@ -188,17 +204,19 @@ export default function TorneoDetalle() {
           <div className="header-content">
             <div className="header-title-section">
               <h1 className="detalle-title">{torneo.nombre}</h1>
-              <span className="detalle-sport-badge">{torneo.deporte.nombre}</span>
+              <span className="detalle-sport-badge">
+                {torneo.deporte.nombre}
+              </span>
             </div>
             {isCreator && (
               <div className="header-actions">
-                <button 
+                <button
                   className="btn-header-action btn-edit"
                   onClick={() => navigate(`/home/torneos/${id}/editar`)}
                 >
                   Editar
                 </button>
-                <button 
+                <button
                   className="btn-header-action btn-delete-header"
                   onClick={handleDelete}
                 >
@@ -209,45 +227,52 @@ export default function TorneoDetalle() {
           </div>
           <p className="detalle-description pb-4">{torneo.descripcion}</p>
           <Row>
-             <Col>
-               <p>
-                 <strong>Duracion:</strong>{' '}
-                 {new Date(torneo.fechaInicioEvento).toLocaleDateString()} {' - '}{' '}
-                 {new Date(torneo.fechaFinEvento).toLocaleDateString()}
-               </p>
-             </Col>
-             <Col>
-               <p>
-                 <strong>Inscripciones:</strong>{' '}
-                 {new Date(torneo.fechaInicioInscripcion).toLocaleDateString()}{' '}
-                 {' - '} {new Date(torneo.fechaFinInscripcion).toLocaleDateString()}
-               </p>
-             </Col>
-           </Row>
-           <Row>
-             <Col>
-               <p>
-                 <strong>Localidad:</strong> {torneo.localidad.nombre}
-               </p>
-             </Col>
-             <Col>
-               <p>
-                 <strong>Código:</strong> {torneo.codigo}
-               </p>
-             </Col>
-           </Row>
+            <Col>
+              <p>
+                <strong>Duracion:</strong>{' '}
+                {new Date(torneo.fechaInicioEvento).toLocaleDateString()}{' '}
+                {' - '} {new Date(torneo.fechaFinEvento).toLocaleDateString()}
+              </p>
+            </Col>
+            <Col>
+              <p>
+                <strong>Inscripciones:</strong>{' '}
+                {new Date(torneo.fechaInicioInscripcion).toLocaleDateString()}{' '}
+                {' - '}{' '}
+                {new Date(torneo.fechaFinInscripcion).toLocaleDateString()}
+              </p>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <p>
+                <strong>Localidad:</strong> {torneo.localidad.nombre}
+              </p>
+            </Col>
+            <Col>
+              <p>
+                <strong>Código:</strong> {torneo.codigo}
+              </p>
+            </Col>
+          </Row>
         </div>
 
         {/* Equipos Info y Status */}
         <div className="equipos-status-section">
           <div className="equipos-count-card">
             <span className="equipos-count-text">
-              Equipos inscritos: <strong>{torneo.equipos?.length || 0}</strong> / {torneo.cantEquiposMax}
+              Equipos inscritos: <strong>{torneo.equipos?.length || 0}</strong>{' '}
+              / {torneo.cantEquiposMax}
             </span>
             <div className="progress-bar-container">
-              <div 
-                className="progress-bar-fill" 
-                style={{ width: `${((torneo.equipos?.length || 0) / torneo.cantEquiposMax) * 100}%` }}
+              <div
+                className="progress-bar-fill"
+                style={{
+                  width: `${
+                    ((torneo.equipos?.length || 0) / torneo.cantEquiposMax) *
+                    100
+                  }%`,
+                }}
               />
             </div>
           </div>
@@ -256,12 +281,22 @@ export default function TorneoDetalle() {
         {/* Action Buttons */}
         <div className="action-buttons-section">
           {isCreator && (
-            <button onClick={() => navigate(`/home/torneos/${torneo.id}/crearEstablecimiento`)} className="action-btn btn-secondary-action">
-              Crear Establecimientos
+            <button
+              onClick={() =>
+                navigate(`/home/torneos/${torneo.id}/ListarEstablecimientos`)
+              }
+              className="action-btn btn-secondary-action"
+            >
+              Establecimientos
             </button>
           )}
           {!userIsMember() ? (
-            <button onClick={() => navigate(`/home/torneos/${torneo.id}/crear-equipo`)} className="action-btn btn-primary-action">
+            <button
+              onClick={() =>
+                navigate(`/home/torneos/${torneo.id}/crear-equipo`)
+              }
+              className="action-btn btn-primary-action"
+            >
               Inscribir Equipo
             </button>
           ) : (
@@ -270,7 +305,12 @@ export default function TorneoDetalle() {
             </button>
           )}
           {isCreator && (
-            <button onClick={() => navigate(`/home/torneos/${torneo.id}/crearPartido`)} className="action-btn btn-secondary-action">
+            <button
+              onClick={() =>
+                navigate(`/home/torneos/${torneo.id}/crearPartido`)
+              }
+              className="action-btn btn-secondary-action"
+            >
               Crear Partidos
             </button>
           )}
@@ -279,7 +319,7 @@ export default function TorneoDetalle() {
         {/* Tabla de Equipos */}
         <div className="section-container">
           <h2 className="section-title">Equipos Participantes</h2>
-          
+
           {/* Versión Desktop - Tabla */}
           <div className="custom-table-container">
             <table className="custom-table">
@@ -300,11 +340,18 @@ export default function TorneoDetalle() {
                       <td className="team-name-cell">{equipo.nombre}</td>
                       <td>
                         <span className="jugadores-badge">
-                          {equipo.miembros?.length ?? 0}/{torneo.deporte?.cantMaxJugadores ?? '-'}
+                          {equipo.miembros?.length ?? 0}/
+                          {torneo.deporte?.cantMaxJugadores ?? '-'}
                         </span>
                       </td>
                       <td>
-                        <span className={`badge-custom ${equipo.esPublico ? 'badge-equipo' : 'badge-individual'}`}>
+                        <span
+                          className={`badge-custom ${
+                            equipo.esPublico
+                              ? 'badge-equipo'
+                              : 'badge-individual'
+                          }`}
+                        >
                           {equipo.esPublico ? 'Público' : 'Privado'}
                         </span>
                       </td>
@@ -326,7 +373,9 @@ export default function TorneoDetalle() {
                             <>
                               <button
                                 className="btn-action"
-                                onClick={() => navigate(`/home/equipos/${equipo.id}/editar`)}
+                                onClick={() =>
+                                  navigate(`/home/equipos/${equipo.id}/editar`)
+                                }
                               >
                                 Editar
                               </button>
@@ -338,7 +387,9 @@ export default function TorneoDetalle() {
                               </button>
                               <button
                                 className="btn-action"
-                                onClick={() => navigate(`/home/equipos/${equipo.id}`)}
+                                onClick={() =>
+                                  navigate(`/home/equipos/${equipo.id}`)
+                                }
                               >
                                 Ver equipo
                               </button>
@@ -346,7 +397,9 @@ export default function TorneoDetalle() {
                           ) : isMember(equipo) ? (
                             <button
                               className="btn-action"
-                              onClick={() => navigate(`/home/equipos/${equipo.id}`)}
+                              onClick={() =>
+                                navigate(`/home/equipos/${equipo.id}`)
+                              }
                             >
                               Ver equipo
                             </button>
@@ -379,12 +432,17 @@ export default function TorneoDetalle() {
                     <div className="equipo-info-row">
                       <span className="equipo-info-label">Jugadores</span>
                       <span className="jugadores-badge">
-                        {equipo.miembros?.length ?? 0}/{torneo.deporte?.cantMaxJugadores ?? '-'}
+                        {equipo.miembros?.length ?? 0}/
+                        {torneo.deporte?.cantMaxJugadores ?? '-'}
                       </span>
                     </div>
                     <div className="equipo-info-row">
                       <span className="equipo-info-label">Tipo</span>
-                      <span className={`badge-custom ${equipo.esPublico ? 'badge-equipo' : 'badge-individual'}`}>
+                      <span
+                        className={`badge-custom ${
+                          equipo.esPublico ? 'badge-equipo' : 'badge-individual'
+                        }`}
+                      >
                         {equipo.esPublico ? 'Público' : 'Privado'}
                       </span>
                     </div>
@@ -406,7 +464,9 @@ export default function TorneoDetalle() {
                       <>
                         <button
                           className="btn-action"
-                          onClick={() => navigate(`/home/equipos/${equipo.id}/editar`)}
+                          onClick={() =>
+                            navigate(`/home/equipos/${equipo.id}/editar`)
+                          }
                         >
                           Editar
                         </button>
@@ -456,182 +516,300 @@ export default function TorneoDetalle() {
                     onClick={() => setTabKey(fecha)}
                   >
                     Fecha {idx + 1}
-                    <span className="tab-date">{new Date(fecha).toLocaleDateString('es-AR')}</span>
+                    <span className="tab-date">
+                      {new Date(fecha).toLocaleDateString('es-AR')}
+                    </span>
                   </button>
                 ))}
               </div>
               <div className="tab-content">
-                {Object.entries(partidosPorFecha).map(([fecha, partidos]) => (
-                  tabKey === fecha && (
-                    <div key={fecha}>
-                      {/* Versión Desktop - Tabla */}
-                      <div className="custom-table-container">
-                        <table className="custom-table partidos-table">
-                          <thead>
-                            <tr>
-                              <th>#</th>
-                              <th>Fecha</th>
-                              <th>Hora</th>
-                              <th>Establecimiento</th>
-                              <th>Local</th>
-                              <th>Visitante</th>
-                              <th>Resultado</th>
-                              <th>Acciones</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {partidos.map((partido, i) => (
-                              <tr key={partido.id}>
-                                <td>{i + 1}</td>
-                                <td>{new Date(partido.fecha).toLocaleDateString()}</td>
-                                <td>{partido.hora}</td>
-                                <td>{partido.establecimiento?.nombre || '-'}</td>
-                                <td className="team-name-cell">{partido.equipoLocal.nombre}</td>
-                                <td className="team-name-cell">{partido.equipoVisitante.nombre}</td>
-                                <td>
-                                  {partido.resultadoLocal != null && partido.resultadoVisitante != null ? (
-                                    <span className="resultado-badge">
-                                      {partido.resultadoLocal} - {partido.resultadoVisitante}
-                                    </span>
-                                  ) : (
-                                    <span className="resultado-pending">-</span>
+                {Object.entries(partidosPorFecha).map(
+                  ([fecha, partidos]) =>
+                    tabKey === fecha && (
+                      <div key={fecha}>
+                        {/* Versión Desktop - Tabla */}
+                        <div className="custom-table-container">
+                          <table className="custom-table partidos-table">
+                            <thead>
+                              <tr>
+                                <th>#</th>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                                <th>Establecimiento</th>
+                                <th>Local</th>
+                                <th>Visitante</th>
+                                <th>Resultado</th>
+                                <th>Acciones</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {partidos.map((partido, i) => (
+                                <tr key={partido.id}>
+                                  <td>{i + 1}</td>
+                                  <td>
+                                    {new Date(
+                                      partido.fecha
+                                    ).toLocaleDateString()}
+                                  </td>
+                                  <td>{partido.hora}</td>
+                                  <td>
+                                    {partido.establecimiento?.nombre || '-'}
+                                  </td>
+                                  <td className="team-name-cell">
+                                    {partido.equipoLocal.nombre}
+                                  </td>
+                                  <td className="team-name-cell">
+                                    {partido.equipoVisitante.nombre}
+                                  </td>
+                                  <td>
+                                    {partido.resultadoLocal != null &&
+                                    partido.resultadoVisitante != null ? (
+                                      <span className="resultado-badge">
+                                        {partido.resultadoLocal} -{' '}
+                                        {partido.resultadoVisitante}
+                                      </span>
+                                    ) : (
+                                      <span className="resultado-pending">
+                                        -
+                                      </span>
+                                    )}
+                                  </td>
+                                  <td>
+                                    <div className="table-actions">
+                                      <button
+                                        onClick={() =>
+                                          navigate(`/home/partido-detalle`)
+                                        }
+                                        className="btn-action btn-small"
+                                      >
+                                        Ver Partido
+                                      </button>
+                                      {isCreator && (
+                                        <>
+                                          <button
+                                            onClick={() =>
+                                              navigate(
+                                                `/home/Participaciones/${partido.id}`
+                                              )
+                                            }
+                                            className="btn-action btn-small"
+                                          >
+                                            Participaciones
+                                          </button>
+                                          <button
+                                            onClick={() =>
+                                              navigate(
+                                                `/home/torneos/${torneo.id}/EditarPartido/${partido.id}`
+                                              )
+                                            }
+                                            className="btn-action btn-small"
+                                          >
+                                            Editar
+                                          </button>
+                                          <button
+                                            className="btn-action btn-small"
+                                            onClick={() => {
+                                              setPartidoSeleccionado(partido);
+                                              setResultadoLocal(
+                                                partido.resultadoLocal == null
+                                                  ? ''
+                                                  : String(
+                                                      partido.resultadoLocal
+                                                    )
+                                              );
+                                              setResultadoVisitante(
+                                                partido.resultadoVisitante ==
+                                                  null
+                                                  ? ''
+                                                  : String(
+                                                      partido.resultadoVisitante
+                                                    )
+                                              );
+                                              setResultadoModal(true);
+                                            }}
+                                          >
+                                            Resultado
+                                          </button>
+                                          <button
+                                            className="btn-action btn-delete btn-small"
+                                            onClick={() =>
+                                              handleDeletePartido(partido.id)
+                                            }
+                                          >
+                                            Eliminar
+                                          </button>
+                                        </>
+                                      )}
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+
+                        {/* Versión Mobile - Cards */}
+                        <div className="partidos-mobile-list">
+                          {partidos.map((partido, i) => (
+                            <div
+                              key={partido.id}
+                              className="partido-mobile-card"
+                            >
+                              <div className="partido-mobile-header">
+                                <div className="partido-number-badge">
+                                  {i + 1}
+                                </div>
+                                <div className="partido-date-time">
+                                  <div className="partido-date">
+                                    {new Date(
+                                      partido.fecha
+                                    ).toLocaleDateString()}
+                                  </div>
+                                  <div className="partido-time">
+                                    {partido.hora}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="partido-teams-section">
+                                <div className="partido-team-row">
+                                  <div>
+                                    <div className="partido-team-label">
+                                      Local
+                                    </div>
+                                    <div className="partido-team-name">
+                                      {partido.equipoLocal.nombre}
+                                    </div>
+                                  </div>
+                                  {partido.resultadoLocal != null && (
+                                    <div className="partido-score">
+                                      {partido.resultadoLocal}
+                                    </div>
                                   )}
-                                </td>
-                                <td>
-                                  <div className="table-actions">
-                                    <button onClick={() => navigate(`/home/partido-detalle`)} className="btn-action btn-small">
-                                      Ver Partido
-                                    </button>
-                                    {isCreator && (
-                                      <>
-                                        <button onClick={() => navigate(`/home/Participaciones/${partido.id}`)} className="btn-action btn-small">
-                                          Participaciones
-                                        </button>
-                                        <button onClick={() => navigate(`/home/torneos/${torneo.id}/EditarPartido/${partido.id}`)} className="btn-action btn-small">
-                                          Editar
-                                        </button>
-                                        <button
-                                          className="btn-action btn-small"
-                                          onClick={() => {
-                                            setPartidoSeleccionado(partido);
-                                            setResultadoLocal(partido.resultadoLocal == null ? '' : String(partido.resultadoLocal));
-                                            setResultadoVisitante(partido.resultadoVisitante == null ? '' : String(partido.resultadoVisitante));
-                                            setResultadoModal(true);
-                                          }}
-                                        >
-                                          Resultado
-                                        </button>
-                                        <button
-                                          className="btn-action btn-delete btn-small"
-                                          onClick={() => handleDeletePartido(partido.id)}
-                                        >
-                                          Eliminar
-                                        </button>
-                                      </>
+                                </div>
+                                <div className="partido-vs">vs</div>
+                                <div className="partido-team-row">
+                                  <div>
+                                    <div className="partido-team-label">
+                                      Visitante
+                                    </div>
+                                    <div className="partido-team-name">
+                                      {partido.equipoVisitante.nombre}
+                                    </div>
+                                  </div>
+                                  {partido.resultadoVisitante != null && (
+                                    <div className="partido-score">
+                                      {partido.resultadoVisitante}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              {partido.establecimiento && (
+                                <div className="partido-info-grid">
+                                  <div className="partido-info-item">
+                                    <span className="partido-info-label">
+                                      Establecimiento
+                                    </span>
+                                    <span className="partido-info-value">
+                                      {partido.establecimiento.nombre}
+                                    </span>
+                                  </div>
+                                  <div className="partido-info-item">
+                                    <span className="partido-info-label">
+                                      Estado
+                                    </span>
+                                    {partido.resultadoLocal != null &&
+                                    partido.resultadoVisitante != null ? (
+                                      <span className="resultado-badge">
+                                        Finalizado
+                                      </span>
+                                    ) : (
+                                      <span className="partido-info-value">
+                                        Pendiente
+                                      </span>
                                     )}
                                   </div>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-
-                      {/* Versión Mobile - Cards */}
-                      <div className="partidos-mobile-list">
-                        {partidos.map((partido, i) => (
-                          <div key={partido.id} className="partido-mobile-card">
-                            <div className="partido-mobile-header">
-                              <div className="partido-number-badge">{i + 1}</div>
-                              <div className="partido-date-time">
-                                <div className="partido-date">{new Date(partido.fecha).toLocaleDateString()}</div>
-                                <div className="partido-time">{partido.hora}</div>
-                              </div>
-                            </div>
-
-                            <div className="partido-teams-section">
-                              <div className="partido-team-row">
-                                <div>
-                                  <div className="partido-team-label">Local</div>
-                                  <div className="partido-team-name">{partido.equipoLocal.nombre}</div>
                                 </div>
-                                {partido.resultadoLocal != null && (
-                                  <div className="partido-score">{partido.resultadoLocal}</div>
-                                )}
-                              </div>
-                              <div className="partido-vs">vs</div>
-                              <div className="partido-team-row">
-                                <div>
-                                  <div className="partido-team-label">Visitante</div>
-                                  <div className="partido-team-name">{partido.equipoVisitante.nombre}</div>
-                                </div>
-                                {partido.resultadoVisitante != null && (
-                                  <div className="partido-score">{partido.resultadoVisitante}</div>
-                                )}
-                              </div>
-                            </div>
-
-                            {partido.establecimiento && (
-                              <div className="partido-info-grid">
-                                <div className="partido-info-item">
-                                  <span className="partido-info-label">Establecimiento</span>
-                                  <span className="partido-info-value">{partido.establecimiento.nombre}</span>
-                                </div>
-                                <div className="partido-info-item">
-                                  <span className="partido-info-label">Estado</span>
-                                  {partido.resultadoLocal != null && partido.resultadoVisitante != null ? (
-                                    <span className="resultado-badge">Finalizado</span>
-                                  ) : (
-                                    <span className="partido-info-value">Pendiente</span>
-                                  )}
-                                </div>
-                              </div>
-                            )}
-
-                            <div className="partido-mobile-actions">
-                              <button onClick={() => navigate(`/home/partido-detalle/${partido.id}`)} className="btn-action">
-                                Ver Partido
-                              </button>
-                              {isCreator && (
-                                <>
-                                  <button onClick={() => navigate(`/home/Participaciones/${partido.id}`)} className="btn-action">
-                                    📋 Participaciones
-                                  </button>
-                                  <button onClick={() => navigate(`/home/torneos/${torneo.id}/EditarPartido/${partido.id}`)} className="btn-action">
-                                    ✏️ Editar Partido
-                                  </button>
-                                  <button
-                                    className="btn-action"
-                                    onClick={() => {
-                                      setPartidoSeleccionado(partido);
-                                      setResultadoLocal(partido.resultadoLocal == null ? '' : String(partido.resultadoLocal));
-                                      setResultadoVisitante(partido.resultadoVisitante == null ? '' : String(partido.resultadoVisitante));
-                                      setResultadoModal(true);
-                                    }}
-                                  >
-                                    📊 Cargar Resultado
-                                  </button>
-                                  <button
-                                    className="btn-action btn-delete"
-                                    onClick={() => handleDeletePartido(partido.id)}
-                                  >
-                                    🗑️ Eliminar
-                                  </button>
-                                </>
                               )}
+
+                              <div className="partido-mobile-actions">
+                                <button
+                                  onClick={() =>
+                                    navigate(
+                                      `/home/partido-detalle/${partido.id}`
+                                    )
+                                  }
+                                  className="btn-action"
+                                >
+                                  Ver Partido
+                                </button>
+                                {isCreator && (
+                                  <>
+                                    <button
+                                      onClick={() =>
+                                        navigate(
+                                          `/home/Participaciones/${partido.id}`
+                                        )
+                                      }
+                                      className="btn-action"
+                                    >
+                                      📋 Participaciones
+                                    </button>
+                                    <button
+                                      onClick={() =>
+                                        navigate(
+                                          `/home/torneos/${torneo.id}/EditarPartido/${partido.id}`
+                                        )
+                                      }
+                                      className="btn-action"
+                                    >
+                                      ✏️ Editar Partido
+                                    </button>
+                                    <button
+                                      className="btn-action"
+                                      onClick={() => {
+                                        setPartidoSeleccionado(partido);
+                                        setResultadoLocal(
+                                          partido.resultadoLocal == null
+                                            ? ''
+                                            : String(partido.resultadoLocal)
+                                        );
+                                        setResultadoVisitante(
+                                          partido.resultadoVisitante == null
+                                            ? ''
+                                            : String(partido.resultadoVisitante)
+                                        );
+                                        setResultadoModal(true);
+                                      }}
+                                    >
+                                      📊 Cargar Resultado
+                                    </button>
+                                    <button
+                                      className="btn-action btn-delete"
+                                      onClick={() =>
+                                        handleDeletePartido(partido.id)
+                                      }
+                                    >
+                                      🗑️ Eliminar
+                                    </button>
+                                  </>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )
-                ))}
+                    )
+                )}
               </div>
             </div>
           ) : (
             <div className="empty-state">
               <div className="empty-state-icon">⚽</div>
-              <p className="empty-state-text">No hay partidos programados aún</p>
+              <p className="empty-state-text">
+                No hay partidos programados aún
+              </p>
             </div>
           )}
         </div>
@@ -639,21 +817,34 @@ export default function TorneoDetalle() {
 
       {/* Modal de Inscripción */}
       {showEnrollModal && (
-        <div className="modal-custom-overlay" onClick={() => setShowEnrollModal(false)}>
-          <div className="modal-custom-content" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="modal-custom-overlay"
+          onClick={() => setShowEnrollModal(false)}
+        >
+          <div
+            className="modal-custom-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-custom-header">
               <h2 className="modal-custom-title">
                 Inscribirse en {selectedTeam?.nombre}
               </h2>
-              <button className="modal-custom-close" onClick={() => setShowEnrollModal(false)}>
+              <button
+                className="modal-custom-close"
+                onClick={() => setShowEnrollModal(false)}
+              >
                 ✕
               </button>
             </div>
             <div className="modal-custom-body">
-              {enrollError && <div className="alert-danger-custom">{enrollError}</div>}
+              {enrollError && (
+                <div className="alert-danger-custom">{enrollError}</div>
+              )}
               {selectedTeam && !selectedTeam.esPublico ? (
                 <div className="modal-form-group">
-                  <label className="modal-form-label">Contraseña del equipo</label>
+                  <label className="modal-form-label">
+                    Contraseña del equipo
+                  </label>
                   <input
                     type="password"
                     className="modal-form-input"
@@ -664,7 +855,9 @@ export default function TorneoDetalle() {
                   />
                 </div>
               ) : (
-                <p className="modal-info-text">Este equipo es público. Confirme para inscribirse.</p>
+                <p className="modal-info-text">
+                  Este equipo es público. Confirme para inscribirse.
+                </p>
               )}
             </div>
             <div className="modal-custom-footer">
@@ -688,19 +881,27 @@ export default function TorneoDetalle() {
 
       {/* Modal de Resultado */}
       {resultadoModal && partidoSeleccionado && (
-        <div className="modal-custom-overlay" onClick={() => setResultadoModal(false)}>
-          <div className="modal-custom-content" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="modal-custom-overlay"
+          onClick={() => setResultadoModal(false)}
+        >
+          <div
+            className="modal-custom-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-custom-header">
-              <h2 className="modal-custom-title">
-                Resultado del Partido
-              </h2>
-              <button className="modal-custom-close" onClick={() => setResultadoModal(false)}>
+              <h2 className="modal-custom-title">Resultado del Partido</h2>
+              <button
+                className="modal-custom-close"
+                onClick={() => setResultadoModal(false)}
+              >
                 ✕
               </button>
             </div>
             <div className="modal-custom-body">
               <p className="modal-info-text">
-                {partidoSeleccionado.equipoLocal.nombre} vs {partidoSeleccionado.equipoVisitante.nombre}
+                {partidoSeleccionado.equipoLocal.nombre} vs{' '}
+                {partidoSeleccionado.equipoVisitante.nombre}
               </p>
               <div className="resultado-inputs-grid">
                 <div className="modal-form-group">
@@ -729,10 +930,16 @@ export default function TorneoDetalle() {
               </div>
             </div>
             <div className="modal-custom-footer">
-              <button className="btn-cancel-custom" onClick={() => setResultadoModal(false)}>
+              <button
+                className="btn-cancel-custom"
+                onClick={() => setResultadoModal(false)}
+              >
                 Cancelar
               </button>
-              <button className="btn-save-custom" onClick={handleCargarResultado}>
+              <button
+                className="btn-save-custom"
+                onClick={handleCargarResultado}
+              >
                 Guardar
               </button>
             </div>

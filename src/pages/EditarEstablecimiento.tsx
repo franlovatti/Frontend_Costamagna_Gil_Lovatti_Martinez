@@ -1,24 +1,35 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Submit } from '../components/ButtonField.tsx';
-import { useEstablecimientosEvento} from '../hooks/useEstablecimientos.tsx';
+import { useOneEstablecimiento } from '../hooks/useEstablecimientos.tsx';
 import alert from '../components/Alert.tsx';
 
 export default function EditarEstablecimiento() {
   const navigate = useNavigate();
-  const { eventoId } = useParams();
+  const { id, establecimientoId } = useParams();
   const [message, setMessage] = useState<string>();
   const [success, setSuccess] = useState(false);
+  const { establecimiento, errorEstablecimiento } =
+    useOneEstablecimiento(establecimientoId);
 
   const [form, setForm] = useState({
     nombre: '',
     direccion: '',
-    evento: eventoId ?? 0,
-    id: 0,
+    evento: id ?? 0,
+    id: Number(establecimientoId),
   });
 
-  const {establecimientos, loadingEstablecimientos, errorEstablecimientos} = useEstablecimientosEvento(eventoId);
+  useEffect(() => {
+    if (establecimiento) {
+      setForm({
+        nombre: establecimiento.nombre,
+        direccion: establecimiento.direccion,
+        id: establecimiento.id,
+        evento: establecimiento.evento,
+      });
+    }
+  }, [establecimiento]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -46,7 +57,7 @@ export default function EditarEstablecimiento() {
       setMessage('Establecimiento modificado con éxito');
       setSuccess(true);
       setTimeout(() => {
-      navigate(-1);
+        navigate(-1);
       }, 1000);
     } catch (error: unknown) {
       if (error instanceof Error === false) {
@@ -61,46 +72,15 @@ export default function EditarEstablecimiento() {
   return (
     <div className="container mt-4 text-bg-dark p-4 rounded-3 shadow-lg">
       <h2>Editar Establecimiento</h2>
-      {errorEstablecimientos && (
-        alert({message: 'Error al cargar los establecimientos: ' + errorEstablecimientos.message, success: false})
-        )}
+      {errorEstablecimiento &&
+        alert({
+          message:
+            'Error al cargar el establecimiento: ' +
+            errorEstablecimiento.message,
+          success: false,
+        })}
 
-        {alert({message, success})}
-
-      {/* Selección del establecimiento */}
-      <div className="mb-3">
-        <label htmlFor="selectEstablecimiento" className="form-label">
-          Seleccione el establecimiento a modificar
-        </label>
-        <select
-          id="selectEstablecimiento"
-          className="form-select"
-          value={form.id} 
-          onChange={(e) => {
-            const selectedId = Number(e.target.value);
-            const selected = establecimientos?.find(
-              (est) => est.id === selectedId
-            );
-            if (selected) {
-              setForm({
-                nombre: selected.nombre,
-                direccion: selected.direccion,
-                evento: selected.evento,
-                id: selected.id,
-              });
-            }
-          }}
-        >
-          <option value="">Seleccione un establecimiento</option>
-          {!loadingEstablecimientos &&
-            establecimientos &&
-            establecimientos.map((est) => (
-              <option key={est.id} value={est.id}>
-                {est.nombre} - {est.direccion}
-              </option>
-            ))}
-        </select>
-      </div>
+      {alert({ message, success })}
 
       {form.id != 0 && (
         <form onSubmit={handleSubmit}>

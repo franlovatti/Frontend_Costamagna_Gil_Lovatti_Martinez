@@ -31,7 +31,6 @@ import CrearPartido from './pages/CrearPartido.tsx';
 import CrearEstablecimiento from './pages/CrearEstablecimiento.tsx';
 import EditarEstablecimiento from './pages/EditarEstablecimiento.tsx';
 import EditarPartido from './pages/EditarPartido.tsx';
-
 import TorneoDetalle from './pages/TorneoDetalle.tsx';
 import EditarTorneo from './pages/EditarTorneo.tsx';
 import CrearEquipo from './pages/CrearEquipo.tsx';
@@ -42,6 +41,7 @@ import MisTorneos from './pages/misTorneos.tsx';
 import UsuariosAdmin from './pages/admin/UsuariosAdmin.tsx';
 import NoticiasAdmin from './pages/admin/NoticiasAdmin.tsx';
 import PartidoDetalle from './pages/PartidoDetalle.tsx';
+import ListarEstablecimientos from './pages/ListarEstablecimientos.tsx';
 
 function App() {
   return (
@@ -55,7 +55,10 @@ function App() {
                 <Route path="/" element={<MainLayout />}>
                   <Route index element={<MainHome />} />
                   <Route path="Login" element={<Login />} />
-                  <Route path="CrearPartido" element={<CrearPartido />} />
+                  <Route
+                    path="ListarEstablecimientos/:id"
+                    element={<ListarEstablecimientos />}
+                  />
                   <Route path="Registro" element={<Registro />}></Route>
                   <Route
                     path="ForgottenPassword"
@@ -96,11 +99,15 @@ function App() {
                       element={<CrearPartido />}
                     />
                     <Route
+                      path="torneos/:id/ListarEstablecimientos"
+                      element={<ListarEstablecimientos />}
+                    />
+                    <Route
                       path="torneos/:id/CrearEstablecimiento"
                       element={<CrearEstablecimiento />}
                     />
                     <Route
-                      path="torneos/:id/EditarEstablecimiento"
+                      path="torneos/:id/EditarEstablecimiento/:establecimientoId"
                       element={<EditarEstablecimiento />}
                     />
                     <Route
