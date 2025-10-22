@@ -64,11 +64,8 @@ export default function CrearEstablecimiento() {
         <div className="crear-equipo-inner">
           {/* Header */}
           <div className="form-header">
-            <button
-              className="btn-back"
-              onClick={() => navigate(`/home/torneos/${id}`)}
-            >
-              ← Volver al torneo
+            <button className="btn-back" onClick={() => navigate(-1)}>
+              ← Volver
             </button>
             <h1 className="form-title">Crear Nuevo Establecimiento</h1>
             <p className="form-subtitle">
