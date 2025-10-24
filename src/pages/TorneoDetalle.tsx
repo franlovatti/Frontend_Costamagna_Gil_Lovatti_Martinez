@@ -570,7 +570,7 @@ export default function TorneoDetalle() {
                                     <div className="table-actions">
                                       <button
                                         onClick={() =>
-                                          navigate(`/home/partido-detalle`)
+                                          navigate(`/home/partido-detalle/${partido.id}`)
                                         }
                                         className="btn-action btn-small"
                                       >

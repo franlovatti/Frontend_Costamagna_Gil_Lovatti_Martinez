@@ -1,9 +1,6 @@
 import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
 import {
-  Card,
-  Nav,
-  Table,
   Row,
   Col,
   Spinner,
@@ -12,7 +9,6 @@ import {
 } from 'react-bootstrap';
 import { useOnePartido } from '../hooks/usePartidos';
 import { useParticipaciones } from '../hooks/useParticipaciones';
-import { Button } from '../components/ButtonField.tsx';
 import { useNavigate } from 'react-router-dom';
 
 export default function PartidoDetalle() {
@@ -37,8 +33,8 @@ export default function PartidoDetalle() {
 
   const {
     participaciones,
-    loading: loadingParticipaciones,
-    error: errorParticipaciones,
+    // loading: loadingParticipaciones,
+    // error: errorParticipaciones,
   } = useParticipaciones(id || '', equipoid || '');
 
   if (loadingPartido) {
@@ -69,110 +65,122 @@ export default function PartidoDetalle() {
       : partido.equipoVisitante;
 
   return (
-    <Container className="text-bg-dark py-4">
-      <Card className="bg-dark text-light border border-primary shadow-sm mb-4">
-        <Card.Body>
-          <Card.Title className="text-center display-6">
-            Detalle del Partido
-          </Card.Title>
-          <Card.Text className="text-center fs-4">
+    <Container>
+      <div className="participacion-container">
+      <div className="participacion-inner">
+        {/* Botón volver */}
+        <div className="volver-section">
+          <button
+            className="btn-volver"
+            onClick={() => navigate(`/home/torneos/${partido.evento.id}`)}
+          >
+            ← Volver al Torneo
+          </button>
+        </div>
+      <div className="detalle-header">
+        <div className="header-content">
+          <div className="header-title-section">
+            <h1 className="detalle-title">Detalle del Partido</h1>
             <strong>{partido.equipoLocal?.nombre}</strong> vs{' '}
             <strong>{partido.equipoVisitante?.nombre}</strong>
-          </Card.Text>
-          <hr className="border-primary" />
+          </div>
+        </div>
+        <Row>
+          <Col md={6}>
+            <p className="detalle-description">
+              <strong>Fecha:</strong> {new Date(partido.fecha).toLocaleDateString()}
+            </p>
+            <p className="detalle-description">
+              <strong>Hora:</strong> {partido.hora}
+            </p>
+            <p className="detalle-description fs-5">
+              <strong>Resultado:</strong>{' '}
+              <strong>{partido.resultadoLocal}</strong> -{' '}
+              <strong>{partido.resultadoVisitante}</strong>
+            </p>
+          </Col>
+          <Col md={6}>
+            <p className="detalle-description">
+              <strong>Establecimiento:</strong>{' '}
+              {partido.establecimiento?.nombre || 'N/A'}
+            </p>
+            <p className="detalle-description">
+              <strong>Juez:</strong> {partido.juez}
+            </p>
+          </Col>
+        </Row>
+      </div>
 
-          <Card.Text>
-            <span>Fecha:</span> {new Date(partido.fecha).toLocaleDateString()} -{' '}
-            <span>Hora:</span> {partido.hora}
-          </Card.Text>
-
-          <Card.Text>
-            <span>Establecimiento:</span>{' '}
-            {partido.establecimiento?.nombre || 'N/A'}
-          </Card.Text>
-          <Card.Text>
-            <span>Juez:</span> {partido.juez}
-          </Card.Text>
-          <Card.Text className="fs-4">
-            <span>Resultado:</span> <strong>{partido.resultadoLocal}</strong> -{' '}
-            <strong>{partido.resultadoVisitante}</strong>
-          </Card.Text>
-        </Card.Body>
-      </Card>
-
-      <Row className="text-center mb-4">
-        <Col>
-          <Nav
-            variant="pills"
-            className="justify-content-center"
-            activeKey={equipoSeleccionado}
-            onSelect={(selectedKey) =>
-              setEquipoSeleccionado(selectedKey as 'local' | 'visitante')
-            }
-          >
-            <Nav.Item>
-              <Nav.Link eventKey="local" className="fw-bold">
-                {partido.equipoLocal?.nombre || 'Equipo Local'}
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link eventKey="visitante" className="fw-bold">
-                {partido.equipoVisitante?.nombre || 'Equipo Visitante'}
-              </Nav.Link>
-            </Nav.Item>
-          </Nav>
-        </Col>
-      </Row>
-
-      {loadingParticipaciones ? (
-        <div>Cargando participaciones...</div>
-      ) : errorParticipaciones ? (
-        <div>Error al cargar participaciones: {errorParticipaciones}</div>
-      ) : (
-        <Card className="bg-dark text-light border border-primary shadow-sm">
-          <Card.Body>
-            <Card.Title className="text-center fs-4">
-              Participaciones de {equipo.nombre}
-            </Card.Title>
-            <Table
-              striped
-              bordered
-              hover
-              responsive
-              size="sm"
-              className="table-dark align-middle mt-3"
+      <div className="participacion-header">
+          <div className="equipos-tabs">
+            <button
+              className={`equipo-tab ${
+                equipoSeleccionado === 'local' ? 'active' : ''
+              }`}
+              onClick={() => setEquipoSeleccionado('local')}
             >
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Apellido</th>
-                  <th>Puntos</th>
-                  <th>Minutos</th>
-                  <th>Faltas</th>
-                </tr>
-              </thead>
-              <tbody>
-                {participaciones?.map((participacion) => (
+              {partido.equipoLocal?.nombre || 'Equipo Local'}
+            </button>
+            <button
+              className={`equipo-tab ${
+                equipoSeleccionado === 'visitante' ? 'active' : ''
+              }`}
+              onClick={() => setEquipoSeleccionado('visitante')}
+            >
+              {partido.equipoVisitante?.nombre || 'Equipo Visitante'}
+            </button>
+          </div>
+      </div>
+
+      <div className="participaciones-card">
+        <div className="participaciones-header">
+          <h3 className="participaciones-title">
+            Participaciones de {equipo.nombre}
+          </h3>
+        </div>
+        <div className="participaciones-table-container">
+          <table className="participaciones-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Jugador</th>
+                <th>Puntos</th>
+                <th>Minutos</th>
+                <th>Faltas</th>
+              </tr>
+            </thead>
+            <tbody>
+              {participaciones && participaciones.length > 0 ? (
+                participaciones.map((participacion, idx) => (
                   <tr key={participacion.id}>
-                    <td>{participacion.usuario?.nombre ?? ''}</td>
-                    <td>{participacion.usuario?.apellido ?? ''}</td>
-                    <td>{participacion.puntos}</td>
-                    <td>{participacion.minutosjugados}</td>
+                    <td>{idx + 1}</td>
+                    <td className="nombre-jugador">
+                      {participacion.usuario?.nombre ?? ''}{' '}
+                      {participacion.usuario?.apellido ?? ''}
+                    </td>
+                    <td>
+                      <span className="stat-badge">
+                        {participacion.puntos}
+                      </span>
+                    </td>
+                    <td>{participacion.minutosjugados}'</td>
                     <td>{participacion.faltas}</td>
                   </tr>
-                ))}
-              </tbody>
-            </Table>
-          </Card.Body>
-        </Card>
-      )}
-      <Button
-        className="btn-outline-light"
-        onClick={() => navigate(`/home/torneos/${partido.evento.id}`)}
-        disabled={typeof partido.evento.id === 'undefined'}
-      >
-        Volver
-      </Button>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="empty-participaciones">
+                    <div className="empty-icon">📋</div>
+                    <p>No hay participaciones registradas aún</p>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      </div>
+      </div>
     </Container>
   );
 }
