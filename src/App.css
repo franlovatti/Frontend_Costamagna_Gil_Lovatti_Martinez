@@ -17,6 +17,37 @@
   border-color: var(--primary);
 }
 
+.btn-primary-action {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: #e5f5f7;
+}
+
+.btn-primary-action:hover {
+  background-color: var(--secondary);
+  border-color: var(--secondary);
+  color: #e5f5f7;
+  transform: translateY(-2px);
+}
+
+.btn-secondary-action {
+  background-color: transparent;
+  color: var(--text);
+}
+
+.btn-secondary-action:hover {
+  background-color: var(--hover-bg);
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+.btn-disabled {
+  background-color: var(--background);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .btn-delete {
   border-color: rgba(231, 76, 60, 0.4);
   color: var(--danger);

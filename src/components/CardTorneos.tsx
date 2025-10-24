@@ -32,7 +32,7 @@ export default function CardTorneos({
   const localidadDesc = torneo.localidad?.descripcion ?? 'Sin localidad';
 
   const handleCardClick = (e: React.MouseEvent) => {
-    if (!canAccess) return;
+    if (!torneo.esPublico && !canAccess) return;
     // Si se hace click en el botón de inscribirse, no navegar
     if ((e.target as HTMLElement).closest('.btn-inscribirse')) {
       return;
@@ -92,7 +92,7 @@ export default function CardTorneos({
           <button
             className="btn-inscribirse"
             onClick={handleEnrollClick}
-            disabled={canAccess}
+            disabled={isMember}
           >
             {isMember ? 'Ya inscripto' : 'Inscribirse'}
           </button>

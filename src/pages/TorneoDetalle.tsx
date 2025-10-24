@@ -246,7 +246,7 @@ export default function TorneoDetalle() {
           <Row>
             <Col>
               <p>
-                <strong>Localidad:</strong> {torneo.localidad.nombre}
+                <strong>Localidad:</strong> {torneo.localidad.descripcion}
               </p>
             </Col>
             <Col>
