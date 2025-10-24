@@ -372,14 +372,6 @@ export default function TorneoDetalle() {
                           ) : isCaptain(equipo) ? (
                             <>
                               <button
-                                className="btn-action"
-                                onClick={() =>
-                                  navigate(`/home/equipos/${equipo.id}/editar`)
-                                }
-                              >
-                                Editar
-                              </button>
-                              <button
                                 className="btn-action btn-delete"
                                 onClick={() => handleDeleteTeam(equipo.id)}
                               >

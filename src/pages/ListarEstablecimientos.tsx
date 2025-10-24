@@ -2,7 +2,7 @@ import { useEstablecimientosEvento } from '../hooks/useEstablecimientos.tsx';
 import { useParams, useNavigate } from 'react-router';
 import type { Establecimiento } from '../types.tsx';
 import Alert from '../components/Alert.tsx';
-import './ListarEstablecimientos.css';
+import './TorneoDetalle.css';
 
 export default function ListarEstablecimientos() {
   const { id } = useParams<{ id: string }>();
@@ -11,7 +11,9 @@ export default function ListarEstablecimientos() {
     useEstablecimientosEvento(id);
 
   return (
-    <div className="section-container">
+    <div className="torneo-detalle-container">
+      <div className="torneo-detalle-inner">
+        
       {errorEstablecimientos &&
         Alert({
           message:
@@ -19,65 +21,73 @@ export default function ListarEstablecimientos() {
             errorEstablecimientos.message,
           success: false,
         })}
-      <h2 className="section-title">Establecimientos</h2>
-
+      <div className="form-header">
+        <button className="btn-back" onClick={() => navigate(-1)}>
+          ← Volver
+        </button>
+        <h2 className="section-title">Establecimientos del Torneo</h2>
+      </div>
       {/* Versión Desktop - Tabla */}
-      <div className="custom-table-container">
-        <table className="custom-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Nombre</th>
-              <th>Dirección</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {establecimientos.length > 0 ? (
-              establecimientos.map((est: Establecimiento, idx: number) => (
-                <tr key={est.id}>
-                  <td>{idx + 1}</td>
-                  <td>{est.nombre}</td>
-                  <td>{est.direccion}</td>
-                  <td>
-                    <div className="table-actions">
-                      <button
-                        className="btn-action btn-edit"
-                        onClick={() =>
-                          navigate(
-                            `/home/torneos/${est.evento}/EditarEstablecimiento/${est.id}`
-                          )
-                        }
-                      >
-                        Editar
-                      </button>
-                      <button
-                        className="btn-action btn-delete"
-                        onClick={() => deleteEstablecimiento(est.id)}
-                      >
-                        Eliminar
-                      </button>
-                    </div>
+      <div className="section-container">
+        <div className="custom-table-container">
+          <table className="custom-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nombre</th>
+                <th>Dirección</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {establecimientos.length > 0 ? (
+                establecimientos.map((est: Establecimiento, idx: number) => (
+                  <tr key={est.id}>
+                    <td>{idx + 1}</td>
+                    <td>{est.nombre}</td>
+                    <td>{est.direccion}</td>
+                    <td>
+                      <div className="table-actions">
+                        <button
+                          className="btn-action btn-edit"
+                          onClick={() =>
+                            navigate(
+                              `/home/torneos/${est.evento}/FormEstablecimiento/${est.id}`
+                            )
+                          }
+                        >
+                          Editar
+                        </button>
+                        <button
+                          className="btn-action btn-delete"
+                          onClick={() => deleteEstablecimiento(est.id)}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="empty-state-cell">
+                    No hay establecimientos cargados aún
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={6} className="empty-state-cell">
-                  No hay establecimientos cargados aún
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-      <button
-        className="btn-add"
-        onClick={() => navigate(`/home/torneos/${id}/CrearEstablecimiento`)}
-      >
-        + Agregar Establecimiento
-      </button>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="action-buttons-section">
+          <button
+            className="action-btn btn-primary-action"
+            onClick={() => navigate(`/home/torneos/${id}/FormEstablecimiento`)}
+          >
+            + Agregar Establecimiento
+          </button>
+        </div>
 
+      </div>
       {/* Versión Mobile - Cards */}
       <div className="equipos-mobile-list">
         {establecimientos.length > 0 ? (
@@ -121,6 +131,7 @@ export default function ListarEstablecimientos() {
             </p>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

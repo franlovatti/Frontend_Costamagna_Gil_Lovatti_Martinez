@@ -4,9 +4,7 @@ import { useEstablecimientosEvento } from '../hooks/useEstablecimientos';
 import { useEquiposEvento } from '../hooks/useEquipos';
 import { useOnePartido } from '../hooks/usePartidos';
 import axios from 'axios';
-import { Form, Row, Col } from 'react-bootstrap';
-import { Submit } from '../components/ButtonField';
-import alert from '../components/Alert';
+import './cssComponentes/FormTorneos.css';
 
 interface FormPartidoProps {
   id: string;
@@ -22,6 +20,7 @@ export default function FormPartido({
   const navigate = useNavigate();
   const [message, setMessage] = useState<string>();
   const [success, setSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({
     fecha: '',
     hora: '',
@@ -60,7 +59,6 @@ export default function FormPartido({
           `http://localhost:3000/api/partidos/${partidoId}`
         );
         setPartido(response.data.data);
-        console.log(response.data.data);
       } catch (err) {
         setErrorPartido(err as Error);
       } finally {
@@ -103,6 +101,9 @@ export default function FormPartido({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setMessage('');
+    
     try {
       const payload = {
         ...(!createMode && { id: form.id }),
@@ -120,10 +121,9 @@ export default function FormPartido({
         evento: form.evento,
         establecimiento: form.establecimiento,
       };
-      console.log('Payload a enviar:', payload);
-      let response;
+
       if (createMode) {
-        response = await axios.post(
+        await axios.post(
           'http://localhost:3000/api/partidos',
           payload,
           {
@@ -131,7 +131,7 @@ export default function FormPartido({
           }
         );
       } else {
-        response = await axios.put(
+        await axios.put(
           'http://localhost:3000/api/partidos/' + form.id,
           payload,
           {
@@ -139,232 +139,312 @@ export default function FormPartido({
           }
         );
       }
-      console.log('Respuesta del backend:', response.data);
-      setMessage('Partido modificado con éxito');
+      
+      setMessage(createMode ? 'Partido creado con éxito' : 'Partido modificado con éxito');
       setSuccess(true);
       setTimeout(() => {
         navigate(-1);
       }, 1000);
     } catch (error: unknown) {
+      setSuccess(false);
       if (axios.isAxiosError(error)) {
         if (error.response) {
-          console.error('Error del backend:', error.response.data);
-          setMessage(
-            error.response.data.message || 'Error desconocido del servidor'
-          );
-          setSuccess(false);
+          setMessage(error.response.data.message || 'Error desconocido del servidor');
         } else if (error.request) {
-          console.error('Sin respuesta del servidor:', error.request);
           setMessage('No se recibió respuesta del servidor.');
-          setSuccess(false);
         } else {
-          console.error('Error al configurar la petición:', error.message);
           setMessage('Error al enviar la solicitud: ' + error.message);
-          setSuccess(false);
-        }
-      } else if (error instanceof Error === false) {
-        console.error('Error desconocido:', error);
-        setMessage('Ocurrió un error desconocido.');
+        } 
+      } else if (error instanceof Error) {
+        setMessage('Error: ' + error.message);
       } else {
-        console.error('Error al modificar partido: ', error.message);
-        setMessage('Error al modificar partido: ' + error.message);
+        setMessage('Ocurrió un error desconocido.');
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="text-bg-dark container">
-      {errorEstablecimientos &&
-        alert({
-          message:
-            'Error al cargar los establecimientos: ' +
-            errorEstablecimientos.message,
-          success: false,
-        })}
+    <div className="form-torneos-container">
+      <div className="form-torneos-inner">
+        {/* Header */}
+        <div className="form-header">
+          <button 
+            className="btn-back"
+            onClick={() => navigate(-1)}
+            type="button"
+          >
+            ← Volver
+          </button>
+          <h1 className="form-title">
+            {createMode ? 'Crear Partido' : loadingPartido ? 'Cargando Partido...' : 'Editar Partido'}
+          </h1>
+          <p className="form-subtitle">
+            {createMode 
+              ? 'Completa la información del partido' 
+              : 'Modifica los detalles del partido'}
+          </p>
+        </div>
 
-      {errorEquipos &&
-        alert({
-          message: 'Error al cargar los equipos: ' + errorEquipos.message,
-          success: false,
-        })}
+        {/* Alertas de error */}
+        {errorEstablecimientos && (
+          <div className="alert-danger-custom">
+            ⚠️ Error al cargar los establecimientos: {errorEstablecimientos.message}
+          </div>
+        )}
 
-      {errorPartido &&
-        alert({
-          message:
-            'Error al cargar los datos del partido: ' + errorPartido.message,
-          success: false,
-        })}
+        {errorEquipos && (
+          <div className="alert-danger-custom">
+            ⚠️ Error al cargar los equipos: {errorEquipos.message}
+          </div>
+        )}
 
-      {alert({ message, success })}
-      <Form onSubmit={handleSubmit}>
-        <Row>
-          <Col md={12}>
-            <h3>
-              {createMode
-                ? 'Crear Partido'
-                : loadingPartido
-                ? 'Cargando Partido...'
-                : 'Editar Partido'}
-            </h3>
-          </Col>
-          <Col md={6}>
-            <Form.Group className="mb-3" controlId="formHomeTeam">
-              <Form.Label>Seleccione el equipo local</Form.Label>
-              <Form.Select
-                className="bg-bs-dark text-bg-dark border border-primary"
-                name="equipoLocal"
-                value={form.equipoLocal}
-                onChange={handleChange}
-                required
-              >
-                <option value="">
-                  {loadingEquipos
-                    ? 'Cargando equipos...'
-                    : 'Seleccione el equipo local'}
-                </option>
-                {!loadingEquipos &&
-                  equipos.map((equipo) => (
-                    <option
-                      key={equipo.id}
-                      value={equipo.id}
-                      disabled={equipo.id === form.equipoVisitante}
-                    >
-                      {equipo.nombre}
-                    </option>
-                  ))}
-              </Form.Select>
-            </Form.Group>
-          </Col>
+        {errorPartido && (
+          <div className="alert-danger-custom">
+            ⚠️ Error al cargar los datos del partido: {errorPartido.message}
+          </div>
+        )}
 
-          <Col md={6}>
-            <Form.Group className="mb-3" controlId="formAwayTeam">
-              <Form.Label>Seleccione el equipo Visitante</Form.Label>
-              <Form.Select
-                className="bg-bs-dark text-bg-dark border border-primary"
-                name="equipoVisitante"
-                value={form.equipoVisitante}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Seleccione el equipo visitante</option>
-                {equipos.map((equipo) => (
-                  <option
-                    key={equipo.id}
-                    value={equipo.id}
-                    disabled={equipo.id === form.equipoLocal}
+        {/* Mensaje de éxito/error */}
+        {message && (
+          <div className={success ? 'alert-success-custom' : 'alert-danger-custom'}>
+            {success ? '✓' : '⚠️'} {message}
+          </div>
+        )}
+
+        {/* Formulario */}
+        <form onSubmit={handleSubmit} className="torneo-form">
+          {/* Equipos */}
+          <div className="form-section">
+            <h2 className="section-title-form">Equipos</h2>
+            <div className="form-card">
+              <div className="form-grid">
+                <div className="form-group">
+                  <label htmlFor="equipoLocal" className="form-label">
+                    Equipo Local
+                    <span className="required">*</span>
+                  </label>
+                  <select
+                    id="equipoLocal"
+                    name="equipoLocal"
+                    className="form-select"
+                    value={form.equipoLocal}
+                    onChange={handleChange}
+                    required
+                    disabled={loadingEquipos}
                   >
-                    {equipo.nombre}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-          </Col>
-        </Row>
-        <Row>
-          <Col md={6}>
-            <Form.Group className="mb-3" controlId="formMatchDate">
-              <Form.Label>Fecha</Form.Label>
-              <Form.Control
-                className="bg-bs-dark text-bg-dark border border-primary"
-                type="date"
-                name="fecha"
-                value={form.fecha}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-          </Col>
-          <Col md={6}>
-            <Form.Group className="mb-3" controlId="formMatchTime">
-              <Form.Label>Hora</Form.Label>
-              <Form.Control
-                className="bg-bs-dark text-bg-dark border border-primary"
-                type="time"
-                name="hora"
-                value={form.hora}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col md={6}>
-            <Form.Group className="mb-3" controlId="formMatchReferee">
-              <Form.Label>Juez</Form.Label>
-              <Form.Control
-                className="bg-bs-dark text-bg-dark border border-primary"
-                type="text"
-                placeholder="Ingrese el nombre del juez"
-                name="juez"
-                value={form.juez}
-                onChange={handleChange}
-              />
-            </Form.Group>
-          </Col>
-          <Col md={3}>
-            <Form.Group className="mb-3" controlId="formResultadoLocal">
-              <Form.Label>Goles Local</Form.Label>
-              <Form.Control
-                className="bg-bs-dark text-bg-dark border border-primary"
-                type="number"
-                min={0}
-                name="resultadoLocal"
-                value={form.resultadoLocal}
-                onChange={handleChange}
-              />
-            </Form.Group>
-          </Col>
-          <Col md={3}>
-            <Form.Group className="mb-3" controlId="formResultadoVisitante">
-              <Form.Label>Goles Visitante</Form.Label>
-              <Form.Control
-                className="bg-bs-dark text-bg-dark border border-primary"
-                type="number"
-                min={0}
-                name="resultadoVisitante"
-                value={form.resultadoVisitante}
-                onChange={handleChange}
-              />
-            </Form.Group>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col md={12}>
-            <Form.Group className="mb-3" controlId="establecimiento">
-              <Form.Label>Seleccione el establecimiento</Form.Label>
-              <Form.Select
-                className="bg-bs-dark text-bg-dark border border-primary"
-                name="establecimiento"
-                value={form.establecimiento}
-                onChange={handleChange}
-                required
-              >
-                <option value="">
-                  {loadingEstablecimientos
-                    ? 'Cargando establecimientos...'
-                    : establecimientos.length === 0
-                    ? 'No hay establecimientos disponibles'
-                    : 'Seleccione el establecimiento'}
-                </option>
-
-                {!loadingEstablecimientos &&
-                  establecimientos.map((establecimiento) => (
-                    <option key={establecimiento.id} value={establecimiento.id}>
-                      {establecimiento.nombre +
-                        ' - ' +
-                        establecimiento.direccion}
+                    <option value="">
+                      {loadingEquipos
+                        ? 'Cargando equipos...'
+                        : 'Seleccione el equipo local'}
                     </option>
-                  ))}
-              </Form.Select>
-            </Form.Group>
-          </Col>
-        </Row>
+                    {!loadingEquipos &&
+                      equipos.map((equipo) => (
+                        <option
+                          key={equipo.id}
+                          value={equipo.id}
+                          disabled={equipo.id === form.equipoVisitante}
+                        >
+                          {equipo.nombre}
+                        </option>
+                      ))}
+                  </select>
+                </div>
 
-        <Submit>Cargar Partido</Submit>
-      </Form>
+                <div className="form-group">
+                  <label htmlFor="equipoVisitante" className="form-label">
+                    Equipo Visitante
+                    <span className="required">*</span>
+                  </label>
+                  <select
+                    id="equipoVisitante"
+                    name="equipoVisitante"
+                    className="form-select"
+                    value={form.equipoVisitante}
+                    onChange={handleChange}
+                    required
+                    disabled={loadingEquipos}
+                  >
+                    <option value="">Seleccione el equipo visitante</option>
+                    {equipos.map((equipo) => (
+                      <option
+                        key={equipo.id}
+                        value={equipo.id}
+                        disabled={equipo.id === form.equipoLocal}
+                      >
+                        {equipo.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Fecha y Hora */}
+          <div className="form-section">
+            <h2 className="section-title-form">Fecha y Hora</h2>
+            <div className="form-card">
+              <div className="form-grid">
+                <div className="form-group">
+                  <label htmlFor="fecha" className="form-label">
+                    Fecha
+                    <span className="required">*</span>
+                  </label>
+                  <input
+                    id="fecha"
+                    type="date"
+                    name="fecha"
+                    className="form-input"
+                    value={form.fecha}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="hora" className="form-label">
+                    Hora
+                    <span className="required">*</span>
+                  </label>
+                  <input
+                    id="hora"
+                    type="time"
+                    name="hora"
+                    className="form-input"
+                    value={form.hora}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Detalles del Partido */}
+          <div className="form-section">
+            <h2 className="section-title-form">Detalles del Partido</h2>
+            <div className="form-card">
+              <div className="form-grid">
+                <div className="form-group">
+                  <label htmlFor="juez" className="form-label">
+                    Juez/Árbitro
+                  </label>
+                  <input
+                    id="juez"
+                    type="text"
+                    name="juez"
+                    className="form-input"
+                    placeholder="Nombre del juez"
+                    value={form.juez}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="establecimiento" className="form-label">
+                    Establecimiento
+                    <span className="required">*</span>
+                  </label>
+                  <select
+                    id="establecimiento"
+                    name="establecimiento"
+                    className="form-select"
+                    value={form.establecimiento}
+                    onChange={handleChange}
+                    required
+                    disabled={loadingEstablecimientos}
+                  >
+                    <option value="">
+                      {loadingEstablecimientos
+                        ? 'Cargando establecimientos...'
+                        : establecimientos.length === 0
+                        ? 'No hay establecimientos disponibles'
+                        : 'Seleccione el establecimiento'}
+                    </option>
+                    {!loadingEstablecimientos &&
+                      establecimientos.map((establecimiento) => (
+                        <option key={establecimiento.id} value={establecimiento.id}>
+                          {establecimiento.nombre} - {establecimiento.direccion}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Resultados */}
+              <div className="form-group">
+                <label className="form-label">Resultados (opcional)</label>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label htmlFor="resultadoLocal" className="form-label">
+                      Goles Local
+                    </label>
+                    <input
+                      id="resultadoLocal"
+                      type="number"
+                      name="resultadoLocal"
+                      className="form-input"
+                      min={0}
+                      placeholder="0"
+                      value={form.resultadoLocal}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="resultadoVisitante" className="form-label">
+                      Goles Visitante
+                    </label>
+                    <input
+                      id="resultadoVisitante"
+                      type="number"
+                      name="resultadoVisitante"
+                      className="form-input"
+                      min={0}
+                      placeholder="0"
+                      value={form.resultadoVisitante}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+                <span className="form-hint">
+                  Deja vacío si el partido aún no se ha jugado
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Botones */}
+          <div className="form-actions">
+            <button
+              type="button"
+              className="btn-cancel-form"
+              onClick={() => navigate(-1)}
+              disabled={isSubmitting}
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className="btn-submit-form"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="spinner"></span>
+                  {createMode ? 'Creando...' : 'Guardando...'}
+                </>
+              ) : (
+                <>
+                  {createMode ? '✓ Crear Partido' : '✓ Guardar Cambios'}
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

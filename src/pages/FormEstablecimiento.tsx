@@ -1,22 +1,47 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-// import { Form, Row, Col } from 'react-bootstrap';
-// import { Submit } from '../components/ButtonField.tsx';
-// import alert from '../components/Alert.tsx';
 import axios from 'axios';
 import './CrearEquipo.css';
 
-export default function CrearEstablecimiento() {
+export default function FormEstablecimiento() {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
+  const { idT, idE } = useParams<{ idT: string; idE: string }>();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
 
   const [form, setForm] = useState({
     nombre: '',
     direccion: '',
-    evento: id,
+    evento: idT,
   });
+
+  const isEditing = !!idE;
+
+  useEffect(() => {
+    if (!idE) return;
+
+    const fetchEstablecimiento = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/establecimientos/${idE}`,
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
+        console.log('Fetched establecimiento:', response.data);
+        const data = response.data.data;
+        setForm({
+          nombre: data.nombre,
+          direccion: data.direccion,
+          evento: data.evento,
+        });
+      } catch (error) {
+        console.error('Error fetching establecimiento:', error);
+      }
+    };
+
+    fetchEstablecimiento();
+  }, [idE]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -36,13 +61,19 @@ export default function CrearEstablecimiento() {
     const payload = {
       nombre: form.nombre,
       direccion: form.direccion,
-      evento: id,
+      evento: idT,
     };
 
     try {
-      await axios.post('http://localhost:3000/api/establecimientos', payload, {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      if (isEditing) {
+        await axios.put(`http://localhost:3000/api/establecimientos/${idE}`, payload, {
+          headers: { 'Content-Type': 'application/json' },
+        });
+      } else {
+        await axios.post('http://localhost:3000/api/establecimientos', payload, {
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
 
       setShowSuccess(true);
     } catch (error: unknown) {
@@ -67,10 +98,9 @@ export default function CrearEstablecimiento() {
             <button className="btn-back" onClick={() => navigate(-1)}>
               ← Volver
             </button>
-            <h1 className="form-title">Crear Nuevo Establecimiento</h1>
+            <h1 className="form-title">{isEditing ? 'Editar Establecimiento' : 'Crear Nuevo Establecimiento'}</h1>
             <p className="form-subtitle">
-              Completa la información para agregar tu establecimiento en el
-              torneo
+              {isEditing ? 'Completa la información para editar tu establecimiento en el torneo' : 'Completa la información para agregar tu establecimiento en el torneo'}
             </p>
           </div>
           {/* Formulario */}
@@ -131,10 +161,11 @@ export default function CrearEstablecimiento() {
                 {isSubmitting ? (
                   <>
                     <span className="spinner"></span>
-                    Creando equipo...
+                    {isEditing ? 'Guardando cambios...' : 'Creando establecimiento...'}
                   </>
                 ) : (
-                  <>Crear Equipo</>
+
+                  isEditing ? 'Guardar Cambios' : 'Crear Establecimiento'
                 )}
               </button>
             </div>
@@ -152,11 +183,11 @@ export default function CrearEstablecimiento() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="modal-custom-header">
-              <h2 className="modal-custom-title">Establecimiento Creado!</h2>
+              <h2 className="modal-custom-title">{isEditing ? 'Establecimiento Editado!' : 'Establecimiento Creado!'}</h2>
             </div>
             <div className="modal-custom-body">
               <p className="modal-info-text">
-                Tu Establecimiento se ha creado correctamente.
+                Tu Establecimiento se ha {isEditing ? 'editado' : 'creado'} correctamente.
               </p>
             </div>
             <div className="modal-custom-footer">
@@ -175,47 +206,4 @@ export default function CrearEstablecimiento() {
       )}
     </div>
   );
-
-  // return (
-  //   <div className="container mt-4 text-bg-dark p-4 rounded-3 shadow-lg">
-  //     {alert({ message, success })}
-  //     <Form onSubmit={handleSubmit}>
-  //       <Row>
-  //         <Col md={6}>
-  //           <Form.Group controlId="formNombre" className="mb-3">
-  //             <Form.Label>Nombre</Form.Label>
-  //             <Form.Control
-  //               className="bg-bs-dark text-bg-dark border border-primary"
-  //               type="text"
-  //               placeholder="Ingrese el nombre del establecimiento"
-  //               name="nombre"
-  //               value={form.nombre}
-  //               onChange={handleChange}
-  //               required
-  //             />
-  //           </Form.Group>
-  //         </Col>
-
-  //         <Col md={6}>
-  //           <Form.Group controlId="formDireccion" className="mb-3">
-  //             <Form.Label>Dirección</Form.Label>
-  //             <Form.Control
-  //               className="bg-bs-dark text-bg-dark border border-primary"
-  //               type="text"
-  //               placeholder="Ingrese la dirección"
-  //               name="direccion"
-  //               value={form.direccion}
-  //               onChange={handleChange}
-  //               required
-  //             />
-  //           </Form.Group>
-  //         </Col>
-  //       </Row>
-
-  //       <div className="text-center">
-  //         <Submit>Guardar Establecimiento</Submit>
-  //       </div>
-  //     </Form>
-  //   </div>
-  // );
 }

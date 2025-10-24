@@ -679,6 +679,13 @@
     display: none;
   }
 
+  .custom-table-container.no-mobile-hide {
+    display: block !important;
+    visibility: visible !important;
+    overflow-x: auto; /* permite scroll horizontal en móvil */
+    -webkit-overflow-scrolling: touch;
+  }
+
   .equipos-mobile-list,
   .partidos-mobile-list {
     display: block;

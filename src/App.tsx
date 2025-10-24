@@ -17,6 +17,7 @@ import MainLayout from './components/layout/MainLayout.tsx';
 import MainHome from './pages/MainHome.tsx';
 import Torneos from './pages/Torneos.tsx';
 import Noticias from './pages/Noticias.tsx';
+
 import Perfil from './pages/Perfil.tsx';
 import Login from './pages/Login.tsx';
 import Registro from './pages/Registro.tsx';
@@ -28,16 +29,14 @@ import TorneosAdmin from './pages/admin/TorneosAdmin.tsx';
 import AuthLayout from './components/layout/AuthLayout.tsx';
 import CrearTorneo from './pages/CrearTorneo.tsx';
 import CrearPartido from './pages/CrearPartido.tsx';
-import CrearEstablecimiento from './pages/CrearEstablecimiento.tsx';
-import EditarEstablecimiento from './pages/EditarEstablecimiento.tsx';
+import FormEstablecimiento from './pages/FormEstablecimiento.tsx';
 import EditarPartido from './pages/EditarPartido.tsx';
 import TorneoDetalle from './pages/TorneoDetalle.tsx';
 import EditarTorneo from './pages/EditarTorneo.tsx';
 import CrearEquipo from './pages/CrearEquipo.tsx';
-import VerEquipo from './pages/VerEquipo.tsx';
 import EditarEquipo from './pages/EditarEquipo.tsx';
 import CrearParticipacion from './pages/CrearParticipacion.tsx';
-import MisTorneos from './pages/misTorneos.tsx';
+import MisTorneos from './pages/MisTorneos.tsx';
 import UsuariosAdmin from './pages/admin/UsuariosAdmin.tsx';
 import NoticiasAdmin from './pages/admin/NoticiasAdmin.tsx';
 import PartidoDetalle from './pages/PartidoDetalle.tsx';
@@ -48,6 +47,7 @@ function App() {
     <AuthProvider>
       <DeportesProvider>
         <TorneosProvider>
+          <NoticiasProvider>
           <BrowserRouter>
             <div className="App">
               <Routes>
@@ -99,21 +99,16 @@ function App() {
                       element={<ListarEstablecimientos />}
                     />
                     <Route
-                      path="torneos/:id/CrearEstablecimiento"
-                      element={<CrearEstablecimiento />}
-                    />
-                    <Route
-                      path="torneos/:id/EditarEstablecimiento/:establecimientoId"
-                      element={<EditarEstablecimiento />}
+                      path="torneos/:idT/FormEstablecimiento/:idE?"
+                      element={<FormEstablecimiento />}
                     />
                     <Route
                       path="torneos/:id/EditarPartido/:partidoId"
                       element={<EditarPartido />}
                     />
                     <Route path="mis-torneos" element={<MisTorneos />} />
-                    <Route path="equipos/:id" element={<VerEquipo />} />
                     <Route
-                      path="equipos/:id/editar"
+                      path="equipos/:id"
                       element={<EditarEquipo />}
                     />
                     <Route
@@ -181,6 +176,7 @@ function App() {
               </Routes>
             </div>
           </BrowserRouter>
+          </NoticiasProvider>
         </TorneosProvider>
       </DeportesProvider>
     </AuthProvider>

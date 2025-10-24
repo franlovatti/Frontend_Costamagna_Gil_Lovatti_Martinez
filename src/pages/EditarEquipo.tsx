@@ -1,20 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-
 import apiAxios from '../helpers/api';
 import { useAuth } from '../hooks/useAuth';
-
 import type { Equipo, Usuario } from '../types';
-import {
-  Form,
-  InputGroup,
-  Button as RBButton,
-  Table,
-  Row,
-  Spinner,
-  Alert,
-  Modal,
-} from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 
 export default function EditarEquipo() {
   const { id } = useParams() as { id?: string };
@@ -125,176 +114,258 @@ export default function EditarEquipo() {
 
   if (loading)
     return (
-      <div className="p-3">
-        {' '}
-        <Spinner animation="border" /> Cargando...
+      <div className="torneo-detalle-container">
+        <div className="loading-state">Cargando equipo...</div>
       </div>
     );
+
   if (error)
     return (
-      <div className="p-3">
-        <Alert variant="danger">{error}</Alert>
+      <div className="torneo-detalle-container">
+        <div className="torneo-detalle-inner">
+          <div className="empty-state">
+            <div className="empty-state-icon">⚠️</div>
+            <p className="empty-state-text">{error}</p>
+          </div>
+        </div>
       </div>
     );
+
   if (!equipo)
     return (
-      <div className="p-3">
-        <Alert variant="warning">Equipo no encontrado.</Alert>
+      <div className="torneo-detalle-container">
+        <div className="torneo-detalle-inner">
+          <div className="empty-state">
+            <div className="empty-state-icon">❌</div>
+            <p className="empty-state-text">Equipo no encontrado</p>
+          </div>
+        </div>
       </div>
     );
 
   return (
-    <div className="container text-bg-dark p-3">
-      <Row>
-        <h2>{equipo.nombre}</h2>
-      </Row>
+    <div className="torneo-detalle-container">
+      <div className="torneo-detalle-inner">
+        {/* Header con información del equipo */}
+        <div className="detalle-header">
+          <div className="header-content">
+            <div className="header-title-section">
+              <h1 className="detalle-title">{equipo.nombre}</h1>
+              <span
+                className={`badge-custom ${
+                  equipo.esPublico ? 'badge-equipo' : 'badge-individual'
+                }`}
+              >
+                {equipo.esPublico ? 'Público' : 'Privado'}
+              </span>
+            </div>
+          </div>
+          <Row>
+            <Col md={6}>
+              <p className="detalle-description">
+                <strong>Capitán:</strong> {equipo.nombreCapitan}
+              </p>
+            </Col>
+            <Col md={6}>
+              <p className="detalle-description">
+                <strong>Puntos:</strong> {equipo.puntos}
+              </p>
+            </Col>
+          </Row>
+        </div>
 
-      <Row>
-        <p>Capitán: {equipo.nombreCapitan}</p>
-      </Row>
+        {/* Formulario de edición (solo si es capitán) */}
+        {capId === userIdStr && (
+          <div className="crear-participacion-card">
+            <h3 className="card-title-participacion">Editar Equipo</h3>
+            <form onSubmit={handleSaveAll}>
+              <Row>
+                <Col md={equipo.esPublico ? 12 : 6}>
+                  <div className="form-group-custom">
+                    <label className="form-label-custom">
+                      Nombre del equipo
+                    </label>
+                    <input
+                      className="form-input-custom"
+                      type="text"
+                      value={nameInput}
+                      onChange={(e) => setNameInput(e.target.value)}
+                      required
+                    />
+                  </div>
+                </Col>
+                {!equipo.esPublico && (
+                  <Col md={6}>
+                    <div className="form-group-custom">
+                      <label className="form-label-custom">
+                        Nueva contraseña (opcional)
+                      </label>
+                      <div style={{ position: 'relative' }}>
+                        <input
+                          className="form-input-custom"
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder="Dejar vacío para no cambiar"
+                          value={passwordInput}
+                          onChange={(e) => setPasswordInput(e.target.value)}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((s) => !s)}
+                          style={{
+                            position: 'absolute',
+                            right: '10px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: 'var(--text-muted)',
+                            fontSize: '1.2rem',
+                          }}
+                        >
+                          {showPassword ? '👁️' : '👁️‍🗨️'}
+                        </button>
+                      </div>
+                    </div>
+                  </Col>
+                )}
+              </Row>
+            </form>
+          </div>
+        )}
 
-      <Row>
-        <p>Puntos: {equipo.puntos}</p>
-      </Row>
-
-      {capId === userIdStr ? (
-        <>
-          <Form onSubmit={handleSaveAll} className="mb-3">
-            <Form.Group className="mb-2" controlId="equipoNombre">
-              <Form.Label>Nombre del equipo</Form.Label>
-              <Form.Control
-                className="bg-bs-dark text-bg-dark border border-primary"
-                value={nameInput}
-                onChange={(e) => setNameInput(e.target.value)}
-              />
-            </Form.Group>
-            {equipo.esPublico ? null : (
-              <Form.Group className="mb-2" controlId="equipoPassword">
-                <Form.Label>Nueva contraseña (opcional)</Form.Label>
-                <InputGroup>
-                  <Form.Control
-                    className="bg-bs-dark text-bg-dark border border-primary"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Dejar vacío para no cambiar"
-                    value={passwordInput}
-                    onChange={(e) => setPasswordInput(e.target.value)}
-                  />
-                  <InputGroup.Text
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => setShowPassword((s) => !s)}
-                  ></InputGroup.Text>
-                </InputGroup>
-              </Form.Group>
-            )}
-          </Form>
-        </>
-      ) : null}
-
-      <Row className="mb-3">
-        <h5>Miembros</h5>
-      </Row>
-
-      {Array.isArray(equipo.miembros) && equipo.miembros.length > 0 ? (
-        <Table striped variant="dark">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Miembro</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {(equipo.miembros as Usuario[]).map((miembro, idx) => {
-              const memberId = miembro.id ?? miembro.usuario ?? '';
-              const memberIdStr = String(memberId);
-              const capIdLocal = String(equipo.capitan.id);
-              const isMemberCaptain = capIdLocal === memberIdStr;
-              return (
-                <tr key={memberIdStr}>
-                  <td>{idx + 1}</td>
-                  <td>
-                    {miembro.nombre ?? miembro.usuario ?? memberIdStr}
-                    {isMemberCaptain ? ' (Capitán)' : ''}
-                  </td>
-                  <td>
-                    {capId === userIdStr && !isMemberCaptain ? (
-                      <RBButton
-                        size="sm"
-                        variant="danger"
-                        onClick={() => handleRemoveMember(memberId)}
-                      >
-                        Eliminar
-                      </RBButton>
-                    ) : null}
-                  </td>
+        {/* Lista de miembros */}
+        <div className="section-container">
+          <h2 className="section-title">Miembros del Equipo</h2>
+          <div className="custom-table-container no-mobile-hide">
+            <table className="custom-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nombre</th>
+                  <th>Rol</th>
+                  {capId === userIdStr && <th>Acciones</th>}
                 </tr>
-              );
-            })}
-          </tbody>
-        </Table>
-      ) : (
-        <div className="alert alert-secondary">No hay miembros listados.</div>
-      )}
-      <div className="d-flex justify-content-between">
-        <RBButton className="danger" onClick={() => navigate(-1)}>
-          Volver
-        </RBButton>
+              </thead>
+              <tbody>
+                {Array.isArray(equipo.miembros) && equipo.miembros.length > 0 ? (
+                  (equipo.miembros as Usuario[]).map((miembro, idx) => {
+                    const memberId = miembro.id ?? miembro.usuario ?? '';
+                    const memberIdStr = String(memberId);
+                    const capIdLocal = String(equipo.capitan.id);
+                    const isMemberCaptain = capIdLocal === memberIdStr;
+                    return (
+                      <tr key={memberIdStr}>
+                        <td>{idx + 1}</td>
+                        <td className="team-name-cell">
+                          {miembro.nombre ?? miembro.usuario ?? memberIdStr}
+                        </td>
+                        <td>
+                          {isMemberCaptain && (
+                            <span className="jugadores-badge">Capitán</span>
+                          )}
+                        </td>
+                        {capId === userIdStr && (
+                          <td>
+                            {!isMemberCaptain && (
+                              <button
+                                className="btn-action btn-delete btn-small"
+                                onClick={() => handleRemoveMember(memberId)}
+                              >
+                                Eliminar
+                              </button>
+                            )}
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={capId === userIdStr ? 4 : 3}
+                      className="empty-state-cell"
+                    >
+                      No hay miembros listados
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-        <RBButton
-          className="success"
-          onClick={() => handleSaveAll()}
-          disabled={saving}
-        >
-          {saving ? (
-            <>
-              <Spinner animation="border" size="sm" /> Guardando...
-            </>
-          ) : (
-            'Guardar cambios'
+        {/* Botones de acción */}
+        <div className="action-buttons-section">
+          <button className="action-btn btn-secondary-action" onClick={() => navigate(-1)}>
+            ← Volver
+          </button>
+          {capId === userIdStr && (
+            <button
+              className="action-btn btn-primary-action"
+              onClick={() => handleSaveAll()}
+              disabled={saving}
+            >
+              {saving ? 'Guardando...' : 'Guardar Cambios'}
+            </button>
           )}
-        </RBButton>
+        </div>
       </div>
 
-      <Modal
-        show={showRemoveModal}
-        onHide={() => {
-          if (!removing) {
-            setShowRemoveModal(false);
-            setMemberToRemove(null);
-          }
-        }}
-        centered
-      >
-        <Modal.Header
-          data-bs-theme="dark"
-          closeButton
-          className="text-bg-dark border-primary"
-        >
-          <Modal.Title>Eliminar miembro</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="text-bg-dark">
-          ¿Seguro que querés eliminar a este miembro del equipo?
-        </Modal.Body>
-        <Modal.Footer className="text-bg-dark border-primary">
-          <RBButton
-            variant="secondary"
-            onClick={() => {
+      {/* Modal de confirmación para eliminar miembro */}
+      {showRemoveModal && (
+        <div
+          className="modal-overlay-participacion"
+          onClick={() => {
+            if (!removing) {
               setShowRemoveModal(false);
               setMemberToRemove(null);
-            }}
-            disabled={removing}
+            }
+          }}
+        >
+          <div
+            className="modal-content-participacion"
+            onClick={(e) => e.stopPropagation()}
           >
-            Cancelar
-          </RBButton>
-          <RBButton
-            variant="danger"
-            onClick={confirmRemoveMember}
-            disabled={removing}
-          >
-            {removing ? 'Eliminando...' : 'Eliminar'}
-          </RBButton>
-        </Modal.Footer>
-      </Modal>
+            <div className="modal-header-participacion">
+              <h3 className="modal-title-participacion">Eliminar miembro</h3>
+              <button
+                className="modal-close-btn"
+                onClick={() => {
+                  if (!removing) {
+                    setShowRemoveModal(false);
+                    setMemberToRemove(null);
+                  }
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="modal-body-participacion">
+              <p>¿Seguro que querés eliminar a este miembro del equipo?</p>
+            </div>
+            <div className="modal-footer-participacion">
+              <button
+                className="btn-cancel-custom"
+                onClick={() => {
+                  setShowRemoveModal(false);
+                  setMemberToRemove(null);
+                }}
+                disabled={removing}
+              >
+                Cancelar
+              </button>
+              <button
+                className="btn-action btn-delete"
+                onClick={confirmRemoveMember}
+                disabled={removing}
+              >
+                {removing ? 'Eliminando...' : 'Eliminar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
