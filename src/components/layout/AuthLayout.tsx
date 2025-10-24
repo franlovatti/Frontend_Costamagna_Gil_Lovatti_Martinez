@@ -57,7 +57,10 @@ const AuthLayout = () => {
             <span className="icon">📰</span>
             <span>Noticias</span>
           </Link>
-          
+          <Link to="/admin/localidades" className="sidebar-link d-flex align-items-center gap-3 px-4 py-3 text-decoration-none">
+            <span className="icon">📍</span>
+            <span>Localidades</span>
+          </Link>
         </nav>
         <div className="sidebar-footer p-4">
           <button onClick={handleLogout} className="logout-btn w-100 d-flex align-items-center justify-content-center gap-2">

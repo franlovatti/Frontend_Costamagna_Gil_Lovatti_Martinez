@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import CardTorneos from '../components/CardTorneos';
 import { useNavigate } from 'react-router-dom';
 import apiAxios from '../helpers/api';
-import type { Torneo, Deporte, Localidad, Usuario, Equipo } from '../types';
+import type { Torneo, Deporte, Usuario, Equipo } from '../types';
 import { useAuth } from '../hooks/useAuth';
+import MapaLocalidad from '../components/apiMaps/MapaLocalidad';
 import './Torneos.css';
 
 export default function Torneos() {
@@ -11,7 +12,6 @@ export default function Torneos() {
   const [selectedSport, setSelectedSport] = useState<string>('');
   const [selectedLocalidad, setSelectedLocalidad] = useState<string>('');
   const [dataDeportes, setDataDeportes] = useState<Deporte[]>([]);
-  const [dataLocalidades, setDataLocalidades] = useState<Localidad[]>([]);
   const [errorConexion, setErrorConexion] = useState<boolean>(false);
   
   // Modal de código
@@ -34,12 +34,10 @@ export default function Torneos() {
     Promise.all([
       apiAxios.get('/eventos'),
       apiAxios.get('/deportes'),
-      apiAxios.get('/localidades'),
     ])
-      .then(([torneosRes, deportesRes, localidadesRes]) => {
+      .then(([torneosRes, deportesRes]) => {
         setDataTorneos(torneosRes.data.data);
         setDataDeportes(deportesRes.data.data);
-        setDataLocalidades(localidadesRes.data.data);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
@@ -136,7 +134,7 @@ export default function Torneos() {
   const torneosFiltrados = dataTorneos.filter(
     (torneo) =>
       (!selectedSport || String(torneo.deporte.nombre) === selectedSport) &&
-      (!selectedLocalidad || String(torneo.localidad.nombre) === selectedLocalidad)
+      (!selectedLocalidad || String(torneo.localidad.codigo) === selectedLocalidad)
   );
 
   return (
@@ -178,18 +176,7 @@ export default function Torneos() {
                 </option>
               ))}
             </select>
-            <select
-              className="filtro-select-toolbar"
-              value={selectedLocalidad}
-              onChange={(e) => setSelectedLocalidad(e.target.value)}
-            >
-              <option value="">Todas las localidades</option>
-              {dataLocalidades.map((localidad) => (
-                <option key={localidad.id} value={localidad.nombre}>
-                  {localidad.nombre}
-                </option>
-              ))}
-            </select>
+            <MapaLocalidad onSelect={(place) => setSelectedLocalidad(place.place_id!)} localidad={true} className='filtro-select-toolbar' />
           </div>
         </div>
 

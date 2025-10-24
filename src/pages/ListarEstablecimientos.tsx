@@ -108,7 +108,7 @@ export default function ListarEstablecimientos() {
                   className="btn-action btn-edit"
                   onClick={() =>
                     navigate(
-                      `/home/torneos/${est.evento}/EditarEstablecimiento/${est.id}`
+                      `/home/torneos/${est.evento}/FormEstablecimiento/${est.id}`
                     )
                   }
                 >

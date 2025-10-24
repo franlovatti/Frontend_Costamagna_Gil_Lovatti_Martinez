@@ -8,6 +8,7 @@ import ProtectedRoute from './components/ProtectedRoute.tsx';
 import TorneosProvider from './providers/TorneoProvider.tsx';
 import UsuariosProvider from './providers/UsuarioProvider.tsx';
 import NoticiasProvider from './providers/NoticiaProvider.tsx';
+import LocalidadProvider from './providers/LocalidadProvider.tsx';
 
 // Layouts and Components
 import NotFound from './pages/NotFound.js';
@@ -26,6 +27,7 @@ import ChangePassword from './pages/ChangePassword.tsx';
 import Dashboard from './pages/admin/Dashboard.tsx';
 import DeportesAdmin from './pages/admin/DeportesAdmin.tsx';
 import TorneosAdmin from './pages/admin/TorneosAdmin.tsx';
+import LocalidadesAdmin from './pages/admin/LocalidadesAdmin.tsx';
 import AuthLayout from './components/layout/AuthLayout.tsx';
 import CrearTorneo from './pages/CrearTorneo.tsx';
 import CrearPartido from './pages/CrearPartido.tsx';
@@ -48,134 +50,144 @@ function App() {
       <DeportesProvider>
         <TorneosProvider>
           <NoticiasProvider>
-          <BrowserRouter>
-            <div className="App">
-              <Routes>
-                {/*Rutas con el MainLayout*/}
-                <Route path="/" element={<MainLayout />}>
-                  <Route index element={<MainHome />} />
-                  <Route path="Login" element={<Login />} />
-                  <Route path="Registro" element={<Registro />}></Route>
-                  <Route
-                    path="ForgottenPassword"
-                    element={<ForgottenPassword />}
-                  ></Route>
-                  <Route
-                    path="ChangePassword"
-                    element={<ChangePassword />}
-                  ></Route>
-                </Route>
-                <Route
-                  element={
-                    <ProtectedRoute
-                      allowedRoles={['Usuario', 'Administrador']}
-                    />
-                  }
-                >
-                  <Route path="home" element={<MainLayout />}>
-                    <Route index element={<MainHome />} />
-                    <Route path="torneos" element={<Torneos />} />
+            <LocalidadProvider>
+              <BrowserRouter>
+                <div className="App">
+                  <Routes>
+                    {/*Rutas con el MainLayout*/}
+                    <Route path="/" element={<MainLayout />}>
+                      <Route index element={<MainHome />} />
+                      <Route path="Login" element={<Login />} />
+                      <Route path="Registro" element={<Registro />}></Route>
+                      <Route
+                        path="ForgottenPassword"
+                        element={<ForgottenPassword />}
+                      ></Route>
+                      <Route
+                        path="ChangePassword"
+                        element={<ChangePassword />}
+                      ></Route>
+                    </Route>
                     <Route
-                      path="torneos/crear-torneo"
-                      element={<CrearTorneo />}
-                    />
-                    <Route path="torneos/:id" element={<TorneoDetalle />} />
-                    <Route
-                      path="torneos/:id/editar"
-                      element={<EditarTorneo />}
-                    />
-                    <Route path="noticias" element={<Noticias />} />
-                    <Route
-                      path="torneos/:id/crear-equipo"
-                      element={<CrearEquipo />}
-                    />
-                    <Route path="CrearPartido" element={<CrearPartido />} />
-                    <Route
-                      path="torneos/:id/CrearPartido"
-                      element={<CrearPartido />}
-                    />
-                    <Route
-                      path="torneos/:id/ListarEstablecimientos"
-                      element={<ListarEstablecimientos />}
-                    />
-                    <Route
-                      path="torneos/:idT/FormEstablecimiento/:idE?"
-                      element={<FormEstablecimiento />}
-                    />
-                    <Route
-                      path="torneos/:id/EditarPartido/:partidoId"
-                      element={<EditarPartido />}
-                    />
-                    <Route path="mis-torneos" element={<MisTorneos />} />
-                    <Route
-                      path="equipos/:id"
-                      element={<EditarEquipo />}
-                    />
-                    <Route
-                      path="participaciones/:id"
-                      element={<CrearParticipacion />}
-                    />
-                    <Route
-                      path="partido-detalle/:id"
-                      element={<PartidoDetalle />}
-                    ></Route>
+                      element={
+                        <ProtectedRoute
+                          allowedRoles={['Usuario', 'Administrador']}
+                        />
+                      }
+                    >
+                      <Route path="home" element={<MainLayout />}>
+                        <Route index element={<MainHome />} />
+                        <Route path="torneos" element={<Torneos />} />
+                        <Route
+                          path="torneos/crear-torneo"
+                          element={<CrearTorneo />}
+                        />
+                        <Route path="torneos/:id" element={<TorneoDetalle />} />
+                        <Route
+                          path="torneos/:id/editar"
+                          element={<EditarTorneo />}
+                        />
+                        <Route path="noticias" element={<Noticias />} />
+                        <Route
+                          path="torneos/:id/crear-equipo"
+                          element={<CrearEquipo />}
+                        />
+                        <Route path="CrearPartido" element={<CrearPartido />} />
+                        <Route
+                          path="torneos/:id/CrearPartido"
+                          element={<CrearPartido />}
+                        />
+                        <Route
+                          path="torneos/:id/ListarEstablecimientos"
+                          element={<ListarEstablecimientos />}
+                        />
+                        <Route
+                          path="torneos/:idT/FormEstablecimiento/:idE?"
+                          element={<FormEstablecimiento />}
+                        />
+                        <Route
+                          path="torneos/:id/EditarPartido/:partidoId"
+                          element={<EditarPartido />}
+                        />
+                        <Route path="mis-torneos" element={<MisTorneos />} />
+                        <Route
+                          path="equipos/:id"
+                          element={<EditarEquipo />}
+                        />
+                        <Route
+                          path="participaciones/:id"
+                          element={<CrearParticipacion />}
+                        />
+                        <Route
+                          path="partido-detalle/:id"
+                          element={<PartidoDetalle />}
+                        ></Route>
 
-                    <Route path="perfil" element={<Perfil />} />
-                  </Route>
-                </Route>
+                        <Route path="perfil" element={<Perfil />} />
+                      </Route>
+                    </Route>
 
-                {/* Rutas con el AuthLayout - Area Protegida */}
-                <Route
-                  element={<ProtectedRoute allowedRoles={['Administrador']} />}
-                >
-                  <Route path="admin" element={<AuthLayout />}>
-                    <Route index element={<Dashboard />} />
+                    {/* Rutas con el AuthLayout - Area Protegida */}
                     <Route
-                      path="/admin/usuarios"
-                      element={
-                        <UsuariosProvider>
-                          <UsuariosAdmin />
-                        </UsuariosProvider>
-                      }
-                    />
-                    <Route
-                      path="/admin/deportes"
-                      element={
-                        <DeportesProvider>
-                          <DeportesAdmin />
-                        </DeportesProvider>
-                      }
-                    />
-                    <Route
-                      path="/admin/noticias"
-                      element={
-                        <NoticiasProvider>
-                          <NoticiasAdmin />
-                        </NoticiasProvider>
-                      }
-                    />
-                    <Route
-                      path="/admin/torneos"
-                      element={
-                        <TorneosProvider>
-                          <TorneosAdmin />
-                        </TorneosProvider>
-                      }
-                    />
-                    <Route
-                      path="/admin/noticias"
-                      element={
-                        <NoticiasProvider>
-                          <NoticiasAdmin />
-                        </NoticiasProvider>
-                      }
-                    />
-                  </Route>
-                </Route>
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
-          </BrowserRouter>
+                      element={<ProtectedRoute allowedRoles={['Administrador']} />}
+                    >
+                      <Route path="admin" element={<AuthLayout />}>
+                        <Route index element={<Dashboard />} />
+                        <Route
+                          path="/admin/usuarios"
+                          element={
+                            <UsuariosProvider>
+                              <UsuariosAdmin />
+                            </UsuariosProvider>
+                          }
+                        />
+                        <Route
+                          path="/admin/deportes"
+                          element={
+                            <DeportesProvider>
+                              <DeportesAdmin />
+                            </DeportesProvider>
+                          }
+                        />
+                        <Route
+                          path="/admin/noticias"
+                          element={
+                            <NoticiasProvider>
+                              <NoticiasAdmin />
+                            </NoticiasProvider>
+                          }
+                        />
+                        <Route
+                          path="/admin/torneos"
+                          element={
+                            <TorneosProvider>
+                              <TorneosAdmin />
+                            </TorneosProvider>
+                          }
+                        />
+                        <Route
+                          path="/admin/noticias"
+                          element={
+                            <NoticiasProvider>
+                              <NoticiasAdmin />
+                            </NoticiasProvider>
+                          }
+                        />
+                        <Route
+                          path="/admin/localidades"
+                          element={
+                            <LocalidadProvider>
+                              <LocalidadesAdmin />
+                            </LocalidadProvider>
+                          }
+                        />
+                      </Route>
+                    </Route>
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </div>
+              </BrowserRouter>
+            </LocalidadProvider>
           </NoticiasProvider>
         </TorneosProvider>
       </DeportesProvider>

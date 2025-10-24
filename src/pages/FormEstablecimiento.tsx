@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import MapaLocalidad from '../components/apiMaps/MapaLocalidad.tsx';
 import './CrearEquipo.css';
 
 export default function FormEstablecimiento() {
@@ -124,25 +125,14 @@ export default function FormEstablecimiento() {
               />
               <span className="form-hint">Mínimo 3 caracteres</span>
             </div>
-            <div className="form-group">
-              <label htmlFor="direccion" className="form-label">
-                Dirección del Establecimiento
-                <span className="required">*</span>
-              </label>
-              <input
-                id="direccion"
-                type="text"
-                name="direccion"
-                className="form-input"
-                placeholder="Ej: Av. Siempre Viva 742"
-                value={form.direccion}
-                onChange={handleChange}
-                required
-                minLength={3}
-                maxLength={100}
-              />
-              <span className="form-hint">Mínimo 3 caracteres</span>
-            </div>
+             <div className="form-group">
+            <label htmlFor="direccion" className="form-label">
+              Dirección del Establecimiento
+              <span className="required">*</span>
+            </label>
+            <MapaLocalidad onSelect={(place) => setForm({ ...form, direccion: place.formatted_address! })} className="form-input" placeholder='Ej: Zeballos 1341, Rosario' localidad={false} valor={form.direccion} />
+            <span className="form-hint">Mínimo 3 caracteres</span>
+          </div> 
             {/* Botones */}
             <div className="form-actions">
               <button

@@ -23,3 +23,11 @@
   color: var(--text);
   box-shadow: 0 0 0 0.2rem var(--hover-bg-strong);
 }
+
+.modal-content-custom {
+  overflow: visible; /* evita recorte interno */
+}
+
+.pac-container {
+  z-index: 20000 !important; /* mayor que el overlay del modal */
+}

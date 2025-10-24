@@ -368,7 +368,7 @@ export default function FormTorneos() {
                     <option value="">Seleccione la localidad</option>
                     {dataLocalidades.map((localidad) => (
                       <option key={localidad.id} value={localidad.id}>
-                        {localidad.nombre}
+                        {localidad.descripcion}
                       </option>
                     ))}
                   </select>

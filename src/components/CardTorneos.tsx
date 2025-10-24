@@ -29,7 +29,7 @@ export default function CardTorneos({
   });
 
   const deporteNombre = torneo.deporte?.nombre ?? 'Sin deporte';
-  const localidadNombre = torneo.localidad?.nombre ?? 'Sin localidad';
+  const localidadDesc = torneo.localidad?.descripcion ?? 'Sin localidad';
 
   const handleCardClick = (e: React.MouseEvent) => {
     if (!canAccess) return;
@@ -78,7 +78,7 @@ export default function CardTorneos({
           </div>
           
           <div className="torneo-info-item">
-            {localidadNombre}
+            {localidadDesc}
           </div>
 
           {!torneo.esPublico && (

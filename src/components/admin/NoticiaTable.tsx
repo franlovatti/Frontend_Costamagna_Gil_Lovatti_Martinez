@@ -12,7 +12,7 @@ export default function NoticiaTable({
   onDelete: (n: Noticia) => void;
 }) {
   return (
-    <div className="table-responsive custom-table-container">
+    <div className="table-responsive custom-table-container no-mobile-hide">
       <table className="table custom-table mb-0">
         <thead>
           <tr>

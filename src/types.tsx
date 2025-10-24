@@ -94,8 +94,10 @@ type Noticia = {
 
 type Localidad = {
   id: number;
-  nombre: string;
   descripcion: string;
+  lat: number;
+  lng: number;
+  codigo: string;
 };
 export type {
   Torneo,
