@@ -1,7 +1,6 @@
-import { useState, useEffect, useCallback,} from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import apiAxios from '../helpers/api';
 import type { Participation } from '../types';
-
 
 export function useParticipaciones(partidoId: string, equipoId: string) {
   const [participaciones, setParticipaciones] = useState<Participation[]>([]);
@@ -19,7 +18,7 @@ export function useParticipaciones(partidoId: string, equipoId: string) {
         '/participaciones/participacionesxequipo',
         {
           params: { partidoId, equipoid: equipoId },
-        }
+        },
       );
       setParticipaciones(response.data.data);
     } catch (err) {
@@ -37,7 +36,10 @@ export function useParticipaciones(partidoId: string, equipoId: string) {
   return { participaciones, loading, error };
 }
 
-export function useParticipacionesPorUsuarioEnTorneo(usuarioId: string, eventoId: string) {
+export function useParticipacionesPorUsuarioEnTorneo(
+  usuarioId: string,
+  eventoId: string,
+) {
   const [participaciones, setParticipaciones] = useState<Participation[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,12 +50,12 @@ export function useParticipacionesPorUsuarioEnTorneo(usuarioId: string, eventoId
     setLoading(true);
     setError(null);
 
-    try{
+    try {
       const response = await apiAxios.get(
         '/participaciones/participacionesPorUsuarioEnTorneo',
         {
           params: { usuarioId, eventoId: eventoId },
-        }
+        },
       );
       setParticipaciones(response.data.data);
     } catch (err) {
@@ -71,21 +73,24 @@ export function useParticipacionesPorUsuarioEnTorneo(usuarioId: string, eventoId
   return { participaciones, loading, error };
 }
 
-export function useParticipacionesPorTorneo(eventoId: string){
+export function useParticipacionesPorTorneo(eventoId: string) {
   const [participaciones, setParticipaciones] = useState<Participation[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   const fetchParticipaciones = useCallback(async () => {
     if (!eventoId) return;
-    
+
     setLoading(true);
     setError(null);
 
-    try{
-      const response = await apiAxios.get('participaciones/participacionesPorTorneo', {
-        params: { eventoId: eventoId },
-      })
+    try {
+      const response = await apiAxios.get(
+        'participaciones/participacionesPorTorneo',
+        {
+          params: { eventoId: eventoId },
+        },
+      );
       setParticipaciones(response.data.data);
     } catch (err) {
       console.error('Error fetching participations:', err);
@@ -93,7 +98,7 @@ export function useParticipacionesPorTorneo(eventoId: string){
     } finally {
       setLoading(false);
     }
-}, [eventoId]);
+  }, [eventoId]);
 
   useEffect(() => {
     fetchParticipaciones();
@@ -102,21 +107,26 @@ export function useParticipacionesPorTorneo(eventoId: string){
   return { participaciones, loading, error };
 }
 
-export const useParticipacionesTotalesPorTorneo = (eventoId: string | undefined) => {
+export const useParticipacionesTotalesPorTorneo = (
+  eventoId: string | undefined,
+) => {
   const [participaciones, setParticipaciones] = useState<Participation[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchParticipaciones = useCallback(async () => {
     if (!eventoId) return;
-    
+
     setLoading(true);
     setError(null);
 
-    try{
-      const response = await apiAxios.get('participaciones/participacionesTotalesPorTorneo', {
-        params: { eventoId: eventoId },
-      })
+    try {
+      const response = await apiAxios.get<{ data: Participation[] }>(
+        'participaciones/participacionesTotalesPorTorneo',
+        {
+          params: { eventoId: eventoId },
+        },
+      );
       console.log('Participaciones totales por torneo:', response.data.data);
       setParticipaciones(response.data.data);
     } catch (err) {
@@ -125,11 +135,11 @@ export const useParticipacionesTotalesPorTorneo = (eventoId: string | undefined)
     } finally {
       setLoading(false);
     }
-}, [eventoId]);
+  }, [eventoId]);
 
-useEffect(() => {
-  fetchParticipaciones();
-}, [fetchParticipaciones]);
+  useEffect(() => {
+    fetchParticipaciones();
+  }, [fetchParticipaciones]);
 
-return { participaciones, loading, error };
-}
+  return { participaciones, loading, error };
+};

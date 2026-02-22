@@ -29,7 +29,8 @@ export default function TorneoDetalle() {
     fetchTorneo();
   }, [id]);
 
-  const { participacionesTotales, loading, error } = useParticipacionesTotalesPorTorneo(id);
+  const { participaciones: participacionesTotales } =
+    useParticipacionesTotalesPorTorneo(id);
 
   const fetchTorneo = async () => {
     if (!id) return;
@@ -156,7 +157,7 @@ export default function TorneoDetalle() {
   const handleDelete = async () => {
     if (
       !confirm(
-        '¿Estás seguro de eliminar este torneo? Esta acción no se puede deshacer.'
+        '¿Estás seguro de eliminar este torneo? Esta acción no se puede deshacer.',
       )
     )
       return;
@@ -180,15 +181,18 @@ export default function TorneoDetalle() {
   };
 
   const partidosOrdenados = [...(torneo?.partidos || [])].sort(
-    (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
+    (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime(),
   );
 
-  const partidosPorFecha = partidosOrdenados.reduce((acc, partido) => {
-    const fechaKey = new Date(partido.fecha).toDateString();
-    if (!acc[fechaKey]) acc[fechaKey] = [];
-    acc[fechaKey].push(partido);
-    return acc;
-  }, {} as Record<string, Partido[]>);
+  const partidosPorFecha = partidosOrdenados.reduce(
+    (acc, partido) => {
+      const fechaKey = new Date(partido.fecha).toDateString();
+      if (!acc[fechaKey]) acc[fechaKey] = [];
+      acc[fechaKey].push(partido);
+      return acc;
+    },
+    {} as Record<string, Partido[]>,
+  );
 
   const isCreator = Number(user?.id) === torneo?.creador;
 
@@ -542,7 +546,7 @@ export default function TorneoDetalle() {
                                   <td>{i + 1}</td>
                                   <td>
                                     {new Date(
-                                      partido.fecha
+                                      partido.fecha,
                                     ).toLocaleDateString()}
                                   </td>
                                   <td>{partido.hora}</td>
@@ -572,7 +576,9 @@ export default function TorneoDetalle() {
                                     <div className="table-actions">
                                       <button
                                         onClick={() =>
-                                          navigate(`/home/partido-detalle/${partido.id}`)
+                                          navigate(
+                                            `/home/partido-detalle/${partido.id}`,
+                                          )
                                         }
                                         className="btn-action btn-small"
                                       >
@@ -583,7 +589,7 @@ export default function TorneoDetalle() {
                                           <button
                                             onClick={() =>
                                               navigate(
-                                                `/home/Participaciones/${partido.id}`
+                                                `/home/Participaciones/${partido.id}`,
                                               )
                                             }
                                             className="btn-action btn-small"
@@ -593,7 +599,7 @@ export default function TorneoDetalle() {
                                           <button
                                             onClick={() =>
                                               navigate(
-                                                `/home/torneos/${torneo.id}/EditarPartido/${partido.id}`
+                                                `/home/torneos/${torneo.id}/EditarPartido/${partido.id}`,
                                               )
                                             }
                                             className="btn-action btn-small"
@@ -608,16 +614,16 @@ export default function TorneoDetalle() {
                                                 partido.resultadoLocal == null
                                                   ? ''
                                                   : String(
-                                                      partido.resultadoLocal
-                                                    )
+                                                      partido.resultadoLocal,
+                                                    ),
                                               );
                                               setResultadoVisitante(
                                                 partido.resultadoVisitante ==
                                                   null
                                                   ? ''
                                                   : String(
-                                                      partido.resultadoVisitante
-                                                    )
+                                                      partido.resultadoVisitante,
+                                                    ),
                                               );
                                               setResultadoModal(true);
                                             }}
@@ -656,7 +662,7 @@ export default function TorneoDetalle() {
                                 <div className="partido-date-time">
                                   <div className="partido-date">
                                     {new Date(
-                                      partido.fecha
+                                      partido.fecha,
                                     ).toLocaleDateString()}
                                   </div>
                                   <div className="partido-time">
@@ -731,7 +737,7 @@ export default function TorneoDetalle() {
                                 <button
                                   onClick={() =>
                                     navigate(
-                                      `/home/partido-detalle/${partido.id}`
+                                      `/home/partido-detalle/${partido.id}`,
                                     )
                                   }
                                   className="btn-action"
@@ -743,7 +749,7 @@ export default function TorneoDetalle() {
                                     <button
                                       onClick={() =>
                                         navigate(
-                                          `/home/Participaciones/${partido.id}`
+                                          `/home/Participaciones/${partido.id}`,
                                         )
                                       }
                                       className="btn-action"
@@ -753,7 +759,7 @@ export default function TorneoDetalle() {
                                     <button
                                       onClick={() =>
                                         navigate(
-                                          `/home/torneos/${torneo.id}/EditarPartido/${partido.id}`
+                                          `/home/torneos/${torneo.id}/EditarPartido/${partido.id}`,
                                         )
                                       }
                                       className="btn-action"
@@ -767,12 +773,14 @@ export default function TorneoDetalle() {
                                         setResultadoLocal(
                                           partido.resultadoLocal == null
                                             ? ''
-                                            : String(partido.resultadoLocal)
+                                            : String(partido.resultadoLocal),
                                         );
                                         setResultadoVisitante(
                                           partido.resultadoVisitante == null
                                             ? ''
-                                            : String(partido.resultadoVisitante)
+                                            : String(
+                                                partido.resultadoVisitante,
+                                              ),
                                         );
                                         setResultadoModal(true);
                                       }}
@@ -794,7 +802,7 @@ export default function TorneoDetalle() {
                           ))}
                         </div>
                       </div>
-                    )
+                    ),
                 )}
               </div>
             </div>
@@ -809,15 +817,16 @@ export default function TorneoDetalle() {
         </div>
 
         {/* Tabla de participaciones*/}
-        <div className='section-container'>
-          <h2 className='section-title'>Participaciones</h2>ç
-          
- {/* Versión Desktop - Tabla */}
+        <div className="section-container">
+          <h2 className="section-title">Tabla de Participaciones</h2>
+
+          {/* Versión Desktop - Tabla */}
           <div className="custom-table-container">
             <table className="custom-table">
               <thead>
                 <tr>
                   <th>Nombre</th>
+                  <th>Equipo</th>
                   <th>Faltas</th>
                   <th>Minutos Jugados</th>
                   <th>Puntos</th>
@@ -826,14 +835,21 @@ export default function TorneoDetalle() {
               <tbody>
                 {participacionesTotales && participacionesTotales.length > 0 ? (
                   participacionesTotales.map((participacion: Participation) => (
-                    <tr key={participacion.usuario.nombre}>
-                      <td>{participacion.usuario.nombre}</td>
-                      <td>{participacion.faltas}</td>
-                      <td> {participacion.minutosjugados}
+                    <tr key={participacion.usuario?.id}>
+                      <td>
+                        {participacion.usuario.nombre +
+                          ' ' +
+                          participacion.usuario.apellido}
                       </td>
                       <td>
-                        {participacion.puntos}
+                        {participacion.usuario.equipos.map((equipo) => (
+                          <span>{equipo.nombre}</span>
+                        ))}
                       </td>
+
+                      <td>{participacion.faltas}</td>
+                      <td> {participacion.minutosjugados}</td>
+                      <td>{participacion.puntos}</td>
                     </tr>
                   ))
                 ) : (
@@ -929,7 +945,6 @@ export default function TorneoDetalle() {
               </div>
             )}
           </div>
-
         </div>
       </div>
 
