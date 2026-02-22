@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback} from 'react';
+import { useState, useEffect, useCallback,} from 'react';
 import apiAxios from '../helpers/api';
 import type { Participation } from '../types';
+
 
 export function useParticipaciones(partidoId: string, equipoId: string) {
   const [participaciones, setParticipaciones] = useState<Participation[]>([]);
@@ -68,4 +69,67 @@ export function useParticipacionesPorUsuarioEnTorneo(usuarioId: string, eventoId
   }, [fetchParticipaciones]);
 
   return { participaciones, loading, error };
+}
+
+export function useParticipacionesPorTorneo(eventoId: string){
+  const [participaciones, setParticipaciones] = useState<Participation[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  const fetchParticipaciones = useCallback(async () => {
+    if (!eventoId) return;
+    
+    setLoading(true);
+    setError(null);
+
+    try{
+      const response = await apiAxios.get('participaciones/participacionesPorTorneo', {
+        params: { eventoId: eventoId },
+      })
+      setParticipaciones(response.data.data);
+    } catch (err) {
+      console.error('Error fetching participations:', err);
+      setError('Failed to fetch participations.');
+    } finally {
+      setLoading(false);
+    }
+}, [eventoId]);
+
+  useEffect(() => {
+    fetchParticipaciones();
+  }, [fetchParticipaciones]);
+
+  return { participaciones, loading, error };
+}
+
+export const useParticipacionesTotalesPorTorneo = (eventoId: string | undefined) => {
+  const [participaciones, setParticipaciones] = useState<Participation[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchParticipaciones = useCallback(async () => {
+    if (!eventoId) return;
+    
+    setLoading(true);
+    setError(null);
+
+    try{
+      const response = await apiAxios.get('participaciones/participacionesTotalesPorTorneo', {
+        params: { eventoId: eventoId },
+      })
+      console.log('Participaciones totales por torneo:', response.data.data);
+      setParticipaciones(response.data.data);
+    } catch (err) {
+      console.error('Error fetching participations:', err);
+      setError('Failed to fetch participations.');
+    } finally {
+      setLoading(false);
+    }
+}, [eventoId]);
+
+useEffect(() => {
+  fetchParticipaciones();
+}, [fetchParticipaciones]);
+
+return { participaciones, loading, error };
 }

@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router-dom';
-import type { Equipo, Partido, Torneo, Usuario } from '../types';
+import type { Equipo, Participation, Partido, Torneo, Usuario } from '../types';
 import { Row, Col } from 'react-bootstrap';
 import apiAxios from '../helpers/api';
 import { useAuth } from '../hooks/useAuth';
+import { useParticipacionesTotalesPorTorneo } from '../hooks/useParticipaciones';
 import './TorneoDetalle.css';
 
 export default function TorneoDetalle() {
@@ -27,6 +28,8 @@ export default function TorneoDetalle() {
   useEffect(() => {
     fetchTorneo();
   }, [id]);
+
+  const { participacionesTotales, loading, error } = useParticipacionesTotalesPorTorneo(id);
 
   const fetchTorneo = async () => {
     if (!id) return;
@@ -195,7 +198,6 @@ export default function TorneoDetalle() {
         <div className="loading-state">Cargando torneo...</div>
       </div>
     );
-
   return (
     <div className="torneo-detalle-container">
       <div className="torneo-detalle-inner">
@@ -804,6 +806,130 @@ export default function TorneoDetalle() {
               </p>
             </div>
           )}
+        </div>
+
+        {/* Tabla de participaciones*/}
+        <div className='section-container'>
+          <h2 className='section-title'>Participaciones</h2>ç
+          
+ {/* Versión Desktop - Tabla */}
+          <div className="custom-table-container">
+            <table className="custom-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Faltas</th>
+                  <th>Minutos Jugados</th>
+                  <th>Puntos</th>
+                </tr>
+              </thead>
+              <tbody>
+                {participacionesTotales && participacionesTotales.length > 0 ? (
+                  participacionesTotales.map((participacion: Participation) => (
+                    <tr key={participacion.usuario.nombre}>
+                      <td>{participacion.usuario.nombre}</td>
+                      <td>{participacion.faltas}</td>
+                      <td> {participacion.minutosjugados}
+                      </td>
+                      <td>
+                        {participacion.puntos}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="empty-state-cell">
+                      No hay participaciones registradas aún
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Versión Mobile - Cards */}
+          <div className="equipos-mobile-list">
+            {torneo.equipos && torneo.equipos.length > 0 ? (
+              torneo.equipos.map((equipo: Equipo, idx: number) => (
+                <div key={equipo.id} className="equipo-mobile-card">
+                  <div className="equipo-mobile-header">
+                    <div className="equipo-mobile-number">{idx + 1}</div>
+                    <div className="equipo-mobile-name">{equipo.nombre}</div>
+                  </div>
+                  <div className="equipo-mobile-info">
+                    <div className="equipo-info-row">
+                      <span className="equipo-info-label">Jugadores</span>
+                      <span className="jugadores-badge">
+                        {equipo.miembros?.length ?? 0}/
+                        {torneo.deporte?.cantMaxJugadores ?? '-'}
+                      </span>
+                    </div>
+                    <div className="equipo-info-row">
+                      <span className="equipo-info-label">Tipo</span>
+                      <span
+                        className={`badge-custom ${
+                          equipo.esPublico ? 'badge-equipo' : 'badge-individual'
+                        }`}
+                      >
+                        {equipo.esPublico ? 'Público' : 'Privado'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="equipo-mobile-actions">
+                    {!userIsMember() ? (
+                      <button
+                        className="btn-action"
+                        onClick={() => {
+                          setSelectedTeam(equipo);
+                          setEnrollPassword('');
+                          setEnrollError(null);
+                          setShowEnrollModal(true);
+                        }}
+                      >
+                        Unirse
+                      </button>
+                    ) : isCaptain(equipo) ? (
+                      <>
+                        <button
+                          className="btn-action"
+                          onClick={() =>
+                            navigate(`/home/equipos/${equipo.id}/editar`)
+                          }
+                        >
+                          Editar
+                        </button>
+                        <button
+                          className="btn-action"
+                          onClick={() => navigate(`/home/equipos/${equipo.id}`)}
+                        >
+                          Ver equipo
+                        </button>
+                        <button
+                          className="btn-action btn-delete"
+                          onClick={() => handleDeleteTeam(equipo.id)}
+                        >
+                          Eliminar
+                        </button>
+                      </>
+                    ) : isMember(equipo) ? (
+                      <button
+                        className="btn-action"
+                        onClick={() => navigate(`/home/equipos/${equipo.id}`)}
+                      >
+                        Ver equipo
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="empty-state">
+                <div className="empty-state-icon">👥</div>
+                <p className="empty-state-text">No hay equipos inscritos aún</p>
+              </div>
+            )}
+          </div>
+
         </div>
       </div>
 
