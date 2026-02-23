@@ -865,83 +865,43 @@ export default function TorneoDetalle() {
 
           {/* Versión Mobile - Cards */}
           <div className="equipos-mobile-list">
-            {torneo.equipos && torneo.equipos.length > 0 ? (
-              torneo.equipos.map((equipo: Equipo, idx: number) => (
-                <div key={equipo.id} className="equipo-mobile-card">
+            {participacionesTotales && participacionesTotales.length > 0 ? (
+              participacionesTotales.map((participacion: Participation) => (
+                <div
+                  key={participacion.usuario.id}
+                  className="equipo-mobile-card"
+                >
                   <div className="equipo-mobile-header">
-                    <div className="equipo-mobile-number">{idx + 1}</div>
-                    <div className="equipo-mobile-name">{equipo.nombre}</div>
+                    <div className="equipo-mobile-name">
+                      {participacion.usuario.nombre}
+                    </div>
                   </div>
                   <div className="equipo-mobile-info">
                     <div className="equipo-info-row">
-                      <span className="equipo-info-label">Jugadores</span>
-                      <span className="jugadores-badge">
-                        {equipo.miembros?.length ?? 0}/
-                        {torneo.deporte?.cantMaxJugadores ?? '-'}
-                      </span>
+                      <span className="equipo-info-label">Equipo</span>
+                      {participacion.usuario.equipos.map((equipo: Equipo) => (
+                        <span>{equipo.nombre}</span>
+                      ))}
                     </div>
                     <div className="equipo-info-row">
-                      <span className="equipo-info-label">Tipo</span>
-                      <span
-                        className={`badge-custom ${
-                          equipo.esPublico ? 'badge-equipo' : 'badge-individual'
-                        }`}
-                      >
-                        {equipo.esPublico ? 'Público' : 'Privado'}
-                      </span>
+                      <span className="equipo-info-label">Faltas</span>
+                      <span>{participacion.faltas}</span>
                     </div>
-                  </div>
-                  <div className="equipo-mobile-actions">
-                    {!userIsMember() ? (
-                      <button
-                        className="btn-action"
-                        onClick={() => {
-                          setSelectedTeam(equipo);
-                          setEnrollPassword('');
-                          setEnrollError(null);
-                          setShowEnrollModal(true);
-                        }}
-                      >
-                        Unirse
-                      </button>
-                    ) : isCaptain(equipo) ? (
-                      <>
-                        <button
-                          className="btn-action"
-                          onClick={() =>
-                            navigate(`/home/equipos/${equipo.id}/editar`)
-                          }
-                        >
-                          Editar
-                        </button>
-                        <button
-                          className="btn-action"
-                          onClick={() => navigate(`/home/equipos/${equipo.id}`)}
-                        >
-                          Ver equipo
-                        </button>
-                        <button
-                          className="btn-action btn-delete"
-                          onClick={() => handleDeleteTeam(equipo.id)}
-                        >
-                          Eliminar
-                        </button>
-                      </>
-                    ) : isMember(equipo) ? (
-                      <button
-                        className="btn-action"
-                        onClick={() => navigate(`/home/equipos/${equipo.id}`)}
-                      >
-                        Ver equipo
-                      </button>
-                    ) : null}
+                    <div className="equipo-info-row">
+                      <span className="equipo-info-label">Minutos Jugados</span>
+                      <span>{participacion.minutosjugados}</span>
+                    </div>
+                    <div className="equipo-info-row">
+                      <span className="equipo-info-label">Puntos</span>
+                      <span>{participacion.puntos}</span>
+                    </div>
                   </div>
                 </div>
               ))
             ) : (
               <div className="empty-state">
                 <div className="empty-state-icon">👥</div>
-                <p className="empty-state-text">No hay equipos inscritos aún</p>
+                <p className="empty-state-text">No hay Participaciones aún</p>
               </div>
             )}
           </div>

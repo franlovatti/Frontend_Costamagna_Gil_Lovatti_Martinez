@@ -7,4 +7,4 @@ export const useUsuario = () => {
     throw new Error('useUsuario must be used within a UsuarioProvider');
   }
   return context;
-}; 
+};
