@@ -5,8 +5,8 @@ import type { Equipo, Participation, Partido, Torneo, Usuario } from '../types';
 import { Row, Col } from 'react-bootstrap';
 import apiAxios from '../helpers/api';
 import { useAuth } from '../hooks/useAuth';
-import { useParticipacionesTotalesPorTorneo } from '../hooks/useParticipaciones';
 import './TorneoDetalle.css';
+import { useParticipantesEvento } from '../hooks/useUsuario.tsx';
 
 export default function TorneoDetalle() {
   const [torneo, setTorneo] = useState<Torneo | null>(null);
@@ -29,8 +29,32 @@ export default function TorneoDetalle() {
     fetchTorneo();
   }, [id]);
 
-  const { participaciones: participacionesTotales } =
-    useParticipacionesTotalesPorTorneo(id);
+  const { participantes: participantesDesordenados } =
+    useParticipantesEvento(id);
+
+  const calcularStats = (participations: Participation[] | undefined) => {
+    if (!participations) return { faltas: 0, minutosJugados: 0, puntos: 0 };
+
+    return participations.reduce(
+      (acc, part) => {
+        acc.faltas += part.faltas;
+        acc.minutosjugados += part.minutosjugados;
+        acc.puntos += part.puntos;
+        return acc;
+      },
+      { faltas: 0, minutosjugados: 0, puntos: 0 },
+    );
+  };
+
+  const ordenarParticipantes = (participantes: Usuario[]) => {
+    return [...participantes].sort((a, b) => {
+      const puntosA = calcularStats(a.participations).puntos;
+      const puntosB = calcularStats(b.participations).puntos;
+      return puntosB - puntosA;
+    });
+  };
+
+  const participantes = ordenarParticipantes(participantesDesordenados);
 
   const fetchTorneo = async () => {
     if (!id) return;
@@ -816,9 +840,9 @@ export default function TorneoDetalle() {
           )}
         </div>
 
-        {/* Tabla de participaciones*/}
+        {/*Tabla de Participantes*/}
         <div className="section-container">
-          <h2 className="section-title">Tabla de Participaciones</h2>
+          <h2 className="section-title">Tabla de Participantes</h2>
 
           {/* Versión Desktop - Tabla */}
           <div className="custom-table-container">
@@ -833,23 +857,29 @@ export default function TorneoDetalle() {
                 </tr>
               </thead>
               <tbody>
-                {participacionesTotales && participacionesTotales.length > 0 ? (
-                  participacionesTotales.map((participacion: Participation) => (
-                    <tr key={participacion.usuario?.id}>
+                {participantes && participantes.length > 0 ? (
+                  participantes.map((participante: Usuario) => (
+                    <tr key={participante.id}>
                       <td>
-                        {participacion.usuario.nombre +
-                          ' ' +
-                          participacion.usuario.apellido}
+                        {participante.nombre + ' ' + participante.apellido}
                       </td>
                       <td>
-                        {participacion.usuario.equipos.map((equipo) => (
+                        {participante.equipos.map((equipo) => (
                           <span>{equipo.nombre}</span>
                         ))}
                       </td>
-
-                      <td>{participacion.faltas}</td>
-                      <td> {participacion.minutosjugados}</td>
-                      <td>{participacion.puntos}</td>
+                      <td>
+                        {calcularStats(participante.participations)?.faltas}
+                      </td>
+                      <td>
+                        {
+                          calcularStats(participante.participations)
+                            ?.minutosjugados
+                        }
+                      </td>
+                      <td>
+                        {calcularStats(participante.participations)?.puntos}
+                      </td>
                     </tr>
                   ))
                 ) : (
@@ -865,35 +895,41 @@ export default function TorneoDetalle() {
 
           {/* Versión Mobile - Cards */}
           <div className="equipos-mobile-list">
-            {participacionesTotales && participacionesTotales.length > 0 ? (
-              participacionesTotales.map((participacion: Participation) => (
-                <div
-                  key={participacion.usuario.id}
-                  className="equipo-mobile-card"
-                >
+            {participantes && participantes.length > 0 ? (
+              participantes.map((participante: Usuario) => (
+                <div key={participante.id} className="equipo-mobile-card">
                   <div className="equipo-mobile-header">
                     <div className="equipo-mobile-name">
-                      {participacion.usuario.nombre}
+                      {participante.nombre + ' ' + participante.apellido}
                     </div>
                   </div>
                   <div className="equipo-mobile-info">
                     <div className="equipo-info-row">
                       <span className="equipo-info-label">Equipo</span>
-                      {participacion.usuario.equipos.map((equipo: Equipo) => (
+                      {participante.equipos.map((equipo: Equipo) => (
                         <span>{equipo.nombre}</span>
                       ))}
                     </div>
                     <div className="equipo-info-row">
                       <span className="equipo-info-label">Faltas</span>
-                      <span>{participacion.faltas}</span>
+                      <span>
+                        {calcularStats(participante.participations)?.faltas}
+                      </span>
                     </div>
                     <div className="equipo-info-row">
                       <span className="equipo-info-label">Minutos Jugados</span>
-                      <span>{participacion.minutosjugados}</span>
+                      <span>
+                        {
+                          calcularStats(participante.participations)
+                            ?.minutosjugados
+                        }
+                      </span>
                     </div>
                     <div className="equipo-info-row">
                       <span className="equipo-info-label">Puntos</span>
-                      <span>{participacion.puntos}</span>
+                      <span>
+                        {calcularStats(participante.participations)?.puntos}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -901,7 +937,7 @@ export default function TorneoDetalle() {
             ) : (
               <div className="empty-state">
                 <div className="empty-state-icon">👥</div>
-                <p className="empty-state-text">No hay Participaciones aún</p>
+                <p className="empty-state-text">No hay Participantes aún</p>
               </div>
             )}
           </div>
