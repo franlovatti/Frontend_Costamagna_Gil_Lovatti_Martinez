@@ -20,6 +20,8 @@ export default function TorneoDetalle() {
   const [resultadoVisitante, setResultadoVisitante] = useState<string>('');
   const [partidoSeleccionado, setPartidoSeleccionado] =
     useState<Partido | null>(null);
+  const [ordenarParticipanteCriterio, setOrdenarParticipanteCriterio] =
+    useState<string>('puntos');
   const [tabKey, setTabKey] = useState<string>('');
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
@@ -33,7 +35,7 @@ export default function TorneoDetalle() {
     useParticipantesEvento(id);
 
   const calcularStats = (participations: Participation[] | undefined) => {
-    if (!participations) return { faltas: 0, minutosJugados: 0, puntos: 0 };
+    if (!participations) return { faltas: 0, minutosjugados: 0, puntos: 0 };
 
     return participations.reduce(
       (acc, part) => {
@@ -46,15 +48,27 @@ export default function TorneoDetalle() {
     );
   };
 
-  const ordenarParticipantes = (participantes: Usuario[]) => {
+  type stats = {
+    puntos: number;
+    minutosjugados: number;
+    faltas: number;
+  };
+
+  const ordenarParticipantes = (
+    participantes: Usuario[],
+    c: keyof stats = 'puntos',
+  ) => {
     return [...participantes].sort((a, b) => {
-      const puntosA = calcularStats(a.participations).puntos;
-      const puntosB = calcularStats(b.participations).puntos;
-      return puntosB - puntosA;
+      const statsA = calcularStats(a.participations);
+      const statsB = calcularStats(b.participations);
+      return statsB[c] - statsA[c];
     });
   };
 
-  const participantes = ordenarParticipantes(participantesDesordenados);
+  const participantes = ordenarParticipantes(
+    participantesDesordenados,
+    ordenarParticipanteCriterio as keyof stats,
+  );
 
   const fetchTorneo = async () => {
     if (!id) return;
@@ -851,9 +865,26 @@ export default function TorneoDetalle() {
                 <tr>
                   <th>Nombre</th>
                   <th>Equipo</th>
-                  <th>Faltas</th>
-                  <th>Minutos Jugados</th>
-                  <th>Puntos</th>
+                  <th
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => setOrdenarParticipanteCriterio('faltas')}
+                  >
+                    Faltas
+                  </th>
+                  <th
+                    style={{ cursor: 'pointer' }}
+                    onClick={() =>
+                      setOrdenarParticipanteCriterio('minutosjugados')
+                    }
+                  >
+                    Minutos Jugados
+                  </th>
+                  <th
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => setOrdenarParticipanteCriterio('puntos')}
+                  >
+                    Puntos
+                  </th>
                 </tr>
               </thead>
               <tbody>
