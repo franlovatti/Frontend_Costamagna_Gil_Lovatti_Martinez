@@ -38,7 +38,7 @@ import EditarTorneo from './pages/EditarTorneo.tsx';
 import CrearEquipo from './pages/CrearEquipo.tsx';
 import EditarEquipo from './pages/EditarEquipo.tsx';
 import CrearParticipacion from './pages/CrearParticipacion.tsx';
-import MisTorneos from './pages/MisTorneos.tsx';
+import MisTorneos from './pages/misTorneos.tsx';
 import UsuariosAdmin from './pages/admin/UsuariosAdmin.tsx';
 import NoticiasAdmin from './pages/admin/NoticiasAdmin.tsx';
 import PartidoDetalle from './pages/PartidoDetalle.tsx';
@@ -122,8 +122,12 @@ function App() {
                           path="partido-detalle/:id"
                           element={<PartidoDetalle />}
                         ></Route>
-
-                        <Route path="perfil" element={<Perfil />} />
+                        
+                        <Route path="perfil" element={
+                          <UsuariosProvider>
+                          <Perfil />
+                          </UsuariosProvider>}
+                        />
                       </Route>
                     </Route>
 

@@ -12,7 +12,7 @@ const AuthLayout = () => {
     logout();
     navigate('/');
   };
-
+  
   return (
     <div className="auth-layout d-flex">
       <aside className="auth-sidebar d-flex flex-column">

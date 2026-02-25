@@ -21,6 +21,9 @@
   background-color: var(--primary);
   border-color: var(--primary);
   color: #e5f5f7;
+  font-weight: 400;
+  padding: 0.875rem 1.5rem;
+  font-size: 0.95rem;
 }
 
 .btn-primary-action:hover {

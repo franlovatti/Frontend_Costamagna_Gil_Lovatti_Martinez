@@ -127,6 +127,17 @@
   color: #e74c3c;
 }
 
+.nav-link:active,
+.nav-link:focus {
+  color: var(--text) !important;
+  background-color: var(--hover-bg);
+}
+
+.nav-link:active:hover,
+.nav-link:focus:hover {
+  color: var(--text) !important;
+}
+
 .nav-link-logout:hover {
   background-color: rgba(231, 76, 60, 0.1);
   border-color: #e74c3c;

@@ -1,7 +1,9 @@
 import type { User } from "../contexts/auth.tsx"
 import './cssComponentes/PerfilCard.css';
 
-const PerfilCard = (usuario: User) => {
+export default function PerfilCard(
+  { usuario, onEdit }: 
+  { usuario: User, onEdit: (d: User) => void }) {
   return (
     <div className="col-12 col-lg-4">
       <div className="perfil-card h-100">
@@ -35,11 +37,10 @@ const PerfilCard = (usuario: User) => {
           </div>
         </div>
 
-        <button className="btn-editar-perfil w-100">
+        <button className="btn-action btn-primary-action w-100" onClick={() => onEdit(usuario)}>
           ✏️ Editar Perfil
         </button>
       </div>
     </div>
   )
 };
-export default PerfilCard;

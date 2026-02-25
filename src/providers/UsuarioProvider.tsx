@@ -39,11 +39,22 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
 
   const modificarUsuario = async (usuario: User) => {
     try {
+      setError(null);
       await apiAxios.put(`/usuarios/${usuario.id}`, usuario);
       await getUsuarios();
+      return true;
     } catch (error) {
-      setError("Error al modificar el usuario:" + error);
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Error al modificar el usuario";
+      setError(message);
+      return false;
     }
+  };
+
+  const clearError = () => {
+    setError(null);
   };
 
   useEffect(() => {
@@ -51,7 +62,7 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <UsuarioContext.Provider value={{ usuarios, loading, error, getUsuarios, modificarUsuario, filtrarUsuarios }}>
+    <UsuarioContext.Provider value={{ usuarios, loading, error, getUsuarios, modificarUsuario, filtrarUsuarios, clearError }}>
       {children}
     </UsuarioContext.Provider>
   );

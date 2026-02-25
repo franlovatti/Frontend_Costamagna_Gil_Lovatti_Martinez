@@ -132,7 +132,7 @@
 
 .auth-btn-primary {
   background-color: var(--primary);
-  color: var(--text);
+  color: #e5f5f7;
   border: none;
 }
 

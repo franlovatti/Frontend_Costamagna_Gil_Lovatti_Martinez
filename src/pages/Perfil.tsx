@@ -1,16 +1,17 @@
 import type { User } from '../contexts/auth.tsx';
+import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth.tsx';
 import StatCard from '../components/admin/StatCard.tsx';
 import PerfilCard from '../components/PerfilCard.tsx';
 import TorneosPerfil from '../components/TorneosPerfil.tsx';
+import UsuarioFormModal from '../components/UsuarioFormModal.tsx';
 import { useMisEquipos } from '../hooks/useEquipos.tsx';
+import { useUsuario } from '../hooks/useUsuario.tsx';
 import './Perfil.css';
 
-{/* De aca solo falta la logica de editar perfil */}
-
 const Perfil = () => {
-  const { user } = useAuth();
-  console.log('Usuario en Perfil:', user);
+  const { user, updateUser } = useAuth();  
+  const { modificarUsuario, error, clearError } = useUsuario();
   const usuario: User = user ? user : {
     id: '0',
     nombre: 'Invitado',
@@ -21,6 +22,8 @@ const Perfil = () => {
     estado: false,
   } as User;
 
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [showModal, setShowModal] = useState(false);
   const { equipos, loadingEquipos, errorEquipos } = useMisEquipos(usuario.id);
 
   function calcularEstadisticas(e: typeof equipos) {
@@ -59,6 +62,20 @@ const Perfil = () => {
     return { torneosActivos, torneosTerminados, partidosPendientes, victorias };
   }
 
+  const handleEdit = (usuario: User) => {
+      setEditingUser(usuario);
+      setShowModal(true);
+    };
+
+  const handleSave = async (updatedData: Partial<User>) => {
+    clearError();
+    const ok = await modificarUsuario({ ...updatedData, id: usuario.id } as User);
+    if (ok) {
+      updateUser(updatedData);
+      setShowModal(false);
+    }
+  }
+
   const { torneosActivos, torneosTerminados, partidosPendientes, victorias } = calcularEstadisticas(equipos);
   const stats = [
     { icon: '🏆',
@@ -90,7 +107,7 @@ const Perfil = () => {
 
         {/* Grid principal */}
         <div className="row g-4 mb-4">
-          <PerfilCard {...usuario} />
+          <PerfilCard usuario={usuario} onEdit={handleEdit} />
 
           {/* Estadísticas y Torneos */}
           <div className="col-12 col-lg-8">
@@ -116,6 +133,15 @@ const Perfil = () => {
             <TorneosPerfil equipos={equipos} loadingEquipos={loadingEquipos} errorEquipos={errorEquipos} />
           </div>
         </div>
+
+        {showModal && (
+                <UsuarioFormModal
+                  setShowModal={setShowModal}
+                  editingUsuario={editingUser}
+                  onSave={handleSave}
+                  error={error}
+                />
+              )}
       </div>
     </div>
   );

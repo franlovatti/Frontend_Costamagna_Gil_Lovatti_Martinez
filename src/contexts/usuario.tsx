@@ -7,7 +7,8 @@ type UsuarioContextType = {
   error: string | null;
   getUsuarios: (opts?: { q?: string; page?: number }) => Promise<void>;
   filtrarUsuarios: (rol?: string, estado?: string) => Promise<void>;
-  modificarUsuario: (usuario: User) => Promise<void>;
+  modificarUsuario: (usuario: User) => Promise<boolean>;
+  clearError: () => void;
 };
 
 export const UsuarioContext = createContext<UsuarioContextType | null>(null);

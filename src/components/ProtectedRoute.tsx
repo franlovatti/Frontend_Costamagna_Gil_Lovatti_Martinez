@@ -1,38 +1,42 @@
 import { useAuth } from "../hooks/useAuth";
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
 interface ProtectedRouteProps {
-  allowedRoles: string[];      // Array de strings para los roles permitidos
+  allowedRoles: string[];
 }
 
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
   const { user, isAuthenticated, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
-    // Si está cargando, puedes mostrar un spinner o un mensaje de carga
-    return null;
-  } else {
-  // 1. Verificar autenticación
+    return (
+      <div className="loading-container " style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '100vh',
+        backgroundColor: 'var(--background)'
+      }}>
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+    );
+  }
+  
   if (!isAuthenticated) {
-    // Si no está autenticado, redirige a la página de login.
-    // 'replace' evita que el usuario vuelva a la página protegida con el botón de atrás.
-    return <Navigate to={isAuthenticated ? "/home" : "/login"} replace />;
+    return <Navigate to="/login" replace state={{ from: location }}/>;
+  
   }
-  }
-
-  // 2. Verificar roles (si se especificaron 'allowedRoles')
   if (allowedRoles && allowedRoles.length > 0) {
-    // Comprobamos si el rol del usuario está incluido en los roles permitidos
     const userHasRequiredRole = user && allowedRoles.includes(user.role);
     if (!userHasRequiredRole) {
-      return <Navigate to="/login" replace />;
+      return <Navigate to="/home" replace />;
     }
   }
 
-  // 3. Si está autenticado y tiene el rol correcto, renderiza los hijos.
-  // Usamos 'children' directamente para mayor flexibilidad.
-  // Si se usa como elemento de <Route>, se puede usar <Outlet /> para rutas anidadas.
   return <Outlet />;
 };
 

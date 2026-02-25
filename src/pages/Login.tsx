@@ -1,13 +1,18 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../hooks/useAuth.tsx';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import './Auth.css';
 
 const Login = () => {
   const { login, loading: cargandoAuth, error, setError } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = (location.state as { from?: Location })?.from;
+  const redirectTo = from ? `${from.pathname}${from.search}${from.hash}` : '/home';
+
 
   type LoginFormFields = {
     usuario: string;
@@ -32,7 +37,7 @@ const Login = () => {
       if (!success) {
         throw new Error('Credenciales inválidas');
       }
-      navigate('/home');
+      navigate(redirectTo, { replace: true });
     } catch (error) {
       console.error('Error al iniciar sesion:', error);
     } finally {

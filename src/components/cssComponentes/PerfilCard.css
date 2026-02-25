@@ -105,20 +105,3 @@
   color: var(--text);
   font-weight: 300;
 }
-
-/* Botón editar perfil */
-.btn-editar-perfil {
-  padding: 0.875rem 1.5rem;
-  background-color: var(--primary);
-  color: var(--text);
-  border: none;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  font-weight: 400;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-editar-perfil:hover {
-  background-color: var(--secondary);
-}
