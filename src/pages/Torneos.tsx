@@ -1,18 +1,23 @@
 import { useState, useEffect } from 'react';
+import { useTorneo } from '../hooks/useTorneo';
 import CardTorneos from '../components/CardTorneos';
 import { useNavigate } from 'react-router-dom';
 import apiAxios from '../helpers/api';
-import type { Torneo, Deporte, Usuario, Equipo } from '../types';
+import type { Equipo, Usuario } from '../types';
+import type { Torneo } from '../contexts/torneo.tsx';
+import type { Deporte } from '../contexts/deporte.tsx';
 import { useAuth } from '../hooks/useAuth';
-import MapaLocalidad from '../components/apiMaps/MapaLocalidad';
+import MapaLocalidad from '../components/ApiMaps/MapaLocalidad';
 import './Torneos.css';
+import { useDeporte } from '../hooks/useDeporte.tsx';
 
 export default function Torneos() {
+  const { torneos, loading, error, getTorneos } = useTorneo();
+  const { deportes, getDeportes } = useDeporte();
   const [dataTorneos, setDataTorneos] = useState<Torneo[]>([]);
   const [selectedSport, setSelectedSport] = useState<string>('');
   const [selectedLocalidad, setSelectedLocalidad] = useState<string>('');
   const [dataDeportes, setDataDeportes] = useState<Deporte[]>([]);
-  const [errorConexion, setErrorConexion] = useState<boolean>(false);
   
   // Modal de código
   const [showCodeModal, setShowCodeModal] = useState(false);
@@ -31,21 +36,20 @@ export default function Torneos() {
   const { user } = useAuth();
 
   useEffect(() => {
-    Promise.all([
-      apiAxios.get('/eventos'),
-      apiAxios.get('/deportes'),
-    ])
-      .then(([torneosRes, deportesRes]) => {
-        setDataTorneos(torneosRes.data.data);
-        setDataDeportes(deportesRes.data.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-        setErrorConexion(true);
-      });
-  }, []);
+    getTorneos();
+    getDeportes();
+  }, [getTorneos, getDeportes]);
 
-  const handleClick = (id: number) => {
+  useEffect(() => {
+    setDataTorneos(torneos);
+  }, [torneos]);
+
+  useEffect(() => {
+    setDataDeportes(deportes);
+  }, [deportes]);
+
+  const handleClick = (id: number | undefined) => {
+    if (id === undefined) return;
     navigate(`/home/torneos/${id}`);
   };
 
@@ -148,13 +152,6 @@ export default function Torneos() {
           </p>
         </div>
 
-        {/* Error de conexión */}
-        {errorConexion && (
-          <div className="alert-danger-custom">
-            Ocurrió un error al recuperar los datos. Por favor, inténtelo de nuevo.
-          </div>
-        )}
-
         {/* Toolbar */}
         <div className="torneos-toolbar">
           <div className="toolbar-actions">
@@ -180,26 +177,38 @@ export default function Torneos() {
           </div>
         </div>
 
+        {/* Error de conexión */}
+        {error && !loading && (
+          <div className="alert-danger-custom">
+            ⚠️ {error}
+          </div>
+        )}
+
         {/* Grid de torneos */}
-        {torneosFiltrados.length === 0 ? (
+        {loading ? (
+          <div className="loading-state">
+            <div className="spinner-large"></div>
+            <p>Cargando torneos...</p>
+          </div>
+        ) : torneosFiltrados.length === 0 ? (
           <div className="torneos-empty-state">
             <div className="empty-state-icon">🏆</div>
             <p className="empty-state-text">No se encontraron torneos</p>
-          </div>
-        ) : (
-          <div className="torneos-grid">
-            {torneosFiltrados.map((torneo) => (
-              <CardTorneos
-                key={torneo.id}
-                torneo={torneo}
-                handleClick={handleClick}
-                isMember={userIsMemberOf(torneo)}
-                onEnroll={handleEnrollFromCard}
-                isCreador={userIsCreadorOf(torneo)}
-              />
-            ))}
-          </div>
-        )}
+            </div>
+          ) : (
+            <div className="torneos-grid">
+              {torneosFiltrados.map((torneo) => (
+                <CardTorneos
+                  key={torneo.id}
+                  torneo={torneo}
+                  handleClick={handleClick}
+                  isMember={userIsMemberOf(torneo)}
+                  onEnroll={handleEnrollFromCard}
+                  isCreador={userIsCreadorOf(torneo)}
+                />
+              ))}
+            </div>
+          )}
 
         {/* Modal de código */}
         {showCodeModal && (

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDeporte } from '../../hooks/useDeporte.tsx';
 import './DeportesAdmin.css';
 import type { Deporte } from '../../contexts/deporte.tsx';
@@ -14,6 +14,10 @@ const DeportesAdmin = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [editingDeporte, setEditingDeporte] = useState<Deporte | null>(null);
   const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    getDeportes();
+  }, [getDeportes]);
 
   // Filtrar deportes
   const deportesFiltrados = deportes.filter((deporte) =>

@@ -1,40 +1,16 @@
-import apiAxios from '../helpers/api.tsx';
 import { useEffect, useState } from 'react';
-import type { Noticia } from '../contexts/noticia.tsx';
+import { useNoticia } from '../hooks/useNoticia.tsx';
 import './Noticias.css';
 
 export default function Noticias() {
-  const [noticias, setNoticias] = useState<Noticia[]>([]);
+  const { noticias, loading, error, getNoticias } = useNoticia();
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
-  const [error, setError] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(true);
+  const [errorFiltro, setErrorFiltro] = useState<string>('');
 
   useEffect(() => {
-    const fetchNoticias = async () => {
-      try {
-        setLoading(true);
-        const response = await apiAxios.get('/noticias');
-        if (response.data && Array.isArray(response.data.data)) {
-          // Ordenar por fecha más reciente primero
-          const sortedNoticias = response.data.data.sort(
-            (a: Noticia, b: Noticia) => 
-              new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
-          );
-          setNoticias(sortedNoticias);
-        } else {
-          console.error('Unexpected API response format:', response.data);
-        }
-      } catch (error) {
-        console.error('Error fetching noticias:', error);
-        setError('Error al cargar las noticias. Intenta nuevamente.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchNoticias();
-  }, []);
+    getNoticias();
+  }, [getNoticias]);
 
   const handleDateChange = (type: 'start' | 'end', value: string) => {
     if (type === 'start') {
@@ -48,16 +24,16 @@ export default function Noticias() {
     const end = value && type === 'end' ? new Date(value) : new Date(endDate);
 
     if (startDate && endDate && start > end) {
-      setError('La fecha de inicio no puede ser mayor que la fecha de fin.');
+      setErrorFiltro('La fecha de inicio no puede ser mayor que la fecha de fin.');
     } else {
-      setError('');
+      setErrorFiltro('');
     }
   };
 
   const clearFilters = () => {
     setStartDate('');
     setEndDate('');
-    setError('');
+    setErrorFiltro('');
   };
 
   const filteredNoticias = noticias.filter((noticia) => {
@@ -136,20 +112,27 @@ export default function Noticias() {
         </div>
 
         {/* Error de validación */}
-        {error && !loading && (
+        {errorFiltro && !loading && (
           <div className="alert-danger-custom">
-            ⚠️ {error}
+            {errorFiltro}
           </div>
         )}
 
-        {/* Loading state */}
+        {/* Error de carga */} 
+        {error && !loading && (
+          <div className="alert-danger-custom">
+              ⚠️ {error}
+          </div>
+        )}
+
+        {/* Cargando */}
         {loading ? (
           <div className="loading-state">
             <div className="spinner-large"></div>
             <p>Cargando noticias...</p>
           </div>
         ) : filteredNoticias.length === 0 ? (
-          /* Empty state */
+          /* Vacio */
           <div className="noticias-empty-state">
             <div className="empty-state-icon">📭</div>
             <p className="empty-state-text">
@@ -157,11 +140,6 @@ export default function Noticias() {
                 ? 'No se encontraron noticias en el rango de fechas seleccionado'
                 : 'No hay noticias disponibles en este momento'}
             </p>
-            {(startDate || endDate) && (
-              <button className="btn-secondary-action" onClick={clearFilters}>
-                Ver todas las noticias
-              </button>
-            )}
           </div>
         ) : (
           /* Lista de noticias */

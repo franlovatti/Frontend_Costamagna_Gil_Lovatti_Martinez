@@ -1,15 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { UsuarioContext } from "../contexts/usuario";
 import apiAxios from "../helpers/api";
 import type { User } from "../contexts/auth";
-
+import { AxiosError } from "axios";
 
 const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
   const [usuarios, setUsuarios] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const getUsuarios = async (opts?: { q?: string; page?: number }) => {
+  const getUsuarios = useCallback(async (opts?: { q?: string; page?: number }) => {
     setLoading(true);
     try {
       const res = await apiAxios.get('/usuarios', { params: opts });
@@ -20,9 +20,9 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
       setError("No se pudieron cargar los usuarios" + error);
     }
     setLoading(false);
-  };
+  }, []);
 
-  const filtrarUsuarios = async (rol?: string, estado?: string) => {
+  const filtrarUsuarios = useCallback(async (rol?: string, estado?: string) => {
     setLoading(true);
     try {
       const res = await apiAxios.get('/usuarios/filter', {
@@ -35,7 +35,7 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
       setError('No se pudieron cargar los usuarios filtrados' + error);
     }
     setLoading(false);
-  };
+  }, []);
 
   const modificarUsuario = async (usuario: User) => {
     try {
@@ -44,9 +44,10 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
       await getUsuarios();
       return true;
     } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       const message =
-        error?.response?.data?.message ||
-        error?.message ||
+        axiosError?.response?.data?.message ||
+        axiosError?.message ||
         "Error al modificar el usuario";
       setError(message);
       return false;

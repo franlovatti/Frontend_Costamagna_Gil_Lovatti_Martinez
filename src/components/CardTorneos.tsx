@@ -1,8 +1,8 @@
-import type { Torneo } from '../types';
+import type { Torneo } from '../contexts/torneo';
 
 interface CardTorneosProps {
   torneo: Torneo;
-  handleClick: (id: number) => void;
+  handleClick: (id: number | undefined) => void;
   isMember?: boolean;
   onEnroll?: (torneo: Torneo) => void;
   isCreador?: boolean;
@@ -16,17 +16,19 @@ export default function CardTorneos({
   isCreador,
 }: CardTorneosProps) {
   const canAccess = Boolean(isMember || isCreador);
-  const fechaInicioEvento = new Date(torneo.fechaInicioEvento).toLocaleDateString('es-AR', {
+  const fechaInicioEvento = torneo.fechaInicioEvento ?
+  new Date(torneo.fechaInicioEvento).toLocaleDateString('es-AR', {
     day: '2-digit',
     month: 'short',
     year: 'numeric'
-  });
+  }) : 'Fecha no definida';
   
-  const fechaFinEvento = new Date(torneo.fechaFinEvento).toLocaleDateString('es-AR', {
+  const fechaFinEvento = torneo.fechaFinEvento ?
+  new Date(torneo.fechaFinEvento).toLocaleDateString('es-AR', {
     day: '2-digit',
     month: 'short',
     year: 'numeric'
-  });
+  }) : 'Fecha no definida';
 
   const deporteNombre = torneo.deporte?.nombre ?? 'Sin deporte';
   const localidadDesc = torneo.localidad?.descripcion ?? 'Sin localidad';

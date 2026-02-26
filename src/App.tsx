@@ -148,41 +148,25 @@ function App() {
                         <Route
                           path="/admin/deportes"
                           element={
-                            <DeportesProvider>
-                              <DeportesAdmin />
-                            </DeportesProvider>
+                            <DeportesAdmin />
                           }
                         />
                         <Route
                           path="/admin/noticias"
                           element={
-                            <NoticiasProvider>
-                              <NoticiasAdmin />
-                            </NoticiasProvider>
+                            <NoticiasAdmin />
                           }
                         />
                         <Route
                           path="/admin/torneos"
                           element={
-                            <TorneosProvider>
-                              <TorneosAdmin />
-                            </TorneosProvider>
-                          }
-                        />
-                        <Route
-                          path="/admin/noticias"
-                          element={
-                            <NoticiasProvider>
-                              <NoticiasAdmin />
-                            </NoticiasProvider>
+                            <TorneosAdmin />
                           }
                         />
                         <Route
                           path="/admin/localidades"
                           element={
-                            <LocalidadProvider>
-                              <LocalidadesAdmin />
-                            </LocalidadProvider>
+                            <LocalidadesAdmin />
                           }
                         />
                       </Route>

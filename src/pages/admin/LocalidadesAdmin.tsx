@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocalidad } from '../../hooks/useLocalidad.tsx';
 import type { Localidad } from '../../contexts/localidad.tsx';
 import './DeportesAdmin.css';
@@ -8,9 +8,13 @@ import LocalidadFormModal from '../../components/admin/LocalidadFormModal.tsx';
 
 
 export default function LocalidadesAdmin() {
-  const { localidades, loading, error, borrarLocalidad, crearLocalidad } = useLocalidad();
+  const { localidades, loading, error, borrarLocalidad, crearLocalidad, getLocalidades } = useLocalidad();
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    getLocalidades();
+  }, [getLocalidades]);
 
   const localidadesFiltradas = localidades.filter((localidad) =>
     localidad.descripcion.toLowerCase().includes(searchTerm.toLowerCase()) ||

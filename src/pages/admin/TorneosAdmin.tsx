@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './TorneosAdmin.css';
 import SearchBar from '../../components/SearchBar.tsx';
 import type { Torneo } from '../../contexts/torneo.tsx';
@@ -18,6 +18,10 @@ const TorneosAdmin = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [editingTorneo, setEditingTorneo] = useState<Torneo | null>(null);
   const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    getTorneos();
+  }, [getTorneos]);
 
   // Filtrar torneos
   const torneosFiltrados = torneos.filter(torneo =>

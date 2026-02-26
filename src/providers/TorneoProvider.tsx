@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { TorneoContext } from "../contexts/torneo";
 import apiAxios from "../helpers/api";
 import type { Torneo } from "../contexts/torneo";
@@ -25,20 +25,26 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
     deporteC: Deporte;
   }
 
-  const getTorneos = async () => {
+  const getTorneos = useCallback(async () => {
     setLoading(true);
     try {
       const res = await apiAxios.get('/eventos');
-      setTorneos(Array.isArray(res.data.data) ? res.data.data : []);
+      const data = Array.isArray(res.data.data) ? res.data.data : [];
+      const ordenados = data.sort((a: Torneo, b: Torneo) => {
+      const fechaA = a.fechaInicioEvento ? new Date(a.fechaInicioEvento).getTime() : 0;
+      const fechaB = b.fechaInicioEvento ? new Date(b.fechaInicioEvento).getTime() : 0;
+      return fechaB - fechaA;
+      });
+      setTorneos(ordenados);
       setError(null);
     } catch (error) {
       setTorneos([]);
       setError("No se pudieron cargar los torneos" + error);
     }
     setLoading(false);
-  };
+  }, []);
 
-  const filtrarTorneos = async (fechaDesde?: string, fechaHasta?: string, deporte?: string, modalidad?: string, equiposDesde?: number, equiposHasta?: number) => {
+  const filtrarTorneos = useCallback(async (fechaDesde?: string, fechaHasta?: string, deporte?: string, modalidad?: string, equiposDesde?: number, equiposHasta?: number) => {
     setLoading(true);
     try {
       const res = await apiAxios.get('/eventos/filter', {
@@ -51,9 +57,9 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
       setError('No se pudieron cargar los torneos filtrados' + error);
     }
     setLoading(false);
-  };
+  }, []);
 
-  const borrarTorneo = async (id: number) => {
+  const borrarTorneo = useCallback(async (id: number) => {
     try {
       await apiAxios.delete(`/eventos/${id}`);
       await getTorneos();
@@ -63,9 +69,9 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
       console.error("Error al borrar el torneo:", errorMsg);
       setError("Error al borrar el torneo:" + errorMsg);
     }
-  };
+  }, [getTorneos]);
 
-  const modificarTorneo = async (torneo: Torneo) => {
+  const modificarTorneo = useCallback(async (torneo: Torneo) => {
     try {
       const payload: Payload = { ...torneo, deporte: torneo.deporte.id, deporteC: torneo.deporte };
       payload.deporteC = undefined as unknown as Deporte; // No enviar el objeto deporte completo
@@ -75,9 +81,9 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       setError("Error al modificar el torneo:" + error);
     }
-  };
+  }, [getTorneos]);
 
-  const crearTorneo = async (torneo: Torneo) => {
+  const crearTorneo = useCallback(async (torneo: Torneo) => {
     try {
       const payload: Payload = { ...torneo, deporte: torneo.deporte.id, deporteC: torneo.deporte };
       payload.deporteC = undefined as unknown as Deporte; // No enviar el objeto deporte completo
@@ -87,11 +93,11 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       setError("Error al crear el torneo:" + error);
     }
-  };
+  }, [getTorneos]);
 
   useEffect(() => {
     getTorneos();
-  }, []);
+  }, [getTorneos]);
 
   return (
     <TorneoContext.Provider value={{ torneos, loading, error, getTorneos, borrarTorneo, modificarTorneo, crearTorneo, filtrarTorneos }}>

@@ -1,17 +1,26 @@
 import { createContext } from "react";
 import type { Deporte } from "./deporte";
+import type { Localidad } from "./localidad.tsx";
+import type { Equipo, Partido } from "../types.tsx";
 
 export interface Torneo {
   id?: number;
   nombre: string;
-  esPublico: boolean;
-  contraseña?: string;
-  cantEquiposMax: number;
+  deporte: Deporte;
   fechaInicioInscripcion: Date;
   fechaFinInscripcion: Date;
   fechaInicioEvento?: Date;
   fechaFinEvento?: Date;
-  deporte: Deporte;
+  localidad: Localidad;
+  esPublico: boolean;
+  cantEquiposMax: number;
+  equipos?: Equipo[];
+  creador: number;
+  partidos?: Partido[];
+  codigo?: string;
+  contraseña?: string;
+  descripcion?: string;
+  img?: string;
 }
 
 export interface TorneoContextType {

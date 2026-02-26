@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNoticia } from '../../hooks/useNoticia';
 import './DeportesAdmin.css';
 import ConfirmModal from '../../components/ConfirmModal';
@@ -15,6 +15,10 @@ export default function NoticiaPage() {
   const [editingNoticia, setEditingNoticia] = useState<Noticia | null>(null);
   const [showModal, setShowModal] = useState(false);
   
+  useEffect(() => {
+    getNoticias();
+  }, [getNoticias]);
+
   const noticiasFiltradas = noticias.filter((noticia) =>
     noticia.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
     noticia.descripcion.toLowerCase().includes(searchTerm.toLowerCase())

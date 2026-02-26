@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { NoticiaContext } from '../contexts/noticia.tsx';
 import apiAxios from '../helpers/api';
 import type { Noticia } from '../contexts/noticia.tsx';
@@ -8,7 +8,7 @@ const NoticiasProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const getNoticias = async () => {
+  const getNoticias = useCallback(async () => {
     setLoading(true);
     try {
       const res = await apiAxios.get('/noticias', {
@@ -21,9 +21,9 @@ const NoticiasProvider = ({ children }: { children: React.ReactNode }) => {
       setError('No se pudieron cargar las noticias' + error);
     }
     setLoading(false);
-  };
+  }, []);
 
-  const filtrarNoticias = async (fechaDesde?: string, fechaHasta?: string) => {
+  const filtrarNoticias = useCallback(async (fechaDesde?: string, fechaHasta?: string) => {
     setLoading(true);
     try {
       const res = await apiAxios.get('/noticias/filter', {
@@ -36,38 +36,38 @@ const NoticiasProvider = ({ children }: { children: React.ReactNode }) => {
       setError('No se pudieron cargar las noticias filtradas' + error);
     }
     setLoading(false);
-  };
+  }, []);
 
-  const borrarNoticia = async (id: number) => {
+  const borrarNoticia = useCallback(async (id: number) => {
     try {
       await apiAxios.delete(`/noticias/${id}`);
       await getNoticias();
     } catch (error) {
       setError('Error al borrar la noticia:' + error);
     }
-  };
+  }, [getNoticias]);
 
-  const modificarNoticia = async (noticia: Noticia) => {
+  const modificarNoticia = useCallback(async (noticia: Noticia) => {
     try {
       await apiAxios.put(`/noticias/${noticia.id}`, noticia);
       await getNoticias();
     } catch (error) {
       setError('Error al modificar la noticia:' + error);
     }
-  };
+  }, [getNoticias]);
 
-  const crearNoticia = async (noticia: Noticia) => {
+  const crearNoticia = useCallback(async (noticia: Noticia) => {
     try {
       await apiAxios.post('/noticias', noticia);
       await getNoticias();
     } catch (error) {
       setError('Error al crear la noticia:' + error);
     }
-  };
+  }, [getNoticias]);
 
   useEffect(() => {
     getNoticias();
-  }, []);
+  }, [getNoticias]);
 
   return (
     <NoticiaContext.Provider
