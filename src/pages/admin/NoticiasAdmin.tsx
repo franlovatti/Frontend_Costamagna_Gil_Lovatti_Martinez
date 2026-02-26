@@ -10,7 +10,7 @@ import FiltroFecha from '../../components/filtros/FiltroFecha.tsx';
 import Filtros from '../../components/filtros/Filtros.tsx';
 
 export default function NoticiaPage() {
-  const { noticias, borrarNoticia, modificarNoticia, crearNoticia, filtrarNoticias, getNoticias } = useNoticia();
+  const { noticias, borrarNoticia, modificarNoticia, crearNoticia, filtrarNoticias, getNoticias, loading, error } = useNoticia();
   const [searchTerm, setSearchTerm] = useState('');
   const [editingNoticia, setEditingNoticia] = useState<Noticia | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -109,10 +109,18 @@ export default function NoticiaPage() {
         />
       </Filtros>
 
+      {/* Error de conexión */}
+      {error && !loading && (
+        <div className="alert-danger-custom">
+          ⚠️ {error}
+        </div>
+      )}
+
       <NoticiasTable
         noticias={noticiasFiltradas}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        loading={loading}
       />
 
       {showModal && (

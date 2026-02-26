@@ -14,7 +14,7 @@ import FiltroRango from '../../components/filtros/FiltroRango.tsx';
 import Filtros from '../../components/filtros/Filtros.tsx';
 
 const TorneosAdmin = () => {
-  const { torneos, borrarTorneo, modificarTorneo, crearTorneo, filtrarTorneos, getTorneos, error } = useTorneo();
+  const { torneos, borrarTorneo, modificarTorneo, crearTorneo, filtrarTorneos, getTorneos, error, loading } = useTorneo();
   const [searchTerm, setSearchTerm] = useState('');
   const [editingTorneo, setEditingTorneo] = useState<Torneo | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -141,8 +141,20 @@ const TorneosAdmin = () => {
         />
       </Filtros>
 
+      {/* Error de conexión */}
+      {error && !loading && (
+        <div className="alert-danger-custom">
+          ⚠️ {error}
+        </div>
+      )}
+
       <div className="row g-3">
-        {torneosFiltrados.length === 0 ? (
+        {loading ? (
+          <div className="loading-state">
+            <div className="spinner-large"></div>
+            <p>Cargando torneos...</p>
+          </div>
+        ) :torneosFiltrados.length === 0 ? (
           <div className="col-12">
             <div className="empty-state text-center py-5">
               <p className="text-muted-custom mb-0">No se encontraron torneos</p>
@@ -176,12 +188,6 @@ const TorneosAdmin = () => {
                 handleCancelDelete={handleCancelDelete}
               />
             )}
-
-      {error && (
-        <div className="alert alert-danger mt-4" role="alert">
-          {error}
-        </div>
-      )}
       
     </div>
   );

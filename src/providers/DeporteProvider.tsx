@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { DeporteContext } from "../contexts/deporte";
 import apiAxios from "../helpers/api";
 import type { Deporte } from "../contexts/deporte";
-
+import { AxiosError } from "axios";
 
 const DeportesProvider = ({ children }: { children: React.ReactNode }) => {
   const [deportes, setDeportes] = useState<Deporte[]>([]);
@@ -15,9 +15,10 @@ const DeportesProvider = ({ children }: { children: React.ReactNode }) => {
       const res = await apiAxios.get('/deportes');
       setDeportes(Array.isArray(res.data.data) ? res.data.data : []);
       setError(null);
-    } catch (error) {
+    } catch (err) {
+      const axiosError = err as AxiosError<{ message?: string }>;
       setDeportes([]);
-      setError("No se pudieron cargar los deportes" + error);
+      setError("No se pudieron cargar los deportes: " + (axiosError.response?.data?.message || axiosError.message));
     } finally {
       setLoading(false);
     }
@@ -31,9 +32,10 @@ const DeportesProvider = ({ children }: { children: React.ReactNode }) => {
       });
       setDeportes(Array.isArray(res.data.data) ? res.data.data : []);
       setError(null);
-    } catch (error) {
+    } catch (err) {
+      const axiosError = err as AxiosError<{ message?: string }>;
       setDeportes([]);
-      setError('No se pudieron cargar los deportes filtrados' + error);
+      setError('No se pudieron cargar los deportes filtrados: ' + (axiosError.response?.data?.message || axiosError.message));
     }
     setLoading(false);
   }, []);
@@ -42,8 +44,9 @@ const DeportesProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await apiAxios.delete(`/deportes/${id}`);
       await getDeportes();
-    } catch (error) {
-      setError("Error al borrar el deporte:" + error);
+    } catch (err) {
+      const axiosError = err as AxiosError<{ message?: string }>;
+      setError("Error al borrar el deporte: " + (axiosError.response?.data?.message || axiosError.message));
     }
   }, [getDeportes]);
 
@@ -51,8 +54,9 @@ const DeportesProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await apiAxios.put(`/deportes/${deporte.id}`, deporte);
       await getDeportes();
-    } catch (error) {
-      setError("Error al modificar el deporte:" + error);
+    } catch (err) {
+      const axiosError = err as AxiosError<{ message?: string }>;
+      setError("Error al modificar el deporte: " + (axiosError.response?.data?.message || axiosError.message));
     }
   }, [getDeportes]);
 
@@ -60,8 +64,9 @@ const DeportesProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await apiAxios.post("/deportes", deporte);
       await getDeportes();
-    } catch (error) {
-      setError("Error al crear el deporte:" + error);
+    } catch (err) {
+      const axiosError = err as AxiosError<{ message?: string }>;
+      setError("Error al crear el deporte: " + (axiosError.response?.data?.message || axiosError.message));
     }
   }, [getDeportes]);
 

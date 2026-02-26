@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { NoticiaContext } from '../contexts/noticia.tsx';
 import apiAxios from '../helpers/api';
 import type { Noticia } from '../contexts/noticia.tsx';
+import { AxiosError } from 'axios';
 
 const NoticiasProvider = ({ children }: { children: React.ReactNode }) => {
   const [noticias, setNoticias] = useState<Noticia[]>([]);
@@ -17,8 +18,9 @@ const NoticiasProvider = ({ children }: { children: React.ReactNode }) => {
       setNoticias(Array.isArray(res.data.data) ? res.data.data : []);
       setError(null);
     } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       setNoticias([]);
-      setError('No se pudieron cargar las noticias' + error);
+      setError('No se pudieron cargar las noticias: ' + (axiosError.response?.data?.message || axiosError.message));
     }
     setLoading(false);
   }, []);
@@ -32,8 +34,9 @@ const NoticiasProvider = ({ children }: { children: React.ReactNode }) => {
       setNoticias(Array.isArray(res.data.data) ? res.data.data : []);
       setError(null);
     } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       setNoticias([]);
-      setError('No se pudieron cargar las noticias filtradas' + error);
+      setError('No se pudieron cargar las noticias filtradas: ' + (axiosError.response?.data?.message || axiosError.message));
     }
     setLoading(false);
   }, []);
@@ -43,7 +46,8 @@ const NoticiasProvider = ({ children }: { children: React.ReactNode }) => {
       await apiAxios.delete(`/noticias/${id}`);
       await getNoticias();
     } catch (error) {
-      setError('Error al borrar la noticia:' + error);
+      const axiosError = error as AxiosError<{ message?: string }>;
+      setError('Error al borrar la noticia: ' + (axiosError.response?.data?.message || axiosError.message));
     }
   }, [getNoticias]);
 
@@ -52,7 +56,8 @@ const NoticiasProvider = ({ children }: { children: React.ReactNode }) => {
       await apiAxios.put(`/noticias/${noticia.id}`, noticia);
       await getNoticias();
     } catch (error) {
-      setError('Error al modificar la noticia:' + error);
+      const axiosError = error as AxiosError<{ message?: string }>;
+      setError('Error al modificar la noticia: ' + (axiosError.response?.data?.message || axiosError.message));
     }
   }, [getNoticias]);
 
@@ -61,7 +66,8 @@ const NoticiasProvider = ({ children }: { children: React.ReactNode }) => {
       await apiAxios.post('/noticias', noticia);
       await getNoticias();
     } catch (error) {
-      setError('Error al crear la noticia:' + error);
+      const axiosError = error as AxiosError<{ message?: string }>;
+      setError('Error al crear la noticia: ' + (axiosError.response?.data?.message || axiosError.message));
     }
   }, [getNoticias]);
 

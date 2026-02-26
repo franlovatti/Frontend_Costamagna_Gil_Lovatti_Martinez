@@ -62,8 +62,8 @@ const TorneosPerfil = ({ equipos, loadingEquipos, errorEquipos }: TorneosPerfilP
           <div className="spinner-border text-primary" role="status"></div>
         </div>
       ) : errorEquipos ? (
-        <div className="alert alert-danger" role="alert">
-          {errorEquipos}
+        <div className="alert-danger-custom" role="alert">
+          ⚠️ No se pudieron cargar los torneos: {errorEquipos}
         </div>
       ) : (
       <div>

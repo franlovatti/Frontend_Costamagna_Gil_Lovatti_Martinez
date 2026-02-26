@@ -36,7 +36,7 @@ const statCards = [
 ];
 
 const Dashboard = () => {
-  const { stats, deportesConEventos, loading } = useStats();
+  const { stats, deportesConEventos, loading, error } = useStats();
 
   const eventos = stats?.eventos || 0;
 
@@ -46,7 +46,12 @@ const Dashboard = () => {
         <h1 className="mb-2">Panel de Estadísticas</h1>
         <p className="text-muted-custom mb-0">Análisis general de la plataforma</p>
       </div>
-      
+      {/* Error de conexión */}
+        {error && !loading && (
+          <div className="alert-danger-custom">
+            ⚠️ {error}
+          </div>
+        )}
       <div className="row g-3 mb-4">
         {statCards.map((card) => (
           <div className="col-12 col-sm-6 col-lg-3" key={card.key}>

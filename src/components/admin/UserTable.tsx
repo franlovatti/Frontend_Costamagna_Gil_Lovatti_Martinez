@@ -6,10 +6,12 @@ export default function UserTable({
   usuarios,
   onEdit,
   onDelete,
+  loading
 }: {
   usuarios: User[];
   onEdit: (u: User) => void;
   onDelete: (u: User) => void;
+  loading: boolean;
 }) {
   return (
     <div className="table-responsive custom-table-container no-mobile-hide">
@@ -26,7 +28,13 @@ export default function UserTable({
           </tr>
         </thead>
         <tbody>
-          {usuarios.length === 0 ? (
+          {loading ? (
+            <tr>
+              <td colSpan={7} className="text-center py-5 text-muted-custom">
+                <div className="spinner-border text-primary" role="status"></div>
+              </td>
+            </tr>
+            ) : usuarios.length === 0 ? (
             <tr>
               <td colSpan={7} className="text-center py-5 text-muted-custom">
                 No se encontraron usuarios
