@@ -35,7 +35,8 @@ export default function TorneoDetalle() {
     useParticipantesEvento(id);
 
   const calcularStats = (participations: Participation[] | undefined) => {
-    if (!participations) return { faltas: 0, minutosjugados: 0, puntos: 0 };
+    if (!participations)
+      return { faltas: 0, minutosjugados: 0, puntos: 0, equipo: 0 };
 
     return participations.reduce(
       (acc, part) => {
@@ -44,7 +45,7 @@ export default function TorneoDetalle() {
         acc.puntos += part.puntos;
         return acc;
       },
-      { faltas: 0, minutosjugados: 0, puntos: 0 },
+      { faltas: 0, minutosjugados: 0, puntos: 0, equipo: 0 },
     );
   };
 
@@ -52,6 +53,7 @@ export default function TorneoDetalle() {
     puntos: number;
     minutosjugados: number;
     faltas: number;
+    equipo: number;
   };
 
   const ordenarParticipantes = (
@@ -869,6 +871,7 @@ export default function TorneoDetalle() {
               <option value="faltas">Faltas</option>
               <option value="minutosjugados">Minutos Jugados</option>
               <option value="puntos">Puntos</option>
+              <option value="equipo">Equipo</option>
             </select>
           </div>
 
@@ -878,7 +881,12 @@ export default function TorneoDetalle() {
               <thead>
                 <tr>
                   <th>Nombre</th>
-                  <th>Equipo</th>
+                  <th
+                    className="table-column-header"
+                    onClick={() => setOrdenarParticipanteCriterio('equipo')}
+                  >
+                    Equipo
+                  </th>
                   <th
                     className="table-column-header"
                     onClick={() => setOrdenarParticipanteCriterio('faltas')}
