@@ -64,6 +64,12 @@ export default function FormTorneos() {
     });
   }, [id]);
 
+  useEffect(() => {
+    if (error || errorConexion){
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [error, errorConexion]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {

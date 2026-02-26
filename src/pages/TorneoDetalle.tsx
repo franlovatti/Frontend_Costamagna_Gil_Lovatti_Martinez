@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router-dom';
-import type { Equipo, Partido, Torneo, Usuario } from '../types';
+import type { Equipo, Participation, Partido, Torneo, Usuario } from '../types';
 import { Row, Col } from 'react-bootstrap';
 import apiAxios from '../helpers/api';
 import { useAuth } from '../hooks/useAuth';
 import './TorneoDetalle.css';
+import { useParticipantesEvento } from '../hooks/useUsuario.tsx';
 
 export default function TorneoDetalle() {
   const [torneo, setTorneo] = useState<Torneo | null>(null);
@@ -19,6 +20,8 @@ export default function TorneoDetalle() {
   const [resultadoVisitante, setResultadoVisitante] = useState<string>('');
   const [partidoSeleccionado, setPartidoSeleccionado] =
     useState<Partido | null>(null);
+  const [ordenarParticipanteCriterio, setOrdenarParticipanteCriterio] =
+    useState<string>('puntos');
   const [tabKey, setTabKey] = useState<string>('');
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
@@ -27,6 +30,47 @@ export default function TorneoDetalle() {
   useEffect(() => {
     fetchTorneo();
   }, [id]);
+
+  const { participantes: participantesDesordenados } =
+    useParticipantesEvento(id);
+
+  const calcularStats = (participations: Participation[] | undefined) => {
+    if (!participations)
+      return { faltas: 0, minutosjugados: 0, puntos: 0, equipo: 0 };
+
+    return participations.reduce(
+      (acc, part) => {
+        acc.faltas += part.faltas;
+        acc.minutosjugados += part.minutosjugados;
+        acc.puntos += part.puntos;
+        return acc;
+      },
+      { faltas: 0, minutosjugados: 0, puntos: 0, equipo: 0 },
+    );
+  };
+
+  type stats = {
+    puntos: number;
+    minutosjugados: number;
+    faltas: number;
+    equipo: number;
+  };
+
+  const ordenarParticipantes = (
+    participantes: Usuario[],
+    c: keyof stats = 'puntos',
+  ) => {
+    return [...participantes].sort((a, b) => {
+      const statsA = calcularStats(a.participations);
+      const statsB = calcularStats(b.participations);
+      return statsB[c] - statsA[c];
+    });
+  };
+
+  const participantes = ordenarParticipantes(
+    participantesDesordenados,
+    ordenarParticipanteCriterio as keyof stats,
+  );
 
   const fetchTorneo = async () => {
     if (!id) return;
@@ -153,7 +197,7 @@ export default function TorneoDetalle() {
   const handleDelete = async () => {
     if (
       !confirm(
-        '¿Estás seguro de eliminar este torneo? Esta acción no se puede deshacer.'
+        '¿Estás seguro de eliminar este torneo? Esta acción no se puede deshacer.',
       )
     )
       return;
@@ -177,15 +221,18 @@ export default function TorneoDetalle() {
   };
 
   const partidosOrdenados = [...(torneo?.partidos || [])].sort(
-    (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
+    (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime(),
   );
 
-  const partidosPorFecha = partidosOrdenados.reduce((acc, partido) => {
-    const fechaKey = new Date(partido.fecha).toDateString();
-    if (!acc[fechaKey]) acc[fechaKey] = [];
-    acc[fechaKey].push(partido);
-    return acc;
-  }, {} as Record<string, Partido[]>);
+  const partidosPorFecha = partidosOrdenados.reduce(
+    (acc, partido) => {
+      const fechaKey = new Date(partido.fecha).toDateString();
+      if (!acc[fechaKey]) acc[fechaKey] = [];
+      acc[fechaKey].push(partido);
+      return acc;
+    },
+    {} as Record<string, Partido[]>,
+  );
 
   const isCreator = Number(user?.id) === torneo?.creador;
 
@@ -195,7 +242,6 @@ export default function TorneoDetalle() {
         <div className="loading-state">Cargando torneo...</div>
       </div>
     );
-
   return (
     <div className="torneo-detalle-container">
       <div className="torneo-detalle-inner">
@@ -540,7 +586,7 @@ export default function TorneoDetalle() {
                                   <td>{i + 1}</td>
                                   <td>
                                     {new Date(
-                                      partido.fecha
+                                      partido.fecha,
                                     ).toLocaleDateString()}
                                   </td>
                                   <td>{partido.hora}</td>
@@ -570,7 +616,9 @@ export default function TorneoDetalle() {
                                     <div className="table-actions">
                                       <button
                                         onClick={() =>
-                                          navigate(`/home/partido-detalle/${partido.id}`)
+                                          navigate(
+                                            `/home/partido-detalle/${partido.id}`,
+                                          )
                                         }
                                         className="btn-action btn-small"
                                       >
@@ -581,7 +629,7 @@ export default function TorneoDetalle() {
                                           <button
                                             onClick={() =>
                                               navigate(
-                                                `/home/Participaciones/${partido.id}`
+                                                `/home/Participaciones/${partido.id}`,
                                               )
                                             }
                                             className="btn-action btn-small"
@@ -591,7 +639,7 @@ export default function TorneoDetalle() {
                                           <button
                                             onClick={() =>
                                               navigate(
-                                                `/home/torneos/${torneo.id}/EditarPartido/${partido.id}`
+                                                `/home/torneos/${torneo.id}/EditarPartido/${partido.id}`,
                                               )
                                             }
                                             className="btn-action btn-small"
@@ -606,16 +654,16 @@ export default function TorneoDetalle() {
                                                 partido.resultadoLocal == null
                                                   ? ''
                                                   : String(
-                                                      partido.resultadoLocal
-                                                    )
+                                                      partido.resultadoLocal,
+                                                    ),
                                               );
                                               setResultadoVisitante(
                                                 partido.resultadoVisitante ==
                                                   null
                                                   ? ''
                                                   : String(
-                                                      partido.resultadoVisitante
-                                                    )
+                                                      partido.resultadoVisitante,
+                                                    ),
                                               );
                                               setResultadoModal(true);
                                             }}
@@ -654,7 +702,7 @@ export default function TorneoDetalle() {
                                 <div className="partido-date-time">
                                   <div className="partido-date">
                                     {new Date(
-                                      partido.fecha
+                                      partido.fecha,
                                     ).toLocaleDateString()}
                                   </div>
                                   <div className="partido-time">
@@ -729,7 +777,7 @@ export default function TorneoDetalle() {
                                 <button
                                   onClick={() =>
                                     navigate(
-                                      `/home/partido-detalle/${partido.id}`
+                                      `/home/partido-detalle/${partido.id}`,
                                     )
                                   }
                                   className="btn-action"
@@ -741,7 +789,7 @@ export default function TorneoDetalle() {
                                     <button
                                       onClick={() =>
                                         navigate(
-                                          `/home/Participaciones/${partido.id}`
+                                          `/home/Participaciones/${partido.id}`,
                                         )
                                       }
                                       className="btn-action"
@@ -751,7 +799,7 @@ export default function TorneoDetalle() {
                                     <button
                                       onClick={() =>
                                         navigate(
-                                          `/home/torneos/${torneo.id}/EditarPartido/${partido.id}`
+                                          `/home/torneos/${torneo.id}/EditarPartido/${partido.id}`,
                                         )
                                       }
                                       className="btn-action"
@@ -765,12 +813,14 @@ export default function TorneoDetalle() {
                                         setResultadoLocal(
                                           partido.resultadoLocal == null
                                             ? ''
-                                            : String(partido.resultadoLocal)
+                                            : String(partido.resultadoLocal),
                                         );
                                         setResultadoVisitante(
                                           partido.resultadoVisitante == null
                                             ? ''
-                                            : String(partido.resultadoVisitante)
+                                            : String(
+                                                partido.resultadoVisitante,
+                                              ),
                                         );
                                         setResultadoModal(true);
                                       }}
@@ -792,7 +842,7 @@ export default function TorneoDetalle() {
                           ))}
                         </div>
                       </div>
-                    )
+                    ),
                 )}
               </div>
             </div>
@@ -804,6 +854,146 @@ export default function TorneoDetalle() {
               </p>
             </div>
           )}
+        </div>
+
+        {/*Tabla de Participantes*/}
+        <div className="section-container">
+          <h2 className="section-title">Tabla de Participantes</h2>
+
+          <div className="filtros-tabla-partcipantes">
+            <select
+              id="criterioOrdenamiento"
+              onChange={(e) => setOrdenarParticipanteCriterio(e.target.value)}
+            >
+              <option value="" selected disabled hidden>
+                Ordenar Participantes
+              </option>
+              <option value="faltas">Faltas</option>
+              <option value="minutosjugados">Minutos Jugados</option>
+              <option value="puntos">Puntos</option>
+              <option value="equipo">Equipo</option>
+            </select>
+          </div>
+
+          {/* Versión Desktop - Tabla */}
+          <div className="custom-table-container">
+            <table className="custom-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th
+                    className="table-column-header"
+                    onClick={() => setOrdenarParticipanteCriterio('equipo')}
+                  >
+                    Equipo
+                  </th>
+                  <th
+                    className="table-column-header"
+                    onClick={() => setOrdenarParticipanteCriterio('faltas')}
+                  >
+                    Faltas
+                  </th>
+                  <th
+                    className="table-column-header"
+                    onClick={() =>
+                      setOrdenarParticipanteCriterio('minutosjugados')
+                    }
+                  >
+                    Minutos Jugados
+                  </th>
+                  <th
+                    className="table-column-header"
+                    onClick={() => setOrdenarParticipanteCriterio('puntos')}
+                  >
+                    Puntos
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {participantes && participantes.length > 0 ? (
+                  participantes.map((participante: Usuario) => (
+                    <tr key={participante.id}>
+                      <td>
+                        {participante.nombre + ' ' + participante.apellido}
+                      </td>
+                      <td>
+                        {participante.equipos.map((equipo) => (
+                          <span>{equipo.nombre}</span>
+                        ))}
+                      </td>
+                      <td>
+                        {calcularStats(participante.participations)?.faltas}
+                      </td>
+                      <td>
+                        {
+                          calcularStats(participante.participations)
+                            ?.minutosjugados
+                        }
+                      </td>
+                      <td>
+                        {calcularStats(participante.participations)?.puntos}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="empty-state-cell">
+                      No hay participaciones registradas aún
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Versión Mobile - Cards */}
+          <div className="equipos-mobile-list">
+            {participantes && participantes.length > 0 ? (
+              participantes.map((participante: Usuario) => (
+                <div key={participante.id} className="equipo-mobile-card">
+                  <div className="equipo-mobile-header">
+                    <div className="equipo-mobile-name">
+                      {participante.nombre + ' ' + participante.apellido}
+                    </div>
+                  </div>
+                  <div className="equipo-mobile-info">
+                    <div className="equipo-info-row">
+                      <span className="equipo-info-label">Equipo</span>
+                      {participante.equipos.map((equipo: Equipo) => (
+                        <span>{equipo.nombre}</span>
+                      ))}
+                    </div>
+                    <div className="equipo-info-row">
+                      <span className="equipo-info-label">Faltas</span>
+                      <span>
+                        {calcularStats(participante.participations)?.faltas}
+                      </span>
+                    </div>
+                    <div className="equipo-info-row">
+                      <span className="equipo-info-label">Minutos Jugados</span>
+                      <span>
+                        {
+                          calcularStats(participante.participations)
+                            ?.minutosjugados
+                        }
+                      </span>
+                    </div>
+                    <div className="equipo-info-row">
+                      <span className="equipo-info-label">Puntos</span>
+                      <span>
+                        {calcularStats(participante.participations)?.puntos}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="empty-state">
+                <div className="empty-state-icon">👥</div>
+                <p className="empty-state-text">No hay Participantes aún</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
