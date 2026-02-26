@@ -858,6 +858,20 @@ export default function TorneoDetalle() {
         <div className="section-container">
           <h2 className="section-title">Tabla de Participantes</h2>
 
+          <div className="filtros-tabla-partcipantes">
+            <select
+              id="criterioOrdenamiento"
+              onChange={(e) => setOrdenarParticipanteCriterio(e.target.value)}
+            >
+              <option value="" selected disabled hidden>
+                Ordenar Participantes
+              </option>
+              <option value="faltas">Faltas</option>
+              <option value="minutosjugados">Minutos Jugados</option>
+              <option value="puntos">Puntos</option>
+            </select>
+          </div>
+
           {/* Versión Desktop - Tabla */}
           <div className="custom-table-container">
             <table className="custom-table">
@@ -866,13 +880,13 @@ export default function TorneoDetalle() {
                   <th>Nombre</th>
                   <th>Equipo</th>
                   <th
-                    style={{ cursor: 'pointer' }}
+                    className="table-column-header"
                     onClick={() => setOrdenarParticipanteCriterio('faltas')}
                   >
                     Faltas
                   </th>
                   <th
-                    style={{ cursor: 'pointer' }}
+                    className="table-column-header"
                     onClick={() =>
                       setOrdenarParticipanteCriterio('minutosjugados')
                     }
@@ -880,7 +894,7 @@ export default function TorneoDetalle() {
                     Minutos Jugados
                   </th>
                   <th
-                    style={{ cursor: 'pointer' }}
+                    className="table-column-header"
                     onClick={() => setOrdenarParticipanteCriterio('puntos')}
                   >
                     Puntos
