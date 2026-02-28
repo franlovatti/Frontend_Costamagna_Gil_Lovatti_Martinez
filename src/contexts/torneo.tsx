@@ -1,8 +1,14 @@
 import { createContext } from "react";
-import type { Deporte } from "./deporte";
-import type { Localidad } from "./localidad.tsx";
-import type { Equipo, Partido } from "../types.tsx";
+import type { Torneo } from "../types.tsx";
+// import type { Deporte } from "./deporte";
+// import type { Localidad } from "./localidad.tsx";
+// import type { Equipo, Partido } from "../types.tsx";
 
+
+
+/*
+! COMENTADO DEBIDO A INCONSISTENCIAS CON EL TIPO TORNEOS CREADO EN types.tsx, 
+! REVISAR SI SE DEBE UNIFICAR O SIMPLEMENTE ELIMINAR ESTE ARCHIVO 
 export interface Torneo {
   id?: number;
   nombre: string;
@@ -21,7 +27,8 @@ export interface Torneo {
   contraseña?: string;
   descripcion?: string;
   img?: string;
-}
+} 
+  */
 
 export interface TorneoContextType {
   torneos: Torneo[];

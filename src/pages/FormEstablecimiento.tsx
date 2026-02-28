@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useOneEstablecimiento } from '../hooks/useEstablecimientos.tsx';
 import axios from 'axios';
 import MapaLocalidad from '../components/ApiMaps/MapaLocalidad.tsx';
 import './CrearEquipo.css';
@@ -18,31 +19,18 @@ export default function FormEstablecimiento() {
 
   const isEditing = !!idE;
 
-  useEffect(() => {
-    if (!idE) return;
+  const { establecimiento } = useOneEstablecimiento(idE);
 
-    const fetchEstablecimiento = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:3000/api/establecimientos/${idE}`,
-          {
-            headers: { 'Content-Type': 'application/json' },
-          }
-        );
-        console.log('Fetched establecimiento:', response.data);
-        const data = response.data.data;
-        setForm({
-          nombre: data.nombre,
-          direccion: data.direccion,
-          evento: data.evento,
-        });
-      } catch (error) {
-        console.error('Error fetching establecimiento:', error);
-      }
-    };
-
-    fetchEstablecimiento();
-  }, [idE]);
+useEffect(() => {
+  if (isEditing && establecimiento) {
+    setForm({
+      nombre: establecimiento.nombre,
+      direccion: establecimiento.direccion,
+      evento: establecimiento.evento.toString(),
+    });
+  }
+}, [isEditing, establecimiento]);
+ 
 
   const handleChange = (
     e: React.ChangeEvent<

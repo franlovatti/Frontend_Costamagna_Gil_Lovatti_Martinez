@@ -27,12 +27,10 @@ import DeportesAdmin from './pages/admin/DeportesAdmin.tsx';
 import TorneosAdmin from './pages/admin/TorneosAdmin.tsx';
 import LocalidadesAdmin from './pages/admin/LocalidadesAdmin.tsx';
 import AuthLayout from './components/layout/AuthLayout.tsx';
-import CrearTorneo from './pages/CrearTorneo.tsx';
-import CrearPartido from './pages/CrearPartido.tsx';
+import FormTorneos from './pages/FormTorneos.tsx';
 import FormEstablecimiento from './pages/FormEstablecimiento.tsx';
-import EditarPartido from './pages/EditarPartido.tsx';
+import FormPartido from './pages/FormPartido.tsx';
 import TorneoDetalle from './pages/TorneoDetalle.tsx';
-import EditarTorneo from './pages/EditarTorneo.tsx';
 import CrearEquipo from './pages/CrearEquipo.tsx';
 import EditarEquipo from './pages/EditarEquipo.tsx';
 import CrearParticipacion from './pages/CrearParticipacion.tsx';
@@ -76,22 +74,22 @@ function App() {
                         <Route path="torneos" element={<Torneos />} />
                         <Route
                           path="torneos/crear-torneo"
-                          element={<CrearTorneo />}
+                          element={<FormTorneos />}
                         />
                         <Route path="torneos/:id" element={<TorneoDetalle />} />
                         <Route
                           path="torneos/:id/editar"
-                          element={<EditarTorneo />}
+                          element={<FormTorneos />}
                         />
                         <Route path="noticias" element={<Noticias />} />
                         <Route
                           path="torneos/:id/crear-equipo"
                           element={<CrearEquipo />}
                         />
-                        <Route path="CrearPartido" element={<CrearPartido />} />
+                        <Route path="CrearPartido" element={<FormPartido />} />
                         <Route
                           path="torneos/:id/CrearPartido"
-                          element={<CrearPartido />}
+                          element={<FormPartido />}
                         />
                         <Route
                           path="torneos/:id/ListarEstablecimientos"
@@ -103,7 +101,7 @@ function App() {
                         />
                         <Route
                           path="torneos/:id/EditarPartido/:partidoId"
-                          element={<EditarPartido />}
+                          element={<FormPartido />}
                         />
                         <Route path="mis-torneos" element={<MisTorneos />} />
                         <Route path="equipos/:id" element={<EditarEquipo />} />

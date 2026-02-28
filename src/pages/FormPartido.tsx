@@ -1,22 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useEstablecimientosEvento } from '../hooks/useEstablecimientos';
 import { useEquiposEvento } from '../hooks/useEquipos';
 import { useOnePartido } from '../hooks/usePartidos';
 import axios from 'axios';
-import './cssComponentes/FormTorneos.css';
+import '../components/cssComponentes/FormTorneos.css';
 
-interface FormPartidoProps {
-  id: string;
-  createMode: boolean;
-  partidoId?: string;
-}
 
-export default function FormPartido({
-  id,
-  createMode,
-  partidoId,
-}: FormPartidoProps) {
+export default function FormPartido() {
+  const { id, partidoId } = useParams();
+  const createMode = !partidoId;
   const navigate = useNavigate();
   const [message, setMessage] = useState<string>();
   const [success, setSuccess] = useState(false);
@@ -38,37 +31,12 @@ export default function FormPartido({
     useEstablecimientosEvento(id);
 
   const { equipos, loadingEquipos, errorEquipos } = useEquiposEvento(id);
-
+ 
   const {
     partido,
     loadingPartido,
     errorPartido,
-    setPartido,
-    setLoadingPartido,
-    setErrorPartido,
   } = useOnePartido(partidoId);
-
-  useEffect(() => {
-    if (!partidoId || createMode) return;
-
-    const fetchData = async () => {
-      setLoadingPartido(true);
-      setErrorPartido(null);
-      try {
-        const response = await axios.get(
-          `http://localhost:3000/api/partidos/${partidoId}`
-        );
-        setPartido(response.data.data);
-      } catch (err) {
-        setErrorPartido(err as Error);
-      } finally {
-        setLoadingPartido(false);
-      }
-    };
-
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [partidoId]);
 
   useEffect(() => {
     if (partido && !createMode) {
