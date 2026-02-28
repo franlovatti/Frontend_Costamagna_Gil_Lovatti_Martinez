@@ -5,7 +5,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import '../components/cssComponentes/FormTorneos.css';
 import { useOneTorneo } from '../hooks/useTorneo.tsx';
-import { toIsoDate } from '../utils/toIsoDate.tsx';
 
 export default function FormTorneos() {
   const navigate = useNavigate();
@@ -56,10 +55,10 @@ export default function FormTorneos() {
       nombre: torneo.nombre,
       deporte: torneo.deporte.id, 
       descripcion: torneo.descripcion!,
-      fechaInicioInscripcion: toIsoDate(torneo.fechaInicioInscripcion),
-      fechaFinInscripcion: toIsoDate(torneo.fechaFinInscripcion),
-      fechaInicioTorneo: toIsoDate(torneo.fechaInicioEvento!),
-      fechaFinTorneo: toIsoDate(torneo.fechaFinEvento!),
+      fechaInicioInscripcion: torneo.fechaInicioInscripcion.toISOString().split('T')[0],
+      fechaFinInscripcion: torneo.fechaFinInscripcion.toISOString().split('T')[0],
+      fechaInicioTorneo: torneo.fechaInicioEvento!.toISOString().split('T')[0],
+      fechaFinTorneo: torneo.fechaFinEvento!.toISOString().split('T')[0],
       localidad: torneo.localidad.id,
       esPublico: torneo.esPublico,
       contraseña: torneo.esPublico ? '' : torneo.contraseña!,
