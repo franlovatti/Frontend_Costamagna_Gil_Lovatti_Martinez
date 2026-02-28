@@ -6,10 +6,12 @@ export default function DeportesTable({
   deportes,
   onEdit,
   onDelete,
+  loading
 }: {
   deportes: Deporte[];
   onEdit: (d: Deporte) => void;
   onDelete: (d: Deporte) => void;
+  loading: boolean;
 }) {
   return (
     <div className="table-responsive custom-table-container no-mobile-hide">
@@ -25,7 +27,13 @@ export default function DeportesTable({
           </tr>
         </thead>
         <tbody>
-          {deportes.length === 0 ? (
+          {loading ? (
+            <tr>
+              <td colSpan={6} className="text-center py-5 text-muted-custom">
+                <div className="spinner-border text-primary" role="status"></div>
+              </td>
+            </tr>
+            ) :deportes.length === 0 ? (
             <tr>
               <td colSpan={6} className="text-center py-5 text-muted-custom">
                 No se encontraron deportes

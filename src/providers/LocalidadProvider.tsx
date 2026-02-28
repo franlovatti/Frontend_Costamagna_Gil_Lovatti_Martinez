@@ -16,8 +16,9 @@ const LocalidadProvider = ({ children }: { children: React.ReactNode }) => {
       const response =  await apiAxios.get("localidades")
       setLocalidades(Array.isArray(response.data.data) ? response.data.data : []);
     } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       setLocalidades([]);
-      setError("Error al cargar las localidades: " + error);
+      setError("Error al cargar las localidades: " + (axiosError.response?.data?.message || axiosError.message));
     } finally {
       setLoading(false);
     }
@@ -32,7 +33,7 @@ const LocalidadProvider = ({ children }: { children: React.ReactNode }) => {
       await getLocalidades();
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
-      const errorMsg = axiosError.response?.data?.message || "Error al borrar la localidad";
+      const errorMsg = "Error al borrar la localidad: " + (axiosError.response?.data?.message || axiosError.message);
       setError(errorMsg);
       return false;
     } finally {
@@ -49,7 +50,7 @@ const LocalidadProvider = ({ children }: { children: React.ReactNode }) => {
       await getLocalidades();
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
-      const errorMsg = axiosError.response?.data?.message || "Error al crear la localidad";
+      const errorMsg = "Error al crear la localidad: " + (axiosError.response?.data?.message || axiosError.message);
       setError(errorMsg);
     } finally {
       setLoading(false);

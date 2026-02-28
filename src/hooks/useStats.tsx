@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import apiAxios from "../helpers/api";
+import { AxiosError } from "axios";
 
 export function useStats() {
 
@@ -24,17 +25,30 @@ export function useStats() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [deportesConEventos, setDeportesConEventos] = useState<DeporteConEventos[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
-    apiAxios.get("/admin/stats").then(res => {
-      setStats(res.data);
-      setLoading(false);
-    });
-    apiAxios.get("/admin/stats/deportesStats").then(res => {
-      setDeportesConEventos(res.data);
-      setLoading(false);
-    });
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const [statsRes, deportesRes] = await Promise.all([
+          apiAxios.get("/admin/stats"),
+          apiAxios.get("/admin/stats/deportesStats")
+        ]);
+        setStats(statsRes.data);
+        setDeportesConEventos(deportesRes.data);
+      } catch (err) {
+        const axiosError = err as AxiosError<{ message?: string }>;
+        const message = axiosError.response?.data?.message || "Error al cargar estadísticas";
+        setError(message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
   }, []);
 
-  return { stats, deportesConEventos, loading };
+  return { stats, deportesConEventos, loading, error };
 }

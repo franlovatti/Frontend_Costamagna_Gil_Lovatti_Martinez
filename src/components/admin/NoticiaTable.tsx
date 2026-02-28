@@ -6,10 +6,12 @@ export default function NoticiaTable({
   noticias,
   onEdit,
   onDelete,
+  loading
 }: {
   noticias: Noticia[];
   onEdit: (n: Noticia) => void;
   onDelete: (n: Noticia) => void;
+  loading: boolean;
 }) {
   return (
     <div className="table-responsive custom-table-container no-mobile-hide">
@@ -23,7 +25,13 @@ export default function NoticiaTable({
           </tr>
         </thead>
         <tbody>
-          {noticias.length === 0 ? (
+          {loading ? (
+            <tr>
+              <td colSpan={4} className="text-center py-5 text-muted-custom">
+                <div className="spinner-border text-primary" role="status"></div>
+              </td>
+            </tr>
+            ) : noticias.length === 0 ? (
             <tr>
               <td colSpan={4} className="text-center py-5 text-muted-custom">
                 No se encontraron noticias

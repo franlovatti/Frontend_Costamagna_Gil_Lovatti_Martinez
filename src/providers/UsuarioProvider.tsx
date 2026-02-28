@@ -16,8 +16,9 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
       setUsuarios(Array.isArray(res.data.data) ? res.data.data : []);
       setError(null);
     } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       setUsuarios([]);
-      setError("No se pudieron cargar los usuarios" + error);
+      setError("No se pudieron cargar los usuarios: " + (axiosError.response?.data?.message || axiosError.message));
     }
     setLoading(false);
   }, []);
@@ -31,8 +32,9 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
       setUsuarios(Array.isArray(res.data.data) ? res.data.data : []);
       setError(null);
     } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       setUsuarios([]);
-      setError('No se pudieron cargar los usuarios filtrados' + error);
+      setError('No se pudieron cargar los usuarios filtrados: ' + (axiosError.response?.data?.message || axiosError.message));
     }
     setLoading(false);
   }, []);
@@ -45,10 +47,7 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
       return true;
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
-      const message =
-        axiosError?.response?.data?.message ||
-        axiosError?.message ||
-        "Error al modificar el usuario";
+      const message = axiosError?.response?.data?.message || axiosError?.message || "Error al modificar el usuario";
       setError(message);
       return false;
     }
@@ -60,7 +59,7 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     getUsuarios();
-  }, []);
+  }, [getUsuarios]);
 
   return (
     <UsuarioContext.Provider value={{ usuarios, loading, error, getUsuarios, modificarUsuario, filtrarUsuarios, clearError }}>

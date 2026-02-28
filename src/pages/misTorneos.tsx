@@ -1,48 +1,38 @@
 import { Col, Row, Tab, Tabs } from 'react-bootstrap';
 import CardTorneos from '../components/CardTorneos.tsx';
 import { useNavigate } from 'react-router';
-import apiAxios from '../helpers/api.tsx';
 import { useEffect, useState } from 'react';
-import type { Torneo } from '../types.tsx';
+import type { Torneo } from '../contexts/torneo.tsx';
 import { useAuth } from '../hooks/useAuth.tsx';
+import { useTorneo } from '../hooks/useTorneo.tsx';
 
 export default function MisTorneos() {
+  const { getTorneosCreadosPorUsuario, torneosCreados, getTorneosInscriptoPorUsuario, torneosInscripto, loading, error } = useTorneo();
   const [dataTorneosCreador, setDataTorneosCreador] = useState<Torneo[]>([]);
-  const [dataTorneosInscripto, setDataTorneosInscripto] = useState<Torneo[]>(
-    []
-  );
+  const [dataTorneosInscripto, setDataTorneosInscripto] = useState<Torneo[]>([]);
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const handleClick = (id: number) => {
-    navigate(`/home/torneos/${id}`);
+  const handleClick = (id: number | undefined) => {
+    if (id !== undefined) {
+      navigate(`/home/torneos/${id}`);
+    }
   };
 
-  /*Esto esta mal hecho, deberia crear 2 nuevos endpoints en el back q devuevan directamente todos 
-  los torneos creados por un user y otro de todos los torneos que participa, 
-  lo hice asi con get all para hacerlo rapido */
   useEffect(() => {
-    apiAxios
-      .get('/eventos/creador/' + user?.id)
-      .then((response) => {
-        setDataTorneosCreador(response.data.data);
-        console.log('Torneos creados:', response.data.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching torneos:', error);
-      });
-  }, [user?.id]);
+    if (user?.id) {
+      getTorneosCreadosPorUsuario(Number(user.id));
+      getTorneosInscriptoPorUsuario(Number(user.id));
+    }
+  }, [user?.id, getTorneosCreadosPorUsuario, getTorneosInscriptoPorUsuario]);
 
   useEffect(() => {
-    apiAxios
-      .get('/eventos/participacion/' + user?.id)
-      .then((response) => {
-        setDataTorneosInscripto(response.data.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching torneos:', error);
-      });
-  }, [user?.id]);
+    setDataTorneosCreador(torneosCreados);
+  }, [torneosCreados]);
+
+  useEffect(() => {
+    setDataTorneosInscripto(torneosInscripto);
+  }, [torneosInscripto]);
 
   return (
     <div className="torneos-page-container">
@@ -53,12 +43,31 @@ export default function MisTorneos() {
             Explora tus propios torneos creados y aquellos en los que estás inscripto.
           </p>
         </div>
+        
+        {/* Error de conexión */}
+        {error && !loading && (
+          <div className="alert-danger-custom">
+            ⚠️ {error}
+          </div>
+        )}
+
         <Tabs
           defaultActiveKey="created"
           id="uncontrolled-tab-example"
           className="mb-3 tabs-header"
         >
           <Tab eventKey="created" title="Torneos Creados">
+            {loading ? (
+              <div className="loading-state">
+                <div className="spinner-large"></div>
+                <p>Cargando torneos...</p>
+              </div>
+            ) : dataTorneosCreador.length === 0 ? (
+              <div className="torneos-empty-state">
+                <div className="empty-state-icon">🏆</div>
+                <p className="empty-state-text">No se encontraron torneos</p>
+              </div>
+            ) : (
             <Row>
               {dataTorneosCreador.map((torneo) => (
                 <Col
@@ -77,8 +86,20 @@ export default function MisTorneos() {
                 </Col>
               ))}
             </Row>
+            )}
           </Tab>
           <Tab eventKey="inscript" title="Torneos Inscripto">
+            {loading ? (
+              <div className="loading-state">
+                <div className="spinner-large"></div>
+                <p>Cargando torneos...</p>
+              </div>
+            ) : dataTorneosInscripto.length === 0 ? (
+              <div className="torneos-empty-state">
+                <div className="empty-state-icon">🏆</div>
+                <p className="empty-state-text">No se encontraron torneos</p>
+              </div>
+            ) : (
             <Row>
               {dataTorneosInscripto.map((torneo) => (
                 <Col
@@ -97,6 +118,7 @@ export default function MisTorneos() {
                 </Col>
               ))}
             </Row>
+            )}
           </Tab>
         </Tabs>
       </div>

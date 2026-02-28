@@ -25,6 +25,8 @@ export interface Torneo {
 
 export interface TorneoContextType {
   torneos: Torneo[];
+  torneosCreados: Torneo[];
+  torneosInscripto: Torneo[];
   loading: boolean;
   error: string | null;
   getTorneos: () => void;
@@ -32,6 +34,8 @@ export interface TorneoContextType {
   borrarTorneo: (id: number) => Promise<void>;
   modificarTorneo: (torneo: Torneo) => Promise<void>;
   crearTorneo: (torneo: Torneo) => Promise<void>;
+  getTorneosCreadosPorUsuario: (id: number) => Promise<void>;
+  getTorneosInscriptoPorUsuario: (id: number) => Promise<void>;
 }
 
 export const TorneoContext = createContext<TorneoContextType | null>(null);

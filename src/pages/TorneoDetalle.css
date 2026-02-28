@@ -345,6 +345,30 @@
   gap: 1rem;
 }
 
+.filtros-tabla-partcipantes {
+  display: none;
+}
+
+.filtros-tabla-partcipantes select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: var(--background);
+  color: #ffffff;
+  border: 0.5px solid #3a6ea5;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  outline: none;
+  font-size: 14px;
+  width: 100%;
+  text-align: center;
+}
+
+.filtros-tabla-partcipantes select:hover {
+  background-color: #1a1c21;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .torneo-detalle-inner {
@@ -454,6 +478,10 @@
 
   .header-actions {
     flex-direction: column;
+  }
+
+  .filtros-tabla-partcipantes {
+    display: block;
   }
 }
 
@@ -839,4 +867,12 @@
   color: var(--success);
   font-weight: 500;
   white-space: nowrap;
+}
+
+.table-column-header {
+  cursor: pointer;
+}
+
+.table-column-header:hover {
+  background-color: #1f3a5f;
 }

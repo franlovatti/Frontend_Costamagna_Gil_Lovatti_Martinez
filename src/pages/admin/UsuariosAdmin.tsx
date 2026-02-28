@@ -10,7 +10,7 @@ import Filtros from '../../components/filtros/Filtros.tsx';
 import FiltroSelect from '../../components/filtros/FiltroSelect.tsx';
 
 const UsuariosAdmin = () => {
-  const { usuarios, modificarUsuario, getUsuarios, filtrarUsuarios } = useUsuario();
+  const { usuarios, modificarUsuario, getUsuarios, filtrarUsuarios, loading, error } = useUsuario();
   const { bajaUsuario } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [usuarioAEditar, setUsuarioAEditar] = useState<User | null>(null);
@@ -125,10 +125,18 @@ const UsuariosAdmin = () => {
         />
       </Filtros>
 
+      {/* Error de conexión */}
+      {error && !loading && (
+        <div className="alert-danger-custom">
+          ⚠️ {error}
+        </div>
+      )}
+
       <UserTable
         usuarios={usuariosFiltrados}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        loading={loading}
       />
 
       {showModal && (

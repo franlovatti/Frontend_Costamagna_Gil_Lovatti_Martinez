@@ -71,6 +71,13 @@ export default function LocalidadesAdmin() {
         crear="Localidad"
       />
 
+      {/* Error de conexión */}
+      {error && !loading && (
+        <div className="alert-danger-custom">
+          ⚠️ {error}
+        </div>
+      )}
+
       <div className="table-responsive custom-table-container no-mobile-hide">
         <table className="table custom-table mb-0">
           <thead>

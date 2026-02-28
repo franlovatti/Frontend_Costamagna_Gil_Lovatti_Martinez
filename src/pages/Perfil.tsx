@@ -135,13 +135,13 @@ const Perfil = () => {
         </div>
 
         {showModal && (
-                <UsuarioFormModal
-                  setShowModal={setShowModal}
-                  editingUsuario={editingUser}
-                  onSave={handleSave}
-                  error={error}
-                />
-              )}
+          <UsuarioFormModal
+            setShowModal={setShowModal}
+            editingUsuario={editingUser}
+            onSave={handleSave}
+            error={error}
+          />
+        )}
       </div>
     </div>
   );

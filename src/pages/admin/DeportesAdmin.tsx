@@ -10,7 +10,7 @@ import Filtros from '../../components/filtros/Filtros.tsx';
 import FiltroRango from '../../components/filtros/FiltroRango.tsx';
 
 const DeportesAdmin = () => {
-  const { deportes, borrarDeporte, modificarDeporte, crearDeporte, filtrarDeportes, getDeportes } = useDeporte();
+  const { deportes, borrarDeporte, modificarDeporte, crearDeporte, filtrarDeportes, getDeportes, error, loading } = useDeporte();
   const [searchTerm, setSearchTerm] = useState('');
   const [editingDeporte, setEditingDeporte] = useState<Deporte | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -50,9 +50,7 @@ const DeportesAdmin = () => {
   };
 
   const [showConfirm, setShowConfirm] = useState(false);
-  const [deporteAEliminar, setDeporteAEliminar] = useState<Deporte | null>(
-    null
-  );
+  const [deporteAEliminar, setDeporteAEliminar] = useState<Deporte | null>(null);
 
   const handleDelete = (deporte: Deporte) => {
     setDeporteAEliminar(deporte);
@@ -72,7 +70,7 @@ const DeportesAdmin = () => {
     setDeporteAEliminar(null);
   };
 
-    const [filtros, setFiltros] = useState({
+  const [filtros, setFiltros] = useState({
     cantMaxJug: 0,
     cantMinJug: 0,
     minDesde: 0,
@@ -135,10 +133,18 @@ const DeportesAdmin = () => {
 
       </Filtros>
 
+      {/* Error de conexión */}
+      {error && !loading && (
+        <div className="alert-danger-custom">
+          ⚠️ {error}
+        </div>
+      )}
+      
       <DeportesTable
         deportes={deportesFiltrados}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        loading={loading}
       />
 
       {showModal && (
