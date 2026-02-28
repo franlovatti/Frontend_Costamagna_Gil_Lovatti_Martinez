@@ -12,7 +12,8 @@ export default function TablaEquipos({
   setEnrollPassword,
   setEnrollError,
   setShowEnrollModal,
-  handleDeleteTeam
+  handleDeleteTeam,
+  setAbandono,
 }: {
   torneo: Torneo;
   isMember: (equipo: Equipo) => boolean;
@@ -23,6 +24,7 @@ export default function TablaEquipos({
   setEnrollError: (error: string | null) => void;
   setShowEnrollModal: (show: boolean) => void;
   handleDeleteTeam: (equipoId: number) => void;
+  setAbandono: (abandono: boolean) => void;
 }) {
 
   const navigate = useNavigate();
@@ -84,7 +86,7 @@ export default function TablaEquipos({
                         >
                           Unirse
                         </button>
-                        ) : (
+                        ) : ( 
                           <button className="btn-action btn-disabled" disabled>
                             Unirse
                           </button>
@@ -116,14 +118,25 @@ export default function TablaEquipos({
                           </button>
                         </>
                       ) : isMember(equipo) ? (
-                        <button
-                          className="btn-action"
-                          onClick={() =>
-                            navigate(`/home/equipos/${equipo.id}`)
-                          }
-                        >
-                          Ver equipo
-                        </button>
+                        <>
+                          <button
+                            className="btn-action"
+                            onClick={() =>
+                              navigate(`/home/equipos/${equipo.id}`)
+                            }
+                          >
+                            Ver equipo
+                          </button>
+                          {estaAbiertoPeriodo(
+                          torneo.fechaInicioInscripcion,
+                          torneo.fechaFinInscripcion) && (
+                          <button className="btn-action" onClick={() => {
+                              setSelectedTeam(equipo);
+                              setAbandono(true);
+                            }}>
+                              Abandonar
+                          </button>)}
+                        </>
                       ) : null}
                     </div>
                   </td>

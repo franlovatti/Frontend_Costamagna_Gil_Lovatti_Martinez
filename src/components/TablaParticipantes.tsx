@@ -16,9 +16,10 @@ export default function TablaParticipantes({
       <div className="filtros-tabla-partcipantes">
         <select
           id="criterioOrdenamiento"
+          defaultValue=""
           onChange={(e) => setOrdenarParticipanteCriterio(e.target.value)}
         >
-          <option value="" selected disabled hidden>
+          <option value="" disabled hidden>
             Ordenar Participantes
           </option>
           <option value="faltas">Faltas</option>

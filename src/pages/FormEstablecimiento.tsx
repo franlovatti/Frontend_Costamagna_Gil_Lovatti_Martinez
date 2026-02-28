@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import MapaLocalidad from '../components/apiMaps/MapaLocalidad.tsx';
+import MapaLocalidad from '../components/ApiMaps/MapaLocalidad.tsx';
 import './CrearEquipo.css';
 
 export default function FormEstablecimiento() {
