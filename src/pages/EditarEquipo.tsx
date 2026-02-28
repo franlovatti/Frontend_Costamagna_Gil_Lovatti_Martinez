@@ -4,6 +4,7 @@ import apiAxios from '../helpers/api';
 import { useAuth } from '../hooks/useAuth';
 import type { Equipo, Usuario } from '../types';
 import { Row, Col } from 'react-bootstrap';
+import { InviteModal } from '../components/InviteModal';
 
 export default function EditarEquipo() {
   const { id } = useParams() as { id?: string };
@@ -19,9 +20,12 @@ export default function EditarEquipo() {
   const [saving, setSaving] = useState(false);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<string | number | null>(
-    null
+    null,
   );
   const [removing, setRemoving] = useState(false);
+
+  // Estado para el modal de invitación
+  const [showInviteModal, setShowInviteModal] = useState(false);
 
   const fetchEquipo = useCallback(async () => {
     if (!id) return;
@@ -77,7 +81,7 @@ export default function EditarEquipo() {
       setError(
         errorObj?.response?.data?.message ??
           (err as Error).message ??
-          'Error al eliminar miembro.'
+          'Error al eliminar miembro.',
       );
     } finally {
       setRemoving(false);
@@ -105,7 +109,7 @@ export default function EditarEquipo() {
       setError(
         errorObj?.response?.data?.message ??
           (err as Error).message ??
-          'Error al guardar cambios.'
+          'Error al guardar cambios.',
       );
     } finally {
       setSaving(false);
@@ -236,7 +240,25 @@ export default function EditarEquipo() {
 
         {/* Lista de miembros */}
         <div className="section-container">
-          <h2 className="section-title">Miembros del Equipo</h2>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '1rem',
+            }}
+          >
+            <h2 className="section-title">Miembros del Equipo</h2>
+            {capId === userIdStr && (
+              <button
+                className="action-btn btn-primary-action flex-grow-0"
+                onClick={() => setShowInviteModal(true)}
+                style={{ padding: '8px 16px', fontSize: '0.9rem' }}
+              >
+                + Invitar Miembro
+              </button>
+            )}
+          </div>
           <div className="custom-table-container no-mobile-hide">
             <table className="custom-table">
               <thead>
@@ -248,7 +270,8 @@ export default function EditarEquipo() {
                 </tr>
               </thead>
               <tbody>
-                {Array.isArray(equipo.miembros) && equipo.miembros.length > 0 ? (
+                {Array.isArray(equipo.miembros) &&
+                equipo.miembros.length > 0 ? (
                   (equipo.miembros as Usuario[]).map((miembro, idx) => {
                     const memberId = miembro.id ?? miembro.usuario ?? '';
                     const memberIdStr = String(memberId);
@@ -297,7 +320,10 @@ export default function EditarEquipo() {
 
         {/* Botones de acción */}
         <div className="action-buttons-section">
-          <button className="action-btn btn-secondary-action" onClick={() => navigate(-1)}>
+          <button
+            className="action-btn btn-secondary-action"
+            onClick={() => navigate(-1)}
+          >
             ← Volver
           </button>
           {capId === userIdStr && (
@@ -365,6 +391,15 @@ export default function EditarEquipo() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modal para invitar miembros */}
+      {showInviteModal && id && (
+        <InviteModal
+          equipoId={Number(id)}
+          isOpen={showInviteModal}
+          onClose={() => setShowInviteModal(false)}
+        />
       )}
     </div>
   );
