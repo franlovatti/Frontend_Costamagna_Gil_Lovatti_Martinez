@@ -3,7 +3,9 @@ import apiAxios from '../helpers/api';
 import type { Localidad, Deporte } from '../types';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import './cssComponentes/FormTorneos.css';
+import '../components/cssComponentes/FormTorneos.css';
+import { useOneTorneo } from '../hooks/useTorneo.tsx';
+import { toIsoDate } from '../utils/toIsoDate.tsx';
 
 export default function FormTorneos() {
   const navigate = useNavigate();
@@ -27,6 +29,8 @@ export default function FormTorneos() {
   const [errorConexion, setErrorConexion] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const {torneo} = useOneTorneo(id);
+
   const isEditing = !!id;
 
   useEffect(() => {
@@ -45,24 +49,26 @@ export default function FormTorneos() {
   }, []);
 
   useEffect(() => {
-    if (!id) return;
-    apiAxios.get(`/eventos/${id}`).then((res) => {
-      const torneo = res.data.data;
+    if(!torneo)return;
+    try{
+      console.log("Torneo fetched successfully:", torneo);
       setForm({
-        nombre: torneo.nombre,
-        deporte: torneo.deporte.id,
-        descripcion: torneo.descripcion,
-        fechaInicioInscripcion: torneo.fechaInicioInscripcion.split('T')[0],
-        fechaFinInscripcion: torneo.fechaFinInscripcion.split('T')[0],
-        fechaInicioTorneo: torneo.fechaInicioEvento.split('T')[0],
-        fechaFinTorneo: torneo.fechaFinEvento.split('T')[0],
-        localidad: torneo.localidad.id,
-        esPublico: torneo.esPublico,
-        contraseña: torneo.esPublico ? '' : torneo.contraseña,
-        cantidadEquipos: torneo.cantEquiposMax,
-      });
+      nombre: torneo.nombre,
+      deporte: torneo.deporte.id, 
+      descripcion: torneo.descripcion!,
+      fechaInicioInscripcion: toIsoDate(torneo.fechaInicioInscripcion),
+      fechaFinInscripcion: toIsoDate(torneo.fechaFinInscripcion),
+      fechaInicioTorneo: toIsoDate(torneo.fechaInicioEvento!),
+      fechaFinTorneo: toIsoDate(torneo.fechaFinEvento!),
+      localidad: torneo.localidad.id,
+      esPublico: torneo.esPublico,
+      contraseña: torneo.esPublico ? '' : torneo.contraseña!,
+      cantidadEquipos: torneo.cantEquiposMax,
     });
-  }, [id]);
+    } catch(error){
+      console.error("Error setting form data:", error);
+    }
+  }, [torneo])
 
   useEffect(() => {
     if (error || errorConexion){
@@ -392,6 +398,7 @@ export default function FormTorneos() {
                     className="form-input"
                     min={2}
                     max={64}
+                    value={form.cantidadEquipos}
                     onChange={handleChange}
                     required
                   />
