@@ -129,13 +129,15 @@ export default function UsuarioFormModal({
           <input type="text" className="d-none" {...register('role')} />
         <div className="d-flex gap-3">
             <button
+              type="button"
               className="btn btn-cancel-custom flex-grow-1"
-              //onClick={() => setShowModal(false)}
+              onClick={() => setShowModal(false)}
               disabled={isSubmitting}
             >
               Cancelar
             </button>
             <button
+              type="submit"
               className="btn btn-save-custom flex-grow-1"
               disabled={isSubmitting}
             >

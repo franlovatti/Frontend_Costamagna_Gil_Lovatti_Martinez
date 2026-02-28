@@ -105,7 +105,7 @@ export default function LocalidadesAdmin() {
               </tr>
             ) : (
               localidadesFiltradas.map((n) => (
-              <tr>
+              <tr key={n.id}>
                 <td>{n.descripcion}</td>
                 <td>{n.lat}</td>
                 <td>{n.lng}</td>

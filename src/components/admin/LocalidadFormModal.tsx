@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Localidad } from '../../contexts/localidad.tsx';
-import MapaLocalidad from '../apiMaps/MapaLocalidad.tsx';
+import MapaLocalidad from '../ApiMaps/MapaLocalidad.tsx';
 import '../cssComponentes/DeporteFormModal.css';
 import '../cssComponentes/ConfirmModal.css';
 
@@ -56,6 +56,7 @@ export default function LocalidadFormModal({setShowModal,onSave}: LocalidadFormM
 
           <div className="d-flex gap-3">
             <button
+              type="button"
               className="btn btn-cancel-custom flex-grow-1"
               onClick={() => setShowModal(false)}
             >

@@ -72,7 +72,7 @@ export default function TablaParticipantes({
                   </td>
                   <td>
                     {participante.equipos.map((equipo) => (
-                      <span>{equipo.nombre}</span>
+                      <span key={equipo.id}>{equipo.nombre}</span>
                     ))}
                   </td>
                   <td>
@@ -114,7 +114,7 @@ export default function TablaParticipantes({
                 <div className="equipo-info-row">
                   <span className="equipo-info-label">Equipo</span>
                   {participante.equipos.map((equipo: Equipo) => (
-                    <span>{equipo.nombre}</span>
+                    <span key={equipo.id}>{equipo.nombre}</span>
                   ))}
                 </div>
                 <div className="equipo-info-row">

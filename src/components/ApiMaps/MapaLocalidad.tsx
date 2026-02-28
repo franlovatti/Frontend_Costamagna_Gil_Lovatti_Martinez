@@ -40,6 +40,7 @@ export default function MapaLocalidad({ onSelect, className, placeholder, locali
     <input
       ref={inputRef}
       type="text"
+      name="localidad"
       value={valor}
       placeholder={placeholder ?? "Buscar ciudad o localidad"}
       className={`form-control ${className ?? ""}`}

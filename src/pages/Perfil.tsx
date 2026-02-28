@@ -116,7 +116,7 @@ const Perfil = () => {
             <div className="row g-3 mb-4">
               {stats.map((stat, index) => (
                 loadingEquipos ? (
-                <div className="stat-card d-flex align-items-center justify-content-center" style={{ minHeight: 120 }}>
+                <div key={index} className="stat-card d-flex align-items-center justify-content-center" style={{ minHeight: 120 }}>
                   <div className="spinner-border text-primary" role="status"></div>
                 </div>
                 ) : (
