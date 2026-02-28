@@ -22,8 +22,6 @@ import Noticias from './pages/Noticias.tsx';
 import Perfil from './pages/Perfil.tsx';
 import Login from './pages/Login.tsx';
 import Registro from './pages/Registro.tsx';
-import ForgottenPassword from './pages/ForgottenPassword.tsx';
-import ChangePassword from './pages/ChangePassword.tsx';
 import Dashboard from './pages/admin/Dashboard.tsx';
 import DeportesAdmin from './pages/admin/DeportesAdmin.tsx';
 import TorneosAdmin from './pages/admin/TorneosAdmin.tsx';
@@ -58,14 +56,7 @@ function App() {
                       <Route index element={<MainHome />} />
                       <Route path="Login" element={<Login />} />
                       <Route path="Registro" element={<Registro />}></Route>
-                      <Route
-                        path="ForgottenPassword"
-                        element={<ForgottenPassword />}
-                      ></Route>
-                      <Route
-                        path="ChangePassword"
-                        element={<ChangePassword />}
-                      ></Route>
+
                       <Route
                         path="unirse-equipo"
                         element={<UnirseEquipo />}

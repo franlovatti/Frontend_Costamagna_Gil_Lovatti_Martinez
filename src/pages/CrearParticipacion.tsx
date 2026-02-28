@@ -1,18 +1,20 @@
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router';
-import apiAxios from '../helpers/api.tsx';
-import { useEffect, useState, useCallback } from 'react';
-import type { Partido, Usuario, Participation } from '../types.tsx';
+import { useEffect, useState } from 'react';
+import type { Usuario, Participation } from '../types.tsx';
+import type { ParticipacionPayload, ParticipacionEditPayload } from '../hooks/useParticipaciones';
 import './Participacion.css';
+import { useParticipacion } from '../hooks/useParticipaciones.ts';
+import { useOnePartido } from '../hooks/usePartidos.tsx';
+import ConfirmModal from '../components/ConfirmModal.tsx';
 
 export default function CrearParticipacion() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-
-  const [partido, setPartido] = useState<Partido | null>(null);
+  const { crearParticipacion, editarParticipacion, borrarParticipacion, traerParticipacionesEquipo, loading, error, participaciones } = useParticipacion();
+  const { partido } = useOnePartido(id);
   const [miembrosLocal, setMiembrosLocal] = useState<Usuario[]>([]);
   const [miembrosVisitante, setMiembrosVisitante] = useState<Usuario[]>([]);
-  const [participaciones, setParticipaciones] = useState<Participation[]>([]);
   const [equipoSeleccionado, setEquipoSeleccionado] = useState<
     'local' | 'visitante'
   >('local');
@@ -34,44 +36,21 @@ export default function CrearParticipacion() {
     puntos: '',
   });
 
-  const traerPartido = useCallback(async () => {
-    try {
-      const response = await apiAxios.get(`/partidos/${id}`);
-      setPartido(response.data.data);
-      setMiembrosLocal(response.data.data.equipoLocal.miembros);
-      setMiembrosVisitante(response.data.data.equipoVisitante.miembros);
-    } catch (error) {
-      console.error('Error al traer el partido:', error);
-    }
-  }, [id]);
-
   const equipoid =
     equipoSeleccionado === 'local'
-      ? String(partido?.equipoLocal?.id)
-      : String(partido?.equipoVisitante?.id);
+      ? partido?.equipoLocal?.id ?? 0
+      : partido?.equipoVisitante?.id ?? 0;
 
-  const traerParticipaciones = useCallback(async () => {
-    if (!id || !equipoid || equipoid === 'undefined') return;
-    try {
-      const response = await apiAxios.get(
-        `/participaciones/participacionesxequipo`,
-        {
-          params: { partidoId: id, equipoid },
-        }
-      );
-      setParticipaciones(response.data.data);
-    } catch (error) {
-      console.error('Error al traer las participaciones:', error);
+  useEffect(() => {
+    setMiembrosLocal(partido?.equipoLocal?.miembros ?? []);
+    setMiembrosVisitante(partido?.equipoVisitante?.miembros ?? []);
+  }, [partido]);
+
+  useEffect(() => {
+    if (id && equipoid && equipoid > 0) {
+      traerParticipacionesEquipo(id, String(equipoid));
     }
-  }, [id, equipoid]);
-
-  useEffect(() => {
-    traerPartido();
-  }, [traerPartido]);
-
-  useEffect(() => {
-    traerParticipaciones();
-  }, [traerParticipaciones]);
+  }, [traerParticipacionesEquipo, id, equipoid]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -87,20 +66,18 @@ export default function CrearParticipacion() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const payload = {
-      usuario: form.usuarioId,
+    const payload: ParticipacionPayload = {
+      usuario: Number(form.usuarioId),
       minutosjugados: Number(form.minutosjugados),
       faltas: Number(form.faltas),
       puntos: Number(form.puntos),
       partido: Number(id),
     };
 
-    try {
-      await apiAxios.post('/participaciones', payload);
-      await traerParticipaciones();
+    const success = await crearParticipacion(payload);
+    if (success) {
+      await traerParticipacionesEquipo(id, String(equipoid));
       setForm({ usuarioId: '', minutosjugados: '', faltas: '', puntos: '' });
-    } catch (error) {
-      console.error('Error al crear la participación:', error);
     }
   };
 
@@ -134,15 +111,16 @@ export default function CrearParticipacion() {
     e.preventDefault();
     if (!editingId) return;
     const payload = {
-      usuario: editForm.usuarioId,
+      id: editingId,
+      usuario: Number(editForm.usuarioId),
       minutosjugados: Number(editForm.minutosjugados),
       faltas: Number(editForm.faltas),
       puntos: Number(editForm.puntos),
       partido: Number(id),
     };
-    try {
-      await apiAxios.put(`/participaciones/${editingId}`, payload);
-      await traerParticipaciones();
+    const success = await editarParticipacion(payload as ParticipacionEditPayload);
+    if (success) {
+      await traerParticipacionesEquipo(id, String(equipoid));
       setShowEditModal(false);
       setEditingId(null);
       setEditForm({
@@ -151,8 +129,6 @@ export default function CrearParticipacion() {
         faltas: '',
         puntos: '',
       });
-    } catch (error) {
-      console.error('Error al guardar la participación:', error);
     }
   };
 
@@ -164,17 +140,18 @@ export default function CrearParticipacion() {
   const handleConfirmDelete = async () => {
     if (!participacionAEliminar) return;
     const participacionId = participacionAEliminar.id;
-    try {
-      await apiAxios.delete(`/participaciones/${participacionId}`);
-      setParticipaciones((prev) =>
-        prev.filter((p) => p.id !== participacionId)
-      );
+    const success = await borrarParticipacion(participacionId);
+    if (success) {
       if (editingId === participacionId) handleCancelEdit();
       setShowDeleteModal(false);
-      await traerParticipaciones();
-    } catch (error) {
-      console.error('Error al eliminar la participación:', error);
+      await traerParticipacionesEquipo(id, String(equipoid));
+      setParticipacionAEliminar(null);
     }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+    setParticipacionAEliminar(null);
   };
 
   if (!partido || !partido.equipoLocal || !partido.equipoVisitante) {
@@ -301,10 +278,15 @@ export default function CrearParticipacion() {
               </div>
             </div>
             <div className="form-actions">
-              <button type="submit" className="btn-primary-participacion">
-                Agregar Participación
+              <button 
+                type="submit" 
+                className="btn-primary-participacion"
+                disabled={loading}
+              >
+                {loading ? 'Guardando...' : 'Agregar Participación'}
               </button>
             </div>
+            {error && <p className="error-message" style={{color: 'red', marginTop: '8px'}}>{error}</p>}
           </form>
         </div>
 
@@ -448,13 +430,19 @@ export default function CrearParticipacion() {
                   type="button"
                   className="btn-cancel-custom"
                   onClick={handleCancelEdit}
+                  disabled={loading}
                 >
                   Cancelar
                 </button>
-                <button type="submit" className="btn-save-custom">
-                  Guardar Cambios
+                <button 
+                  type="submit" 
+                  className="btn-save-custom"
+                  disabled={loading}
+                >
+                  {loading ? 'Guardando...' : 'Guardar Cambios'}
                 </button>
               </div>
+              {error && <p className="error-message" style={{color: 'red', marginTop: '8px'}}>{error}</p>}
             </form>
           </div>
         </div>
@@ -462,504 +450,15 @@ export default function CrearParticipacion() {
 
       {/* Modal de confirmación de eliminación */}
       {showDeleteModal && (
-        <div
-          className="modal-overlay-participacion"
-          onClick={() => setShowDeleteModal(false)}
-        >
-          <div
-            className="modal-content-participacion"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="modal-header-participacion">
-              <h3 className="modal-title-participacion">
-                Eliminar Participación
-              </h3>
-              <button
-                className="modal-close-btn"
-                onClick={() => setShowDeleteModal(false)}
-              >
-                ✕
-              </button>
-            </div>
-            <div className="modal-body-participacion">
-              <p>
-                ¿Estás seguro de eliminar la participación de{' '}
-                <strong>
-                  {participacionAEliminar?.usuario?.nombre ?? ''}{' '}
-                  {participacionAEliminar?.usuario?.apellido ?? ''}
-                </strong>
-                ?
-              </p>
-            </div>
-            <div className="modal-footer-participacion">
-              <button
-                className="btn-cancel-custom"
-                onClick={() => setShowDeleteModal(false)}
-              >
-                Cancelar
-              </button>
-              <button
-                className="btn-action btn-delete"
-                onClick={handleConfirmDelete}
-              >
-                Eliminar
-              </button>
-            </div>
-          </div>
-        </div>
+        <ConfirmModal
+          objeto="eliminar la participación"
+          asunto={`de ${participacionAEliminar?.usuario.nombre} ${participacionAEliminar?.usuario.apellido}`}
+          setShowConfirm={setShowDeleteModal}
+          handleConfirmDelete={handleConfirmDelete}
+          handleCancelDelete={handleCancelDelete}
+        />
       )}
     </div>
   );
 }
 
-// import { useParams } from 'react-router';
-// import { useNavigate } from 'react-router';
-// import apiAxios from '../helpers/api.tsx';
-// import { useEffect, useState, useCallback } from 'react';
-// import {
-//   Card,
-//   Nav,
-//   Form,
-//   Button,
-//   Row,
-//   Col,
-//   Modal,
-//   Table,
-// } from 'react-bootstrap';
-// import type { Partido, Usuario, Participation } from '../types.tsx';
-
-// export default function CrearParticipacion() {
-//   const { id } = useParams<{ id: string }>();
-//   const navigate = useNavigate();
-
-//   const [partido, setPartido] = useState<Partido | null>(null);
-//   const [miembrosLocal, setMiembrosLocal] = useState<Usuario[]>([]);
-//   const [miembrosVisitante, setMiembrosVisitante] = useState<Usuario[]>([]);
-//   const [participaciones, setParticipaciones] = useState<Participation[]>([]);
-//   const [equipoSeleccionado, setEquipoSeleccionado] = useState<
-//     'local' | 'visitante'
-//   >('local');
-//   const [editingId, setEditingId] = useState<number | null>(null);
-//   const [showEditModal, setShowEditModal] = useState<boolean>(false);
-//   const [editForm, setEditForm] = useState({
-//     usuarioId: '',
-//     minutosjugados: '',
-//     faltas: '',
-//     puntos: '',
-//   });
-//   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
-//   const [participacionAEliminar, setParticipacionAEliminar] =
-//     useState<Participation | null>(null);
-//   const [form, setForm] = useState({
-//     usuarioId: '',
-//     minutosjugados: '',
-//     faltas: '',
-//     puntos: '',
-//   });
-
-//   const traerPartido = useCallback(async () => {
-//     try {
-//       const response = await apiAxios.get(`/partidos/${id}`);
-//       setPartido(response.data.data);
-//       setMiembrosLocal(response.data.data.equipoLocal.miembros);
-//       setMiembrosVisitante(response.data.data.equipoVisitante.miembros);
-//     } catch (error) {
-//       console.error('Error al traer el partido:', error);
-//     }
-//   }, [id]);
-
-//   const equipoid =
-//     equipoSeleccionado === 'local'
-//       ? String(partido?.equipoLocal?.id)
-//       : String(partido?.equipoVisitante?.id);
-
-//   const traerParticipaciones = useCallback(async () => {
-//     if (!id || !equipoid || equipoid === 'undefined') return;
-//     try {
-//       const response = await apiAxios.get(
-//         `/participaciones/participacionesxequipo`,
-//         {
-//           params: { partidoId: id, equipoid },
-//         }
-//       );
-//       setParticipaciones(response.data.data);
-//     } catch (error) {
-//       console.error('Error al traer las participaciones:', error);
-//     }
-//   }, [id, equipoid]);
-
-//   useEffect(() => {
-//     traerPartido();
-//   }, [traerPartido]);
-
-//   useEffect(() => {
-//     traerParticipaciones();
-//   }, [traerParticipaciones]);
-
-//   const handleChange = (
-//     e: React.ChangeEvent<
-//       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-//     >
-//   ) => {
-//     const { name, value } = e.target;
-//     setForm((prev) => ({
-//       ...prev,
-//       [name]: value,
-//     }));
-//   };
-
-//   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-//     e.preventDefault();
-//     const payload = {
-//       usuario: form.usuarioId,
-//       minutosjugados: Number(form.minutosjugados),
-//       faltas: Number(form.faltas),
-//       puntos: Number(form.puntos),
-//       partido: Number(id),
-//     };
-
-//     try {
-//       await apiAxios.post('/participaciones', payload);
-//       await traerParticipaciones();
-//       setForm({ usuarioId: '', minutosjugados: '', faltas: '', puntos: '' });
-//     } catch (error) {
-//       console.error('Error al crear la participación:', error);
-//     }
-//   };
-
-//   const handleEdit = (p: Participation) => {
-//     setEditingId(p.id);
-//     setEditForm({
-//       usuarioId: String(p.usuario.id),
-//       minutosjugados: String(p.minutosjugados ?? ''),
-//       faltas: String(p.faltas ?? ''),
-//       puntos: String(p.puntos ?? ''),
-//     });
-//     setShowEditModal(true);
-//   };
-
-//   const handleCancelEdit = () => {
-//     setEditingId(null);
-//     setEditForm({ usuarioId: '', minutosjugados: '', faltas: '', puntos: '' });
-//     setShowEditModal(false);
-//   };
-
-//   const handleEditChange = (
-//     e: React.ChangeEvent<
-//       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-//     >
-//   ) => {
-//     const { name, value } = e.target;
-//     setEditForm((prev) => ({ ...prev, [name]: value }));
-//   };
-
-//   const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-//     e.preventDefault();
-//     if (!editingId) return;
-//     const payload = {
-//       usuario: editForm.usuarioId,
-//       minutosjugados: Number(editForm.minutosjugados),
-//       faltas: Number(editForm.faltas),
-//       puntos: Number(editForm.puntos),
-//       partido: Number(id),
-//     };
-//     try {
-//       await apiAxios.put(`/participaciones/${editingId}`, payload);
-//       await traerParticipaciones();
-//       setShowEditModal(false);
-//       setEditingId(null);
-//       setEditForm({
-//         usuarioId: '',
-//         minutosjugados: '',
-//         faltas: '',
-//         puntos: '',
-//       });
-//     } catch (error) {
-//       console.error('Error al guardar la participación:', error);
-//     }
-//   };
-
-//   const askDelete = (p: Participation) => {
-//     setParticipacionAEliminar(p);
-//     setShowDeleteModal(true);
-//   };
-
-//   const handleConfirmDelete = async () => {
-//     if (!participacionAEliminar) return;
-//     const participacionId = participacionAEliminar.id;
-//     try {
-//       await apiAxios.delete(`/participaciones/${participacionId}`);
-//       setParticipaciones((prev) =>
-//         prev.filter((p) => p.id !== participacionId)
-//       );
-//       if (editingId === participacionId) handleCancelEdit();
-//       setShowDeleteModal(false);
-//       await traerParticipaciones();
-//     } catch (error) {
-//       console.error('Error al eliminar la participación:', error);
-//     }
-//   };
-
-//   if (!partido || !partido.equipoLocal || !partido.equipoVisitante) {
-//     return <div>Cargando...</div>;
-//   }
-
-//   const miembros =
-//     equipoSeleccionado === 'local' ? miembrosLocal : miembrosVisitante;
-//   const equipo =
-//     equipoSeleccionado === 'local'
-//       ? partido.equipoLocal
-//       : partido.equipoVisitante;
-
-//   return (
-//     <div className="text-bg-dark container">
-//       <Row className="text-center p-3">
-//         <Col>
-//           <Nav
-//             variant="tabs"
-//             activeKey={equipoSeleccionado}
-//             onSelect={(selectedKey) =>
-//               setEquipoSeleccionado(selectedKey as 'local' | 'visitante')
-//             }
-//           >
-//             <Nav.Item>
-//               <Nav.Link eventKey="local">
-//                 {partido.equipoLocal?.nombre || 'Equipo Local'}
-//               </Nav.Link>
-//             </Nav.Item>
-//             <Nav.Item>
-//               <Nav.Link eventKey="visitante">
-//                 {partido.equipoVisitante?.nombre || 'Equipo Visitante'}
-//               </Nav.Link>
-//             </Nav.Item>
-//           </Nav>
-//         </Col>
-//       </Row>
-
-//       <Card className="bg-bs-dark text-bg-dark border border-primary mt-2">
-//         <Card.Body>
-//           <Card.Title>Crear Participación para {equipo.nombre}</Card.Title>
-//           <Form onSubmit={handleSubmit}>
-//             <Form.Group className="mb-3">
-//               <Form.Label>Jugador</Form.Label>
-//               <Form.Select
-//                 className="bg-bs-dark text-bg-dark border border-primary"
-//                 name="usuarioId"
-//                 value={form.usuarioId}
-//                 onChange={handleChange}
-//                 required
-//               >
-//                 <option value="">Seleccione un jugador</option>
-//                 {miembros
-//                   ?.filter(
-//                     (miembro) =>
-//                       !participaciones.some((p) => p.usuario.id === miembro.id)
-//                   )
-//                   .map((miembro) => (
-//                     <option key={miembro.id} value={miembro.id}>
-//                       {miembro.nombre}
-//                     </option>
-//                   ))}
-//               </Form.Select>
-//             </Form.Group>
-//             <Form.Group className="mb-3">
-//               <Form.Label>Minutos Jugados</Form.Label>
-//               <Form.Control
-//                 className="bg-bs-dark text-bg-dark border border-primary"
-//                 type="number"
-//                 name="minutosjugados"
-//                 value={form.minutosjugados}
-//                 onChange={handleChange}
-//                 min={0}
-//               />
-//             </Form.Group>
-//             <Form.Group className="mb-3">
-//               <Form.Label>Faltas</Form.Label>
-//               <Form.Control
-//                 className="bg-bs-dark text-bg-dark border border-primary"
-//                 type="number"
-//                 name="faltas"
-//                 value={form.faltas}
-//                 onChange={handleChange}
-//                 min={0}
-//               />
-//             </Form.Group>
-//             <Form.Group className="mb-3">
-//               <Form.Label>Puntos</Form.Label>
-//               <Form.Control
-//                 className="bg-bs-dark text-bg-dark border border-primary"
-//                 type="number"
-//                 name="puntos"
-//                 value={form.puntos}
-//                 onChange={handleChange}
-//                 min={0}
-//               />
-//             </Form.Group>
-//             <div className="d-flex gap-2">
-//               <Button variant="primary" type="submit">
-//                 Crear Participación
-//               </Button>
-//             </div>
-//           </Form>
-//         </Card.Body>
-//       </Card>
-
-//       <Card className="bg-bs-dark text-bg-dark border border-primary mt-3">
-//         <Card.Body>
-//           <Card.Title>Participaciones de {equipo.nombre}</Card.Title>
-//           <Table
-//             striped
-//             bordered
-//             hover
-//             responsive
-//             size="sm"
-//             className="mb-0 table-dark align-middle"
-//           >
-//             <thead>
-//               <tr>
-//                 <th>Nombre</th>
-//                 <th>Apellido</th>
-//                 <th>Puntos</th>
-//                 <th>Minutos</th>
-//                 <th>Faltas</th>
-//                 <th style={{ width: 170 }}>Acciones</th>
-//               </tr>
-//             </thead>
-//             <tbody>
-//               {participaciones?.map((participacion) => (
-//                 <tr key={participacion.id}>
-//                   <td>{participacion.usuario?.nombre ?? ''}</td>
-//                   <td>{participacion.usuario?.apellido ?? ''}</td>
-//                   <td>{participacion.puntos}</td>
-//                   <td>{participacion.minutosjugados}</td>
-//                   <td>{participacion.faltas}</td>
-//                   <td>
-//                     <div className="d-flex gap-2">
-//                       <Button
-//                         size="sm"
-//                         variant="outline-warning"
-//                         onClick={() => handleEdit(participacion)}
-//                       >
-//                         Modificar
-//                       </Button>
-//                       <Button
-//                         size="sm"
-//                         variant="outline-danger"
-//                         onClick={() => askDelete(participacion)}
-//                       >
-//                         Eliminar
-//                       </Button>
-//                     </div>
-//                   </td>
-//                 </tr>
-//               ))}
-//             </tbody>
-//           </Table>
-//         </Card.Body>
-//       </Card>
-
-//       <Modal
-//         show={showEditModal}
-//         onHide={handleCancelEdit}
-//         centered
-//         contentClassName="bg-bs-dark text-bg-dark border border-primary"
-//       >
-//         <Form onSubmit={handleEditSubmit}>
-//           <Modal.Header
-//             data-bs-theme="dark"
-//             closeButton
-//             className="border-primary"
-//           >
-//             <Modal.Title>Editar participación</Modal.Title>
-//           </Modal.Header>
-//           <Modal.Body>
-//             <div className="mb-2" style={{ opacity: 0.85 }}>
-//               Jugador:{' '}
-//               <strong>
-//                 {participaciones.find((p) => p.id === editingId)?.usuario
-//                   ?.nombre ?? ''}
-//               </strong>
-//             </div>
-//             <Row>
-//               <Col md={4}>
-//                 <Form.Group className="mb-3">
-//                   <Form.Label>Puntos</Form.Label>
-//                   <Form.Control
-//                     type="number"
-//                     name="puntos"
-//                     value={editForm.puntos}
-//                     onChange={handleEditChange}
-//                     min={0}
-//                   />
-//                 </Form.Group>
-//               </Col>
-//               <Col md={4}>
-//                 <Form.Group className="mb-3">
-//                   <Form.Label>Minutos</Form.Label>
-//                   <Form.Control
-//                     type="number"
-//                     name="minutosjugados"
-//                     value={editForm.minutosjugados}
-//                     onChange={handleEditChange}
-//                     min={0}
-//                   />
-//                 </Form.Group>
-//               </Col>
-//               <Col md={4}>
-//                 <Form.Group className="mb-3">
-//                   <Form.Label>Faltas</Form.Label>
-//                   <Form.Control
-//                     type="number"
-//                     name="faltas"
-//                     value={editForm.faltas}
-//                     onChange={handleEditChange}
-//                     min={0}
-//                   />
-//                 </Form.Group>
-//               </Col>
-//             </Row>
-//           </Modal.Body>
-//           <Modal.Footer className="border-primary">
-//             <Button variant="secondary" onClick={handleCancelEdit}>
-//               Cancelar
-//             </Button>
-//             <Button variant="primary" type="submit">
-//               Guardar cambios
-//             </Button>
-//           </Modal.Footer>
-//         </Form>
-//       </Modal>
-
-//       {/* Modal Confirmación Eliminar */}
-//       <Modal
-//         show={showDeleteModal}
-//         onHide={() => setShowDeleteModal(false)}
-//         centered
-//         contentClassName="bg-bs-dark text-bg-dark border border-primary"
-//       >
-//         <Modal.Header closeButton className="border-primary">
-//           <Modal.Title>Eliminar participación</Modal.Title>
-//         </Modal.Header>
-//         <Modal.Body>
-//           ¿Estás seguro de eliminar la participación de
-//           {` ${participacionAEliminar?.usuario?.nombre ?? ''}`}?
-//         </Modal.Body>
-//         <Modal.Footer className="border-primary">
-//           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-//             Cancelar
-//           </Button>
-//           <Button variant="danger" onClick={handleConfirmDelete}>
-//             Eliminar
-//           </Button>
-//         </Modal.Footer>
-//       </Modal>
-//       <Button
-//         className="mb-3 mt-3"
-//         variant="primary"
-//         onClick={() => navigate(`/home/torneos/${partido.evento.id}`)}
-//       >
-//         volver
-//       </Button>
-//     </div>
-//   );
-// }
