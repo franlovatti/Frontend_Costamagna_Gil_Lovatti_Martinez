@@ -43,6 +43,7 @@ import UsuariosAdmin from './pages/admin/UsuariosAdmin.tsx';
 import NoticiasAdmin from './pages/admin/NoticiasAdmin.tsx';
 import PartidoDetalle from './pages/PartidoDetalle.tsx';
 import ListarEstablecimientos from './pages/ListarEstablecimientos.tsx';
+import UnirseEquipo from './pages/UnirseEquipo.tsx';
 
 function App() {
   return (
@@ -66,6 +67,10 @@ function App() {
                       <Route
                         path="ChangePassword"
                         element={<ChangePassword />}
+                      ></Route>
+                      <Route
+                        path="unirse-equipo"
+                        element={<UnirseEquipo />}
                       ></Route>
                     </Route>
                     <Route
@@ -110,10 +115,7 @@ function App() {
                           element={<EditarPartido />}
                         />
                         <Route path="mis-torneos" element={<MisTorneos />} />
-                        <Route
-                          path="equipos/:id"
-                          element={<EditarEquipo />}
-                        />
+                        <Route path="equipos/:id" element={<EditarEquipo />} />
                         <Route
                           path="participaciones/:id"
                           element={<CrearParticipacion />}
@@ -122,18 +124,23 @@ function App() {
                           path="partido-detalle/:id"
                           element={<PartidoDetalle />}
                         ></Route>
-                        
-                        <Route path="perfil" element={
-                          <UsuariosProvider>
-                          <Perfil />
-                          </UsuariosProvider>}
+
+                        <Route
+                          path="perfil"
+                          element={
+                            <UsuariosProvider>
+                              <Perfil />
+                            </UsuariosProvider>
+                          }
                         />
                       </Route>
                     </Route>
 
                     {/* Rutas con el AuthLayout - Area Protegida */}
                     <Route
-                      element={<ProtectedRoute allowedRoles={['Administrador']} />}
+                      element={
+                        <ProtectedRoute allowedRoles={['Administrador']} />
+                      }
                     >
                       <Route path="admin" element={<AuthLayout />}>
                         <Route index element={<Dashboard />} />
@@ -147,27 +154,19 @@ function App() {
                         />
                         <Route
                           path="/admin/deportes"
-                          element={
-                            <DeportesAdmin />
-                          }
+                          element={<DeportesAdmin />}
                         />
                         <Route
                           path="/admin/noticias"
-                          element={
-                            <NoticiasAdmin />
-                          }
+                          element={<NoticiasAdmin />}
                         />
                         <Route
                           path="/admin/torneos"
-                          element={
-                            <TorneosAdmin />
-                          }
+                          element={<TorneosAdmin />}
                         />
                         <Route
                           path="/admin/localidades"
-                          element={
-                            <LocalidadesAdmin />
-                          }
+                          element={<LocalidadesAdmin />}
                         />
                       </Route>
                     </Route>
