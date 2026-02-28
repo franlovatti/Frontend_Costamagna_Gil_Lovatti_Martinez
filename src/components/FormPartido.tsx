@@ -240,7 +240,7 @@ export default function FormPartido({
                         : 'Seleccione el equipo local'}
                     </option>
                     {!loadingEquipos &&
-                      equipos.map((equipo) => (
+                      equipos?.map((equipo) => (
                         <option
                           key={equipo.id}
                           value={equipo.id}
@@ -267,7 +267,7 @@ export default function FormPartido({
                     disabled={loadingEquipos}
                   >
                     <option value="">Seleccione el equipo visitante</option>
-                    {equipos.map((equipo) => (
+                    {equipos?.map((equipo) => (
                       <option
                         key={equipo.id}
                         value={equipo.id}
@@ -359,12 +359,12 @@ export default function FormPartido({
                     <option value="">
                       {loadingEstablecimientos
                         ? 'Cargando establecimientos...'
-                        : establecimientos.length === 0
+                        : establecimientos?.length === 0
                         ? 'No hay establecimientos disponibles'
                         : 'Seleccione el establecimiento'}
                     </option>
                     {!loadingEstablecimientos &&
-                      establecimientos.map((establecimiento) => (
+                      establecimientos?.map((establecimiento) => (
                         <option key={establecimiento.id} value={establecimiento.id}>
                           {establecimiento.nombre} - {establecimiento.direccion}
                         </option>

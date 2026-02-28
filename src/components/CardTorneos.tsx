@@ -1,4 +1,5 @@
 import type { Torneo } from '../contexts/torneo';
+import { estaAbiertoPeriodo } from '../helpers/convertirFechas.tsx';
 
 interface CardTorneosProps {
   torneo: Torneo;
@@ -94,7 +95,7 @@ export default function CardTorneos({
           <button
             className="btn-inscribirse"
             onClick={handleEnrollClick}
-            disabled={isMember}
+            disabled={isMember || !estaAbiertoPeriodo(torneo.fechaInicioInscripcion, torneo.fechaFinInscripcion)}
           >
             {isMember ? 'Ya inscripto' : 'Inscribirse'}
           </button>

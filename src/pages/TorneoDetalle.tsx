@@ -1,38 +1,60 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router-dom';
-import type { Equipo, Participation, Partido, Torneo, Usuario } from '../types';
+import type { Equipo, Participation, Partido, Usuario, Stats } from '../types';
 import { Row, Col } from 'react-bootstrap';
-import apiAxios from '../helpers/api';
 import { useAuth } from '../hooks/useAuth';
 import './TorneoDetalle.css';
 import { useParticipantesEvento } from '../hooks/useUsuario.tsx';
+import { useTorneo } from '../hooks/useTorneo.tsx'; 
+import { useBorrarEquipo, useInscribirseEquipo } from '../hooks/useEquipos.tsx';
+import { useBorrarPartido, useCargarResultados } from '../hooks/usePartidos.tsx';
+import ConfirmModal from '../components/ConfirmModal.tsx';
+import {formatFecha, compararFechas, estaAbiertoPeriodo, getFechaString} from '../helpers/convertirFechas';
+import TablaEquipos from '../components/TablaEquipos.tsx';
+import TablaPartidos from '../components/TablaPartidos.tsx';
+import TablaParticipantes from '../components/TablaParticipantes.tsx';
+import ModalInscripcion from '../components/ModalInscripcion.tsx';
+import ModalResultados from '../components/ModalResultados.tsx';
+
 
 export default function TorneoDetalle() {
-  const [torneo, setTorneo] = useState<Torneo | null>(null);
+  const { torneo, getUnTorneo, borrarTorneo, error: errorTorneo, loading: loadingTorneo } = useTorneo();
+  const [showConfirmTorneo, setShowConfirmTorneo] = useState(false);
+  const [showConfirmEquipo, setShowConfirmEquipo] = useState(false);
+  const [equipoAEliminar, setEquipoAEliminar] = useState<number>(0);
+  const { borrarEquipo, loading: loadingBorrarEquipo, error: errorBorrarEquipo } = useBorrarEquipo();
+  const { borrarPartido, loading: loadingBorrarPartido, error: errorBorrarPartido } = useBorrarPartido();
+  const { cargarResultados, loading: loadingCargarResultados, error: errorCargarResultados } = useCargarResultados();
+  const [showConfirmPartido, setShowConfirmPartido] = useState(false);
+  const [partidoAEliminar, setPartidoAEliminar] = useState<number>(0);
+  const { inscribirseEquipo, loading: loadingInscribirse, error: errorInscribirse } = useInscribirseEquipo();
   const [showEnrollModal, setShowEnrollModal] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<Equipo | null>(null);
   const [enrollPassword, setEnrollPassword] = useState('');
   const [enrollError, setEnrollError] = useState<string | null>(null);
-  const [enrolling, setEnrolling] = useState(false);
   const [resultadoModal, setResultadoModal] = useState(false);
   const [resultadoLocal, setResultadoLocal] = useState<string>('');
   const [resultadoVisitante, setResultadoVisitante] = useState<string>('');
-  const [partidoSeleccionado, setPartidoSeleccionado] =
-    useState<Partido | null>(null);
-  const [ordenarParticipanteCriterio, setOrdenarParticipanteCriterio] =
-    useState<string>('puntos');
+  const [partidoSeleccionado, setPartidoSeleccionado] = useState<Partido | null>(null);
+  const [ordenarParticipanteCriterio, setOrdenarParticipanteCriterio] = useState<string>('puntos');
   const [tabKey, setTabKey] = useState<string>('');
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchTorneo();
-  }, [id]);
+    getUnTorneo(Number(id));
+  }, [id, getUnTorneo]);
 
-  const { participantes: participantesDesordenados } =
-    useParticipantesEvento(id);
+  useEffect(() => {
+    if (torneo && torneo.partidos && torneo.partidos.length > 0) {
+      const firstDate = getFechaString(torneo.partidos[0].fecha);
+      setTabKey(firstDate);
+    }
+  }, [torneo]);
+
+  const { participantes: participantesDesordenados } = useParticipantesEvento(id);
 
   const calcularStats = (participations: Participation[] | undefined) => {
     if (!participations)
@@ -49,16 +71,9 @@ export default function TorneoDetalle() {
     );
   };
 
-  type stats = {
-    puntos: number;
-    minutosjugados: number;
-    faltas: number;
-    equipo: number;
-  };
-
   const ordenarParticipantes = (
     participantes: Usuario[],
-    c: keyof stats = 'puntos',
+    c: keyof Stats = 'puntos',
   ) => {
     return [...participantes].sort((a, b) => {
       const statsA = calcularStats(a.participations);
@@ -67,26 +82,8 @@ export default function TorneoDetalle() {
     });
   };
 
-  const participantes = ordenarParticipantes(
-    participantesDesordenados,
-    ordenarParticipanteCriterio as keyof stats,
+  const participantes = ordenarParticipantes( participantesDesordenados, ordenarParticipanteCriterio as keyof Stats,
   );
-
-  const fetchTorneo = async () => {
-    if (!id) return;
-    try {
-      const res = await apiAxios.get(`/eventos/${id}`);
-      setTorneo(res.data.data);
-      // Set primera fecha como tab activo
-      const partidos = res.data.data.partidos || [];
-      if (partidos.length > 0 && !tabKey) {
-        const firstDate = new Date(partidos[0].fecha).toDateString();
-        setTabKey(firstDate);
-      }
-    } catch (err) {
-      console.error('Error fetching torneo:', err);
-    }
-  };
 
   const userIsMember = (): boolean => {
     if (!user || !torneo?.equipos) return false;
@@ -117,17 +114,52 @@ export default function TorneoDetalle() {
   };
 
   const handleDeleteTeam = async (id: number) => {
-    if (!confirm('¿Estás seguro de eliminar este equipo?')) return;
-    try {
-      await apiAxios.delete(`/equipos/${id}`);
-      fetchTorneo();
-    } catch (err) {
-      console.error('Error eliminando equipo:', err);
+    setEquipoAEliminar(id);
+    setShowConfirmEquipo(true);
+  };
+  const handleConfirmDeleteEquipo = async () => {
+    if (equipoAEliminar) {
+      const success = await borrarEquipo(equipoAEliminar);
+      if (success) {
+        await getUnTorneo(Number(id));
+      }
     }
+    setShowConfirmEquipo(false);
+    setEquipoAEliminar(0);
+  };
+  const handleCancelDeleteEquipo = () => {
+    setShowConfirmEquipo(false);
+    setEquipoAEliminar(0);
+  };
+
+  const handleDeletePartido = async (id: number) => {
+    setPartidoAEliminar(id);
+    setShowConfirmPartido(true);
+  };
+  const handleConfirmDeletePartido = async () => {
+    if (partidoAEliminar) {
+      const success = await borrarPartido(partidoAEliminar);
+      if (success) {
+        await getUnTorneo(Number(id));
+      }
+    }
+    setShowConfirmPartido(false);
+    setPartidoAEliminar(0);
+  };
+  const handleCancelDeletePartido = () => {
+    setShowConfirmPartido(false);
+    setPartidoAEliminar(0);
   };
 
   const handleInscribe = async () => {
     if (!selectedTeam) return;
+    
+    // Validar que las inscripciones estén abiertas
+    if (!estaAbiertoPeriodo(torneo?.fechaInicioInscripcion, torneo?.fechaFinInscripcion)) {
+      setEnrollError('Las inscripciones no están abiertas en este momento');
+      return;
+    }
+    
     if (!selectedTeam.esPublico && enrollPassword.trim() === '') {
       setEnrollError('La contraseña es obligatoria para este equipo');
       return;
@@ -136,97 +168,46 @@ export default function TorneoDetalle() {
       setEnrollError('La contraseña es incorrecta');
       return;
     }
-    setEnrollError(null);
-    setEnrolling(true);
-    try {
-      const userId = Number(user?.id);
-      const body: Record<string, unknown> = { usuarioId: userId };
-      if (!selectedTeam.esPublico) body.contraseña = enrollPassword;
-      await apiAxios.post(`/equipos/${selectedTeam.id}/miembros`, body);
-      await fetchTorneo();
+    
+    const userId = Number(user?.id);
+    const success = await inscribirseEquipo(selectedTeam, enrollPassword, userId);
+    if (success) {
       setShowEnrollModal(false);
-    } catch (err: unknown) {
-      console.error('Error al inscribirse:', err);
-      let message = 'Error al inscribirse';
-      if (typeof err === 'object' && err !== null) {
-        const errObj = err as Record<string, unknown>;
-        if (
-          'response' in errObj &&
-          typeof errObj.response === 'object' &&
-          errObj.response !== null
-        ) {
-          const resp = errObj.response as Record<string, unknown>;
-          if (
-            'data' in resp &&
-            typeof resp.data === 'object' &&
-            resp.data !== null
-          ) {
-            const data = resp.data as Record<string, unknown>;
-            if ('message' in data) message = String(data.message);
-          }
-        } else if ('message' in errObj) {
-          message = String((errObj as { message: unknown }).message);
-        }
-      } else if (typeof err === 'string') {
-        message = err;
-      }
-      setEnrollError(message);
-    } finally {
-      setEnrolling(false);
+      await getUnTorneo(Number(id));
     }
   };
 
   const handleCargarResultado = async () => {
     if (!partidoSeleccionado) return;
-    try {
-      await apiAxios.put(`/partidos/${partidoSeleccionado.id}`, {
-        resultadoLocal: resultadoLocal === '' ? null : Number(resultadoLocal),
-        resultadoVisitante:
-          resultadoVisitante === '' ? null : Number(resultadoVisitante),
-      });
+    const success = await cargarResultados(
+      partidoSeleccionado.id,
+      resultadoLocal,
+      resultadoVisitante
+    );
+    if (success) {
       setResultadoModal(false);
       setResultadoLocal('');
       setResultadoVisitante('');
       setPartidoSeleccionado(null);
-      await fetchTorneo();
-    } catch (err) {
-      console.error('Error al cargar resultado:', err);
+      await getUnTorneo(Number(id));
     }
   };
 
-  const handleDelete = async () => {
-    if (
-      !confirm(
-        '¿Estás seguro de eliminar este torneo? Esta acción no se puede deshacer.',
-      )
-    )
-      return;
-    if (!id) return;
-    try {
-      await apiAxios.delete(`/eventos/${id}`);
-      navigate('/home/torneos');
-    } catch (error) {
-      console.error('Error eliminando torneo:', error);
+  const handleConfirmDeleteTorneo = async () => {
+    if (torneo?.id) {
+      borrarTorneo(torneo.id);
+      if (!errorTorneo) navigate('/home/torneos');
     }
-  };
-
-  const handleDeletePartido = async (partidoId: number) => {
-    if (!confirm('¿Estás seguro de eliminar este partido?')) return;
-    try {
-      await apiAxios.delete(`/partidos/${partidoId}`);
-      fetchTorneo();
-    } catch (error) {
-      console.error('Error eliminando partido:', error);
-    }
+    setShowConfirmTorneo(false);
   };
 
   const partidosOrdenados = [...(torneo?.partidos || [])].sort(
-    (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime(),
+    (a, b) => compararFechas(a.fecha, b.fecha),
   );
 
   const partidosPorFecha = partidosOrdenados.reduce(
     (acc, partido) => {
-      const fechaKey = new Date(partido.fecha).toDateString();
+      const fechaKey = getFechaString(partido.fecha);
       if (!acc[fechaKey]) acc[fechaKey] = [];
       acc[fechaKey].push(partido);
       return acc;
@@ -236,10 +217,13 @@ export default function TorneoDetalle() {
 
   const isCreator = Number(user?.id) === torneo?.creador;
 
-  if (!torneo)
+  if (loadingTorneo || !torneo)
     return (
       <div className="torneo-detalle-container">
-        <div className="loading-state">Cargando torneo...</div>
+        <div className="loading-state">
+          <div className="spinner-large"></div>
+          <p>Cargando torneo...</p>
+        </div>
       </div>
     );
   return (
@@ -264,7 +248,7 @@ export default function TorneoDetalle() {
                 </button>
                 <button
                   className="btn-header-action btn-delete-header"
-                  onClick={handleDelete}
+                  onClick={() => setShowConfirmTorneo(true)}
                 >
                   Eliminar
                 </button>
@@ -276,16 +260,16 @@ export default function TorneoDetalle() {
             <Col>
               <p>
                 <strong>Duracion:</strong>{' '}
-                {new Date(torneo.fechaInicioEvento).toLocaleDateString()}{' '}
-                {' - '} {new Date(torneo.fechaFinEvento).toLocaleDateString()}
+                {formatFecha(torneo.fechaInicioEvento)}{' '}
+                {' - '} {formatFecha(torneo.fechaFinEvento)}
               </p>
             </Col>
             <Col>
               <p>
                 <strong>Inscripciones:</strong>{' '}
-                {new Date(torneo.fechaInicioInscripcion).toLocaleDateString()}{' '}
+                {formatFecha(torneo.fechaInicioInscripcion)}{' '}
                 {' - '}{' '}
-                {new Date(torneo.fechaFinInscripcion).toLocaleDateString()}
+                {formatFecha(torneo.fechaFinInscripcion)}
               </p>
             </Col>
           </Row>
@@ -302,6 +286,13 @@ export default function TorneoDetalle() {
             </Col>
           </Row>
         </div>
+
+      {/* Error de conexión */}
+      {(errorTorneo || errorBorrarPartido || errorBorrarEquipo) && (!loadingTorneo && !loadingBorrarPartido && !loadingBorrarEquipo) && (
+        <div className="alert-danger-custom">
+          ⚠️ {errorTorneo || errorBorrarPartido || errorBorrarEquipo}
+        </div>
+      )}
 
         {/* Equipos Info y Status */}
         <div className="equipos-status-section">
@@ -337,6 +328,10 @@ export default function TorneoDetalle() {
             </button>
           )}
           {!userIsMember() ? (
+            estaAbiertoPeriodo(
+                  torneo.fechaInicioInscripcion,
+                  torneo.fechaFinInscripcion
+                ) ? (
             <button
               onClick={() =>
                 navigate(`/home/torneos/${torneo.id}/crear-equipo`)
@@ -344,13 +339,18 @@ export default function TorneoDetalle() {
               className="action-btn btn-primary-action"
             >
               Inscribir Equipo
-            </button>
+            </button>) : (
+              <button className="action-btn btn-disabled" disabled>
+                Inscribir Equipo
+              </button>
+            )
           ) : (
             <button className="action-btn btn-disabled" disabled>
               ✓ Equipo Inscrito
             </button>
           )}
           {isCreator && (
+            (torneo.equipos && torneo.equipos.length > 1) ? (
             <button
               onClick={() =>
                 navigate(`/home/torneos/${torneo.id}/crearPartido`)
@@ -359,775 +359,108 @@ export default function TorneoDetalle() {
             >
               Crear Partidos
             </button>
+            ) : (
+              <button className="action-btn btn-disabled" disabled>
+                Crear Partidos
+              </button>
+            )
           )}
         </div>
 
         {/* Tabla de Equipos */}
-        <div className="section-container">
-          <h2 className="section-title">Equipos Participantes</h2>
-
-          {/* Versión Desktop - Tabla */}
-          <div className="custom-table-container">
-            <table className="custom-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Equipo</th>
-                  <th>Jugadores</th>
-                  <th>Tipo</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {torneo.equipos && torneo.equipos.length > 0 ? (
-                  torneo.equipos.map((equipo: Equipo, idx: number) => (
-                    <tr key={equipo.id}>
-                      <td>{idx + 1}</td>
-                      <td className="team-name-cell">{equipo.nombre}</td>
-                      <td>
-                        <span className="jugadores-badge">
-                          {equipo.miembros?.length ?? 0}/
-                          {torneo.deporte?.cantMaxJugadores ?? '-'}
-                        </span>
-                      </td>
-                      <td>
-                        <span
-                          className={`badge-custom ${
-                            equipo.esPublico
-                              ? 'badge-equipo'
-                              : 'badge-individual'
-                          }`}
-                        >
-                          {equipo.esPublico ? 'Público' : 'Privado'}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="table-actions">
-                          {!userIsMember() ? (
-                            <button
-                              className="btn-action"
-                              onClick={() => {
-                                setSelectedTeam(equipo);
-                                setEnrollPassword('');
-                                setEnrollError(null);
-                                setShowEnrollModal(true);
-                              }}
-                            >
-                              Unirse
-                            </button>
-                          ) : isCaptain(equipo) ? (
-                            <>
-                              <button
-                                className="btn-action btn-delete"
-                                onClick={() => handleDeleteTeam(equipo.id)}
-                              >
-                                Eliminar
-                              </button>
-                              <button
-                                className="btn-action"
-                                onClick={() =>
-                                  navigate(`/home/equipos/${equipo.id}`)
-                                }
-                              >
-                                Ver equipo
-                              </button>
-                            </>
-                          ) : isMember(equipo) ? (
-                            <button
-                              className="btn-action"
-                              onClick={() =>
-                                navigate(`/home/equipos/${equipo.id}`)
-                              }
-                            >
-                              Ver equipo
-                            </button>
-                          ) : null}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={5} className="empty-state-cell">
-                      No hay equipos inscritos aún
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Versión Mobile - Cards */}
-          <div className="equipos-mobile-list">
-            {torneo.equipos && torneo.equipos.length > 0 ? (
-              torneo.equipos.map((equipo: Equipo, idx: number) => (
-                <div key={equipo.id} className="equipo-mobile-card">
-                  <div className="equipo-mobile-header">
-                    <div className="equipo-mobile-number">{idx + 1}</div>
-                    <div className="equipo-mobile-name">{equipo.nombre}</div>
-                  </div>
-                  <div className="equipo-mobile-info">
-                    <div className="equipo-info-row">
-                      <span className="equipo-info-label">Jugadores</span>
-                      <span className="jugadores-badge">
-                        {equipo.miembros?.length ?? 0}/
-                        {torneo.deporte?.cantMaxJugadores ?? '-'}
-                      </span>
-                    </div>
-                    <div className="equipo-info-row">
-                      <span className="equipo-info-label">Tipo</span>
-                      <span
-                        className={`badge-custom ${
-                          equipo.esPublico ? 'badge-equipo' : 'badge-individual'
-                        }`}
-                      >
-                        {equipo.esPublico ? 'Público' : 'Privado'}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="equipo-mobile-actions">
-                    {!userIsMember() ? (
-                      <button
-                        className="btn-action"
-                        onClick={() => {
-                          setSelectedTeam(equipo);
-                          setEnrollPassword('');
-                          setEnrollError(null);
-                          setShowEnrollModal(true);
-                        }}
-                      >
-                        Unirse
-                      </button>
-                    ) : isCaptain(equipo) ? (
-                      <>
-                        <button
-                          className="btn-action"
-                          onClick={() =>
-                            navigate(`/home/equipos/${equipo.id}/editar`)
-                          }
-                        >
-                          Editar
-                        </button>
-                        <button
-                          className="btn-action"
-                          onClick={() => navigate(`/home/equipos/${equipo.id}`)}
-                        >
-                          Ver equipo
-                        </button>
-                        <button
-                          className="btn-action btn-delete"
-                          onClick={() => handleDeleteTeam(equipo.id)}
-                        >
-                          Eliminar
-                        </button>
-                      </>
-                    ) : isMember(equipo) ? (
-                      <button
-                        className="btn-action"
-                        onClick={() => navigate(`/home/equipos/${equipo.id}`)}
-                      >
-                        Ver equipo
-                      </button>
-                    ) : null}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="empty-state">
-                <div className="empty-state-icon">👥</div>
-                <p className="empty-state-text">No hay equipos inscritos aún</p>
-              </div>
-            )}
-          </div>
-        </div>
+        <TablaEquipos
+          torneo={torneo}
+          isMember={isMember}
+          userIsMember={userIsMember}
+          isCaptain={isCaptain}
+          setSelectedTeam={setSelectedTeam}
+          setEnrollPassword={setEnrollPassword}
+          setEnrollError={setEnrollError}
+          setShowEnrollModal={setShowEnrollModal}
+          handleDeleteTeam={handleDeleteTeam}
+        />
 
         {/* Partidos por Fecha */}
-        <div className="section-container">
-          <h2 className="section-title">Partidos</h2>
-          {Object.keys(partidosPorFecha).length > 0 ? (
-            <div className="tabs-container">
-              <div className="tabs-header">
-                {Object.entries(partidosPorFecha).map(([fecha], idx) => (
-                  <button
-                    key={fecha}
-                    className={`tab-button ${tabKey === fecha ? 'active' : ''}`}
-                    onClick={() => setTabKey(fecha)}
-                  >
-                    Fecha {idx + 1}
-                    <span className="tab-date">
-                      {new Date(fecha).toLocaleDateString('es-AR')}
-                    </span>
-                  </button>
-                ))}
-              </div>
-              <div className="tab-content">
-                {Object.entries(partidosPorFecha).map(
-                  ([fecha, partidos]) =>
-                    tabKey === fecha && (
-                      <div key={fecha}>
-                        {/* Versión Desktop - Tabla */}
-                        <div className="custom-table-container">
-                          <table className="custom-table partidos-table">
-                            <thead>
-                              <tr>
-                                <th>#</th>
-                                <th>Fecha</th>
-                                <th>Hora</th>
-                                <th>Establecimiento</th>
-                                <th>Local</th>
-                                <th>Visitante</th>
-                                <th>Resultado</th>
-                                <th>Acciones</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {partidos.map((partido, i) => (
-                                <tr key={partido.id}>
-                                  <td>{i + 1}</td>
-                                  <td>
-                                    {new Date(
-                                      partido.fecha,
-                                    ).toLocaleDateString()}
-                                  </td>
-                                  <td>{partido.hora}</td>
-                                  <td>
-                                    {partido.establecimiento?.nombre || '-'}
-                                  </td>
-                                  <td className="team-name-cell">
-                                    {partido.equipoLocal.nombre}
-                                  </td>
-                                  <td className="team-name-cell">
-                                    {partido.equipoVisitante.nombre}
-                                  </td>
-                                  <td>
-                                    {partido.resultadoLocal != null &&
-                                    partido.resultadoVisitante != null ? (
-                                      <span className="resultado-badge">
-                                        {partido.resultadoLocal} -{' '}
-                                        {partido.resultadoVisitante}
-                                      </span>
-                                    ) : (
-                                      <span className="resultado-pending">
-                                        -
-                                      </span>
-                                    )}
-                                  </td>
-                                  <td>
-                                    <div className="table-actions">
-                                      <button
-                                        onClick={() =>
-                                          navigate(
-                                            `/home/partido-detalle/${partido.id}`,
-                                          )
-                                        }
-                                        className="btn-action btn-small"
-                                      >
-                                        Ver Partido
-                                      </button>
-                                      {isCreator && (
-                                        <>
-                                          <button
-                                            onClick={() =>
-                                              navigate(
-                                                `/home/Participaciones/${partido.id}`,
-                                              )
-                                            }
-                                            className="btn-action btn-small"
-                                          >
-                                            Participaciones
-                                          </button>
-                                          <button
-                                            onClick={() =>
-                                              navigate(
-                                                `/home/torneos/${torneo.id}/EditarPartido/${partido.id}`,
-                                              )
-                                            }
-                                            className="btn-action btn-small"
-                                          >
-                                            Editar
-                                          </button>
-                                          <button
-                                            className="btn-action btn-small"
-                                            onClick={() => {
-                                              setPartidoSeleccionado(partido);
-                                              setResultadoLocal(
-                                                partido.resultadoLocal == null
-                                                  ? ''
-                                                  : String(
-                                                      partido.resultadoLocal,
-                                                    ),
-                                              );
-                                              setResultadoVisitante(
-                                                partido.resultadoVisitante ==
-                                                  null
-                                                  ? ''
-                                                  : String(
-                                                      partido.resultadoVisitante,
-                                                    ),
-                                              );
-                                              setResultadoModal(true);
-                                            }}
-                                          >
-                                            Resultado
-                                          </button>
-                                          <button
-                                            className="btn-action btn-delete btn-small"
-                                            onClick={() =>
-                                              handleDeletePartido(partido.id)
-                                            }
-                                          >
-                                            Eliminar
-                                          </button>
-                                        </>
-                                      )}
-                                    </div>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-
-                        {/* Versión Mobile - Cards */}
-                        <div className="partidos-mobile-list">
-                          {partidos.map((partido, i) => (
-                            <div
-                              key={partido.id}
-                              className="partido-mobile-card"
-                            >
-                              <div className="partido-mobile-header">
-                                <div className="partido-number-badge">
-                                  {i + 1}
-                                </div>
-                                <div className="partido-date-time">
-                                  <div className="partido-date">
-                                    {new Date(
-                                      partido.fecha,
-                                    ).toLocaleDateString()}
-                                  </div>
-                                  <div className="partido-time">
-                                    {partido.hora}
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="partido-teams-section">
-                                <div className="partido-team-row">
-                                  <div>
-                                    <div className="partido-team-label">
-                                      Local
-                                    </div>
-                                    <div className="partido-team-name">
-                                      {partido.equipoLocal.nombre}
-                                    </div>
-                                  </div>
-                                  {partido.resultadoLocal != null && (
-                                    <div className="partido-score">
-                                      {partido.resultadoLocal}
-                                    </div>
-                                  )}
-                                </div>
-                                <div className="partido-vs">vs</div>
-                                <div className="partido-team-row">
-                                  <div>
-                                    <div className="partido-team-label">
-                                      Visitante
-                                    </div>
-                                    <div className="partido-team-name">
-                                      {partido.equipoVisitante.nombre}
-                                    </div>
-                                  </div>
-                                  {partido.resultadoVisitante != null && (
-                                    <div className="partido-score">
-                                      {partido.resultadoVisitante}
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-
-                              {partido.establecimiento && (
-                                <div className="partido-info-grid">
-                                  <div className="partido-info-item">
-                                    <span className="partido-info-label">
-                                      Establecimiento
-                                    </span>
-                                    <span className="partido-info-value">
-                                      {partido.establecimiento.nombre}
-                                    </span>
-                                  </div>
-                                  <div className="partido-info-item">
-                                    <span className="partido-info-label">
-                                      Estado
-                                    </span>
-                                    {partido.resultadoLocal != null &&
-                                    partido.resultadoVisitante != null ? (
-                                      <span className="resultado-badge">
-                                        Finalizado
-                                      </span>
-                                    ) : (
-                                      <span className="partido-info-value">
-                                        Pendiente
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-
-                              <div className="partido-mobile-actions">
-                                <button
-                                  onClick={() =>
-                                    navigate(
-                                      `/home/partido-detalle/${partido.id}`,
-                                    )
-                                  }
-                                  className="btn-action"
-                                >
-                                  Ver Partido
-                                </button>
-                                {isCreator && (
-                                  <>
-                                    <button
-                                      onClick={() =>
-                                        navigate(
-                                          `/home/Participaciones/${partido.id}`,
-                                        )
-                                      }
-                                      className="btn-action"
-                                    >
-                                      📋 Participaciones
-                                    </button>
-                                    <button
-                                      onClick={() =>
-                                        navigate(
-                                          `/home/torneos/${torneo.id}/EditarPartido/${partido.id}`,
-                                        )
-                                      }
-                                      className="btn-action"
-                                    >
-                                      ✏️ Editar Partido
-                                    </button>
-                                    <button
-                                      className="btn-action"
-                                      onClick={() => {
-                                        setPartidoSeleccionado(partido);
-                                        setResultadoLocal(
-                                          partido.resultadoLocal == null
-                                            ? ''
-                                            : String(partido.resultadoLocal),
-                                        );
-                                        setResultadoVisitante(
-                                          partido.resultadoVisitante == null
-                                            ? ''
-                                            : String(
-                                                partido.resultadoVisitante,
-                                              ),
-                                        );
-                                        setResultadoModal(true);
-                                      }}
-                                    >
-                                      📊 Cargar Resultado
-                                    </button>
-                                    <button
-                                      className="btn-action btn-delete"
-                                      onClick={() =>
-                                        handleDeletePartido(partido.id)
-                                      }
-                                    >
-                                      🗑️ Eliminar
-                                    </button>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ),
-                )}
-              </div>
-            </div>
-          ) : (
-            <div className="empty-state">
-              <div className="empty-state-icon">⚽</div>
-              <p className="empty-state-text">
-                No hay partidos programados aún
-              </p>
-            </div>
-          )}
-        </div>
+        <TablaPartidos
+          partidosPorFecha={partidosPorFecha}
+          tabKey={tabKey}
+          setTabKey={setTabKey}
+          torneo={torneo}
+          isCreator={isCreator}
+          setPartidoSeleccionado={setPartidoSeleccionado}
+          setResultadoLocal={setResultadoLocal}
+          setResultadoVisitante={setResultadoVisitante}
+          setResultadoModal={setResultadoModal}
+          handleDeletePartido={handleDeletePartido}
+        />
 
         {/*Tabla de Participantes*/}
-        <div className="section-container">
-          <h2 className="section-title">Tabla de Participantes</h2>
+        <TablaParticipantes
+          participantes={participantes}
+          setOrdenarParticipanteCriterio={setOrdenarParticipanteCriterio}
+          calcularStats={calcularStats}
+         />
 
-          <div className="filtros-tabla-partcipantes">
-            <select
-              id="criterioOrdenamiento"
-              onChange={(e) => setOrdenarParticipanteCriterio(e.target.value)}
-            >
-              <option value="" selected disabled hidden>
-                Ordenar Participantes
-              </option>
-              <option value="faltas">Faltas</option>
-              <option value="minutosjugados">Minutos Jugados</option>
-              <option value="puntos">Puntos</option>
-              <option value="equipo">Equipo</option>
-            </select>
-          </div>
-
-          {/* Versión Desktop - Tabla */}
-          <div className="custom-table-container">
-            <table className="custom-table">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th
-                    className="table-column-header"
-                    onClick={() => setOrdenarParticipanteCriterio('equipo')}
-                  >
-                    Equipo
-                  </th>
-                  <th
-                    className="table-column-header"
-                    onClick={() => setOrdenarParticipanteCriterio('faltas')}
-                  >
-                    Faltas
-                  </th>
-                  <th
-                    className="table-column-header"
-                    onClick={() =>
-                      setOrdenarParticipanteCriterio('minutosjugados')
-                    }
-                  >
-                    Minutos Jugados
-                  </th>
-                  <th
-                    className="table-column-header"
-                    onClick={() => setOrdenarParticipanteCriterio('puntos')}
-                  >
-                    Puntos
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {participantes && participantes.length > 0 ? (
-                  participantes.map((participante: Usuario) => (
-                    <tr key={participante.id}>
-                      <td>
-                        {participante.nombre + ' ' + participante.apellido}
-                      </td>
-                      <td>
-                        {participante.equipos.map((equipo) => (
-                          <span>{equipo.nombre}</span>
-                        ))}
-                      </td>
-                      <td>
-                        {calcularStats(participante.participations)?.faltas}
-                      </td>
-                      <td>
-                        {
-                          calcularStats(participante.participations)
-                            ?.minutosjugados
-                        }
-                      </td>
-                      <td>
-                        {calcularStats(participante.participations)?.puntos}
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={5} className="empty-state-cell">
-                      No hay participaciones registradas aún
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Versión Mobile - Cards */}
-          <div className="equipos-mobile-list">
-            {participantes && participantes.length > 0 ? (
-              participantes.map((participante: Usuario) => (
-                <div key={participante.id} className="equipo-mobile-card">
-                  <div className="equipo-mobile-header">
-                    <div className="equipo-mobile-name">
-                      {participante.nombre + ' ' + participante.apellido}
-                    </div>
-                  </div>
-                  <div className="equipo-mobile-info">
-                    <div className="equipo-info-row">
-                      <span className="equipo-info-label">Equipo</span>
-                      {participante.equipos.map((equipo: Equipo) => (
-                        <span>{equipo.nombre}</span>
-                      ))}
-                    </div>
-                    <div className="equipo-info-row">
-                      <span className="equipo-info-label">Faltas</span>
-                      <span>
-                        {calcularStats(participante.participations)?.faltas}
-                      </span>
-                    </div>
-                    <div className="equipo-info-row">
-                      <span className="equipo-info-label">Minutos Jugados</span>
-                      <span>
-                        {
-                          calcularStats(participante.participations)
-                            ?.minutosjugados
-                        }
-                      </span>
-                    </div>
-                    <div className="equipo-info-row">
-                      <span className="equipo-info-label">Puntos</span>
-                      <span>
-                        {calcularStats(participante.participations)?.puntos}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="empty-state">
-                <div className="empty-state-icon">👥</div>
-                <p className="empty-state-text">No hay Participantes aún</p>
-              </div>
-            )}
-          </div>
-        </div>
       </div>
 
       {/* Modal de Inscripción */}
       {showEnrollModal && (
-        <div
-          className="modal-custom-overlay"
-          onClick={() => setShowEnrollModal(false)}
-        >
-          <div
-            className="modal-custom-content"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="modal-custom-header">
-              <h2 className="modal-custom-title">
-                Inscribirse en {selectedTeam?.nombre}
-              </h2>
-              <button
-                className="modal-custom-close"
-                onClick={() => setShowEnrollModal(false)}
-              >
-                ✕
-              </button>
-            </div>
-            <div className="modal-custom-body">
-              {enrollError && (
-                <div className="alert-danger-custom">{enrollError}</div>
-              )}
-              {selectedTeam && !selectedTeam.esPublico ? (
-                <div className="modal-form-group">
-                  <label className="modal-form-label">
-                    Contraseña del equipo
-                  </label>
-                  <input
-                    type="password"
-                    className="modal-form-input"
-                    value={enrollPassword}
-                    onChange={(e) => setEnrollPassword(e.target.value)}
-                    placeholder="Ingrese la contraseña"
-                    autoFocus
-                  />
-                </div>
-              ) : (
-                <p className="modal-info-text">
-                  Este equipo es público. Confirme para inscribirse.
-                </p>
-              )}
-            </div>
-            <div className="modal-custom-footer">
-              <button
-                className="btn-cancel-custom"
-                onClick={() => setShowEnrollModal(false)}
-              >
-                Cancelar
-              </button>
-              <button
-                className="btn-save-custom"
-                onClick={handleInscribe}
-                disabled={enrolling}
-              >
-                {enrolling ? 'Inscribiendo...' : 'Confirmar'}
-              </button>
-            </div>
-          </div>
-        </div>
+        <ModalInscripcion
+          selectedTeam={selectedTeam}
+          enrollPassword={enrollPassword}
+          setEnrollPassword={setEnrollPassword}
+          setShowEnrollModal={setShowEnrollModal}
+          handleInscribe={handleInscribe}
+          enrollError={enrollError}
+          errorInscribirse={errorInscribirse}
+          loadingInscribirse={loadingInscribirse}
+        />
       )}
 
       {/* Modal de Resultado */}
       {resultadoModal && partidoSeleccionado && (
-        <div
-          className="modal-custom-overlay"
-          onClick={() => setResultadoModal(false)}
-        >
-          <div
-            className="modal-custom-content"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="modal-custom-header">
-              <h2 className="modal-custom-title">Resultado del Partido</h2>
-              <button
-                className="modal-custom-close"
-                onClick={() => setResultadoModal(false)}
-              >
-                ✕
-              </button>
-            </div>
-            <div className="modal-custom-body">
-              <p className="modal-info-text">
-                {partidoSeleccionado.equipoLocal.nombre} vs{' '}
-                {partidoSeleccionado.equipoVisitante.nombre}
-              </p>
-              <div className="resultado-inputs-grid">
-                <div className="modal-form-group">
-                  <label className="modal-form-label">Goles Local</label>
-                  <input
-                    type="number"
-                    min="0"
-                    className="modal-form-input"
-                    value={resultadoLocal}
-                    onChange={(e) => setResultadoLocal(e.target.value)}
-                    placeholder="0"
-                    autoFocus
-                  />
-                </div>
-                <div className="modal-form-group">
-                  <label className="modal-form-label">Goles Visitante</label>
-                  <input
-                    type="number"
-                    min="0"
-                    className="modal-form-input"
-                    value={resultadoVisitante}
-                    onChange={(e) => setResultadoVisitante(e.target.value)}
-                    placeholder="0"
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="modal-custom-footer">
-              <button
-                className="btn-cancel-custom"
-                onClick={() => setResultadoModal(false)}
-              >
-                Cancelar
-              </button>
-              <button
-                className="btn-save-custom"
-                onClick={handleCargarResultado}
-              >
-                Guardar
-              </button>
-            </div>
-          </div>
-        </div>
+        <ModalResultados
+          partidoSeleccionado={partidoSeleccionado}
+          resultadoLocal={resultadoLocal}
+          setResultadoLocal={setResultadoLocal}
+          resultadoVisitante={resultadoVisitante}
+          setResultadoVisitante={setResultadoVisitante}
+          handleCargarResultado={handleCargarResultado}
+          setResultadoModal={setResultadoModal}
+          errorCargarResultados={errorCargarResultados}
+          loadingCargarResultados={loadingCargarResultados}
+        />
       )}
+
+      { /*Modals de Confirmación para todas las cosas*/ }
+
+      {showConfirmEquipo && (
+        <ConfirmModal
+          objeto={"eliminar el equipo"}
+          setShowConfirm={setShowConfirmEquipo}
+          handleConfirmDelete={handleConfirmDeleteEquipo}
+          handleCancelDelete={handleCancelDeleteEquipo}
+        />
+      )}
+
+      {showConfirmTorneo && (
+        <ConfirmModal
+          objeto={"eliminar el torneo " + (torneo ? ` "${torneo.nombre}"` : '')}
+          setShowConfirm={setShowConfirmTorneo}
+          handleConfirmDelete={handleConfirmDeleteTorneo}
+          handleCancelDelete={() => setShowConfirmTorneo(false)}
+        />
+      )}
+
+      {showConfirmPartido && (
+        <ConfirmModal
+          objeto={"eliminar el partido"}
+          setShowConfirm={setShowConfirmPartido}
+          handleConfirmDelete={handleConfirmDeletePartido}
+          handleCancelDelete={handleCancelDeletePartido}
+        />
+      )}
+
     </div>
   );
 }

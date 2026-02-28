@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import type { Partido } from '../types.tsx';
+import { AxiosError } from 'axios';
 
 export function usePartidosEvento(eventoId?: string) {
   const [partidos, setPartidos] = useState<Partido[]>([]);
@@ -63,4 +64,59 @@ export function useOnePartido(partidoId?: string) {
     setLoadingPartido,
     setErrorPartido,
   };
+}
+
+export function useBorrarPartido() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const borrarPartido = async (partidoId: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await axios.delete(`/partidos/${partidoId}`);
+      return true;
+    } catch (err) {
+      const e = err as AxiosError<{ message: string }>;
+      setError("Error al borrar el partido: " + (e.response?.data?.message || e.message));
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { borrarPartido, loading, error };
+}
+
+export function useCargarResultados() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const cargarResultados = async (
+    partidoId: number,
+    resultadoLocal: string,
+    resultadoVisitante: string
+  ) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await axios.put(`/partidos/${partidoId}`, {
+        resultadoLocal: resultadoLocal === '' ? null : Number(resultadoLocal),
+        resultadoVisitante:
+          resultadoVisitante === '' ? null : Number(resultadoVisitante),
+      });
+      return true;
+    } catch (err) {
+      const e = err as AxiosError<{ message: string }>;
+      setError(
+        "Error al cargar resultado: " +
+          (e.response?.data?.message || e.message)
+      );
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { cargarResultados, loading, error };
 }

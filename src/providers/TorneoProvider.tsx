@@ -8,6 +8,7 @@ import { AxiosError } from "axios";
 
 const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
   const [torneos, setTorneos] = useState<Torneo[]>([]);
+  const [torneo, setTorneo] = useState<Torneo | null>(null);
   const [torneosCreados, setTorneosCreados] = useState<Torneo[]>([]);
   const [torneosInscripto, setTorneosInscripto] = useState<Torneo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,9 +42,26 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
       setError(null);
     } catch (error) {
       setTorneos([]);
-      setError("No se pudieron cargar los torneos " + error);
+      const axiosError = error as AxiosError<{ message?: string }>;
+      setError("No se pudieron cargar los torneos: " + (axiosError.response?.data?.message || axiosError.message));
     }
     setLoading(false);
+  }, []);
+
+  const getUnTorneo = useCallback(async (id: number) => {
+    setLoading(true);
+    try {
+      const res = await apiAxios.get('/eventos/' + id);
+      setTorneo(res.data.data);
+      setError(null);
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      setError("No se pudo cargar el torneo: " + (axiosError.response?.data?.message || axiosError.message));
+      setTorneo(null);
+    }
+    finally {
+      setLoading(false);
+    }
   }, []);
 
   const getTorneosCreadosPorUsuario = useCallback(async (id: number) => {
@@ -55,7 +73,8 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
       setError(null);
     } catch (error) {
       setTorneosCreados([]);
-      setError("No se pudieron cargar los torneos creados por el usuario " + error);
+      const axiosError = error as AxiosError<{ message?: string }>;
+      setError("No se pudieron cargar los torneos creados por el usuario: " + (axiosError.response?.data?.message || axiosError.message));
     }
     setLoading(false);
   }, []);
@@ -69,7 +88,8 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
       setError(null);
     } catch (error) {
       setTorneosInscripto([]);
-      setError("No se pudieron cargar los torneos inscripto por el usuario " + error);
+      const axiosError = error as AxiosError<{ message?: string }>;
+      setError("No se pudieron cargar los torneos del usuario: " + (axiosError.response?.data?.message || axiosError.message));
     }
     setLoading(false);
   }, []);
@@ -84,7 +104,8 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
       setError(null);
     } catch (error) {
       setTorneos([]);
-      setError('No se pudieron cargar los torneos filtrados ' + error);
+      const axiosError = error as AxiosError<{ message?: string }>;
+      setError('No se pudieron cargar los torneos filtrados: ' + (axiosError.response?.data?.message || axiosError.message));
     }
     setLoading(false);
   }, []);
@@ -94,10 +115,8 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
       await apiAxios.delete(`/eventos/${id}`);
       await getTorneos();
     } catch (error) {
-      const axiosError = error as AxiosError<{ message?: string }>
-      const errorMsg = axiosError.response?.data?.message || "Error desconocido";
-      console.error("Error al borrar el torneo:", errorMsg);
-      setError("Error al borrar el torneo: " + errorMsg);
+      const axiosError = error as AxiosError<{ message?: string }>;
+      setError("Error al borrar el torneo: " + (axiosError.response?.data?.message || axiosError.message));
     }
   }, [getTorneos]);
 
@@ -109,7 +128,8 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
       await apiAxios.put(`/eventos/${torneo.id}`, payload);
       await getTorneos();
     } catch (error) {
-      setError("Error al modificar el torneo: " + error);
+      const axiosError = error as AxiosError<{ message?: string }>;
+      setError("Error al modificar el torneo: " + (axiosError.response?.data?.message || axiosError.message));
     }
   }, [getTorneos]);
 
@@ -121,7 +141,8 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
       await apiAxios.post("/eventos", payload);
       await getTorneos();
     } catch (error) {
-      setError("Error al crear el torneo: " + error);
+      const axiosError = error as AxiosError<{ message?: string }>;
+      setError("Error al crear el torneo: " + (axiosError.response?.data?.message || axiosError.message));
     }
   }, [getTorneos]);
 
@@ -130,7 +151,7 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
   }, [getTorneos]);
 
   return (
-    <TorneoContext.Provider value={{ torneos, torneosCreados, torneosInscripto, loading, error, getTorneos, borrarTorneo, modificarTorneo, crearTorneo, filtrarTorneos, getTorneosCreadosPorUsuario, getTorneosInscriptoPorUsuario }}>
+    <TorneoContext.Provider value={{ torneos, torneo, torneosCreados, torneosInscripto, loading, error, getTorneos, getUnTorneo, borrarTorneo, modificarTorneo, crearTorneo, filtrarTorneos, getTorneosCreadosPorUsuario, getTorneosInscriptoPorUsuario }}>
       {children}
     </TorneoContext.Provider>
   );

@@ -99,6 +99,14 @@ type Localidad = {
   lng: number;
   codigo: string;
 };
+
+type Stats = {
+    puntos: number;
+    minutosjugados: number;
+    faltas: number;
+    equipo: number;
+  };
+
 export type {
   Torneo,
   Deporte,
@@ -109,4 +117,5 @@ export type {
   Establecimiento,
   Noticia,
   Localidad,
+  Stats,
 };

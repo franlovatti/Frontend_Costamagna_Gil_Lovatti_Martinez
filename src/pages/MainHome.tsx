@@ -2,15 +2,16 @@ import { useAuth } from '../hooks/useAuth';
 import { useDeporte } from '../hooks/useDeporte.tsx';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import apiAxios from '../helpers/api';
-import type { Torneo } from '../types';
 import './MainHome.css';
 import CardTorneos from '../components/CardTorneos';
 import StatCard from '../components/admin/StatCard';
+import { useTorneo } from '../hooks/useTorneo.tsx';
+import type { Torneo } from '../contexts/torneo.tsx';
 
 export default function MainHome() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { torneos, getTorneos } = useTorneo();
   const [featuredTorneos, setFeaturedTorneos] = useState<Torneo[]>([]);
   const { deportes } = useDeporte();
   const [stats, setStats] = useState({
@@ -19,22 +20,20 @@ export default function MainHome() {
     deportes: 0
   });
 
-  //Esto hay que pasarlo al provider de Torneo cuando se acomode eso
+  useEffect(() => {
+    getTorneos();
+  }, [getTorneos]);
+
   useEffect(() => {
     // Cargar torneos destacados y estadísticas
-    apiAxios.get('/eventos')
-      .then((res) => {
-        const torneos = res.data.data || [];
-        setFeaturedTorneos(torneos.slice(0, 3)); // Primeros 3 torneos
-        setStats({
-          totalTorneos: torneos.length,
-          participantes: torneos.reduce((acc: number, t: Torneo) => 
-            acc + (t.equipos?.length || 0), 0),
-          deportes: deportes.length
-        });
-      })
-      .catch((error) => console.error('Error cargando datos:', error));
-  }, [deportes]);
+    setFeaturedTorneos(torneos.slice(0, 3)); // Primeros 3 torneos
+    setStats({
+      totalTorneos: torneos.length,
+      participantes: torneos.reduce((acc: number, t: Torneo) => 
+        acc + (t.equipos?.length || 0), 0),
+      deportes: deportes.length
+    });
+  }, [deportes, torneos]);
 
   const features = [
     {

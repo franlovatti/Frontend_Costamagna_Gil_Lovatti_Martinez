@@ -1,6 +1,7 @@
 import {  useEffect, useState } from "react";
-import axios, { AxiosError } from "axios";
 import type { Equipo, Partido, Torneo } from "../types";
+import apiAxios from "../helpers/api";
+import { AxiosError } from "axios";
 
 export function useEquiposEvento(eventoId?: string) {
   const [equipos, setEquipos] = useState<Equipo[]>([]);
@@ -10,12 +11,11 @@ export function useEquiposEvento(eventoId?: string) {
    useEffect(() => {
     if (!eventoId) return;
     const fetchItems = async () => {
-      console.log(eventoId);
       setLoadingEquipos(true);
       setErrorEquipos(null);
       try {
-        const response = await axios.get(
-          'http://localhost:3000/api/equipos/evento/' + eventoId
+        const response = await apiAxios.get(
+          `/equipos/evento/${eventoId}`
         );
         setEquipos(response.data.data);
       } catch (err) {
@@ -44,8 +44,8 @@ export function useMisEquipos(usuarioId: string) {
       setLoadingEquipos(true);
       setErrorEquipos(null);
       try {
-        const response = await axios.get<{ data: EquipoConTorneo[] }>(
-          `http://localhost:3000/api/equipos/usuario/${usuarioId}`
+        const response = await apiAxios.get<{ data: EquipoConTorneo[] }>(
+          `/equipos/usuario/${usuarioId}`
         );
         setEquipos(response.data?.data ?? []);
       } catch (err) {
@@ -59,4 +59,49 @@ export function useMisEquipos(usuarioId: string) {
   }, [usuarioId]);
 
   return { equipos, loadingEquipos, errorEquipos };
+}
+
+export function useBorrarEquipo() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const borrarEquipo = async (equipoId: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await apiAxios.delete(`/equipos/${equipoId}`);
+      return true;
+    } catch (err) {
+      const e = err as AxiosError<{ message: string }>;
+      setError("Error al borrar el equipo: " + (e.response?.data?.message || e.message));
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { borrarEquipo, loading, error };
+}
+
+export function useInscribirseEquipo() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const inscribirseEquipo = async (equipo: Equipo, contraseña?: string, usuarioId?: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const body: Record<string, unknown> = { usuarioId: usuarioId };
+      if (!equipo.esPublico) body.contraseña = contraseña;
+      await apiAxios.post(`/equipos/${equipo.id}/miembros`, body);
+      return true;
+    } catch (err) {
+      const e = err as AxiosError<{ message: string }>;
+      setError("Error al inscribirse en el equipo: " + (e.response?.data?.message || e.message));
+      return false;
+    } finally {      
+      setLoading(false);
+    }  };
+
+  return { inscribirseEquipo, loading, error };
 }
