@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import type { Usuario, Participation } from '../types.tsx';
 import type { ParticipacionPayload, ParticipacionEditPayload } from '../hooks/useParticipaciones';
 import './Participacion.css';
-import { useParticipacion } from '../hooks/useParticipaciones.ts';
+import { useParticipacion } from '../hooks/useParticipaciones.tsx';
 import { useOnePartido } from '../hooks/usePartidos.tsx';
 import ConfirmModal from '../components/ConfirmModal.tsx';
 

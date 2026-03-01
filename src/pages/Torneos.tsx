@@ -10,14 +10,16 @@ import { useAuth } from '../hooks/useAuth';
 import MapaLocalidad from '../components/ApiMaps/MapaLocalidad';
 import './Torneos.css';
 import { useDeporte } from '../hooks/useDeporte.tsx';
+import FormTorneos from '../components/FormTorneos.tsx';
 
 export default function Torneos() {
-  const { torneos, loading, error, getTorneos } = useTorneo();
+  const { torneos, loading, error, getTorneos, crearTorneo } = useTorneo();
   const { deportes, getDeportes } = useDeporte();
   const [dataTorneos, setDataTorneos] = useState<Torneo[]>([]);
   const [selectedSport, setSelectedSport] = useState<string>('');
   const [selectedLocalidad, setSelectedLocalidad] = useState<string>('');
   const [dataDeportes, setDataDeportes] = useState<Deporte[]>([]);
+  const [showForm, setShowForm] = useState(false);
   
   // Modal de código
   const [showCodeModal, setShowCodeModal] = useState(false);
@@ -51,6 +53,12 @@ export default function Torneos() {
   const handleClick = (id: number | undefined) => {
     if (id === undefined) return;
     navigate(`/home/torneos/${id}`);
+  };
+
+  const handleCreateTorneo = async (data: Partial<Torneo>) => {
+    crearTorneo(data as Torneo);
+    setShowForm(false);
+    getTorneos();
   };
 
   const handleEnrollFromCard = async (evt: Torneo) => {
@@ -141,6 +149,15 @@ export default function Torneos() {
       (!selectedLocalidad || String(torneo.localidad.codigo) === selectedLocalidad)
   );
 
+  if (showForm) {
+    return (
+          <FormTorneos
+            setShowModal={setShowForm}
+            editingTorneo={null}
+            onSave={handleCreateTorneo}
+          />
+        )
+  }
   return (
     <div className="torneos-page-container">
       <div className="torneos-inner-container">
@@ -158,7 +175,7 @@ export default function Torneos() {
             <button className="btn-toolbar" onClick={openCodeModal}>
               Ingresar código
             </button>
-            <button className="btn-save-custom" onClick={() => navigate('crear-torneo')}>
+            <button className="btn-save-custom" onClick={() => setShowForm(true)}>
               Crear Torneo
             </button>
             <select

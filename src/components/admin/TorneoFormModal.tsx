@@ -2,12 +2,15 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import type { Torneo } from "../../contexts/torneo.tsx";
 import { useDeporte } from "../../hooks/useDeporte.tsx";
+import { useLocalidad } from "../../hooks/useLocalidad.tsx";
 import { toDatetimeLocal, parseDatetimeLocal } from "../../helpers/convertirFechas.tsx";
 import "../cssComponentes/ConfirmModal.css";
 import "../cssComponentes/DeporteFormModal.css";
+import '../cssComponentes/FormTorneos.css';
 
 type TorneoFormFields = {
   nombre: string;
+  descripcion: string;
   esPublico: boolean;
   contraseña: string;
   cantEquiposMax: number;
@@ -16,6 +19,7 @@ type TorneoFormFields = {
   fechaInicioEvento: string;
   fechaFinEvento: string;
   deporteId: number;
+  localidadId: number;
 };
 
 interface TorneoFormModalProps {
@@ -30,18 +34,18 @@ export default function TorneoFormModal({
   onSave
 }: TorneoFormModalProps) {
   const { deportes, getDeportes } = useDeporte();
+  const { localidades, getLocalidades } = useLocalidad();
 
   const {
     register,
     handleSubmit,
     watch,
-    // setValue,
-    // control,
     formState: { errors, isSubmitting }
   } = useForm<TorneoFormFields>({
     mode: 'onBlur',
     defaultValues: {
       nombre: editingTorneo?.nombre || '',
+      descripcion: editingTorneo?.descripcion || '',
       esPublico: editingTorneo?.esPublico ?? true,
       contraseña: editingTorneo?.contraseña || '',
       cantEquiposMax: editingTorneo?.cantEquiposMax || 8,
@@ -49,7 +53,8 @@ export default function TorneoFormModal({
       fechaFinInscripcion: toDatetimeLocal(editingTorneo?.fechaFinInscripcion),
       fechaInicioEvento: toDatetimeLocal(editingTorneo?.fechaInicioEvento),
       fechaFinEvento: toDatetimeLocal(editingTorneo?.fechaFinEvento),
-      deporteId: editingTorneo?.deporte?.id || 0
+      deporteId: editingTorneo?.deporte?.id || 0,
+      localidadId: editingTorneo?.localidad?.id || 0,
     }
   });
 
@@ -62,10 +67,16 @@ export default function TorneoFormModal({
     getDeportes();
   }, [getDeportes]);
 
+  useEffect(() => {
+    getLocalidades();
+  }, [getLocalidades]);
+
   const onSubmit = (data: TorneoFormFields) => {
     const deporteSeleccionado = deportes?.find(d => d.id === Number(data.deporteId));
+    const localidadSeleccionada = localidades?.find(l => l.id === Number(data.localidadId));
     const torneoData: Partial<Torneo> = {
       nombre: data.nombre,
+      descripcion: data.descripcion,
       esPublico: data.esPublico,
       contraseña: data.esPublico ? undefined : data.contraseña,
       cantEquiposMax: data.cantEquiposMax,
@@ -73,7 +84,8 @@ export default function TorneoFormModal({
       fechaFinInscripcion: parseDatetimeLocal(data.fechaFinInscripcion)!,
       fechaInicioEvento: parseDatetimeLocal(data.fechaInicioEvento)!,
       fechaFinEvento: parseDatetimeLocal(data.fechaFinEvento)!,
-      deporte: deporteSeleccionado!
+      deporte: deporteSeleccionado!,
+      localidad: localidadSeleccionada!,
     };
 
     if (editingTorneo) {
@@ -116,6 +128,24 @@ export default function TorneoFormModal({
             )}
           </div>
 
+          {/* Descripcion */}
+          <div className="mb-3">
+            <label className="form-label">Descripción</label>
+            <textarea
+              className={`form-control custom-input ${errors.descripcion ? 'is-invalid' : ''}`}
+              placeholder="Ej: Liga de Verano"
+              {...register("descripcion", { 
+                minLength: {
+                  value: 3,
+                  message: "La descripción debe tener al menos 3 caracteres"
+                }
+              })}
+            />
+            {errors.descripcion && (
+              <span className="auth-error-text">{errors.descripcion.message}</span>
+            )}
+          </div>
+
           {/* Deporte */}
           <div className="mb-3">
             <label className="form-label">Deporte *</label>
@@ -123,7 +153,7 @@ export default function TorneoFormModal({
               className={`form-select custom-input ${errors.deporteId ? 'is-invalid' : ''}`}
               {...register("deporteId", { 
                 required: "Debe seleccionar un deporte",
-                validate: (value) => value > 0 || "Debe seleccionar un deporte válido"
+                validate: (value) => value > 0 || "Debe seleccionar un deporte válido",
               })}
             >
               <option value="0">-- Seleccione un deporte --</option>
@@ -133,6 +163,26 @@ export default function TorneoFormModal({
             </select>
             {errors.deporteId && (
               <span className="auth-error-text">{errors.deporteId.message}</span>
+            )}
+          </div>
+
+          {/* Localidad */}
+          <div className="mb-3">
+            <label className="form-label">Localidad *</label>
+            <select
+              className={`form-select custom-input ${errors.localidadId ? 'is-invalid' : ''}`}
+              {...register("localidadId", { 
+                required: "Debe seleccionar una localidad",
+                validate: (value) => value > 0 || "Debe seleccionar una localidad válida",
+              })}
+            >
+              <option value="0">-- Seleccione una localidad --</option>
+              {Array.isArray(localidades) && localidades.map(l => (
+                <option key={l.id} value={l.id}>{l.descripcion}</option>
+              ))}
+            </select>
+            {errors.localidadId && (
+              <span className="auth-error-text">{errors.localidadId.message}</span>
             )}
           </div>
 
@@ -295,173 +345,3 @@ export default function TorneoFormModal({
     </div>
   );
 };
-
-// import type { Torneo } from "../contexts/torneo";
-// import type { Deporte } from "../contexts/deporte";
-// import "./cssComponentes/DeporteFormModal.css";
-// import "./cssComponentes/ConfirmModal.css";
-// import { useDeporte } from "../hooks/useDeporte.tsx";
-// import { useEffect } from "react";
-
-// export default function TorneoFormModal({
-//   setShowModal,
-//   editingTorneo,
-//   formData,
-//   setFormData,
-//   handleSave
-// }: {
-//   setShowModal: (show: boolean) => void;
-//   editingTorneo: Torneo | null;
-//   formData: {
-//     nombre: string,
-//     esPublico: boolean,
-//     contraseña: string,
-//     cantEquiposMax: number,
-//     fechaInicioInscripcion: string,
-//     fechaFinInscripcion: string,
-//     fechaInicioEvento: string,
-//     fechaFinEvento: string,
-//     deporte: Deporte,
-//   };
-//   setFormData: (data: {
-//     nombre: string,
-//     esPublico: boolean,
-//     contraseña: string,
-//     cantEquiposMax: number,
-//     fechaInicioInscripcion: string,
-//     fechaFinInscripcion: string,
-//     fechaInicioEvento: string,
-//     fechaFinEvento: string,
-//     deporte: Deporte,
-//   }) => void;
-//   handleSave: () => void;
-// }) {
-
-//   const { deportes, getDeportes } = useDeporte();
-
-//   useEffect(() => {
-//     getDeportes();
-//   }, [getDeportes]);
-
-//   return (
-//     <div className="modal-overlay" onClick={() => setShowModal(false)}>
-//       <div className="modal-content-custom" onClick={(e) => e.stopPropagation()}>
-//         <h2 className="modal-title mb-4">
-//           {editingTorneo ? 'Editar Torneo' : 'Crear Nuevo Torneo'}
-//         </h2>
-
-//         <div className="mb-3">
-//           <label className="form-label">Nombre *</label>
-//           <input
-//             type="text"
-//             className="form-control custom-input"
-//             value={formData.nombre}
-//             onChange={(e) => setFormData({...formData, nombre: e.target.value})}
-//             placeholder="Ej: Liga de Verano"
-//             required
-//           />
-//         </div>
-
-//         <div className="mb-3">
-//           <label className="form-label">Cantidad maxima de equipos *</label>
-//           <input
-//             type="number"
-//             className="form-control custom-input"
-//             value={formData.cantEquiposMax}
-//             onChange={(e) => setFormData({...formData, cantEquiposMax: parseInt(e.target.value) || 0})}
-//             min="0"
-//             required
-//           />
-//         </div>
-//         <div className="mb-3">
-//           <label className="form-label">Deporte *</label>
-//           <select
-//             className="form-select"
-//             value={formData.deporte?.id ?? ''}
-//             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-//               const id = Number(e.target.value);
-//               const seleccionado = Array.isArray(deportes) ? deportes.find(d => d.id === id) ?? null : null;
-//               setFormData({ ...formData, deporte: seleccionado ?? (formData.deporte ?? null) });
-//             }}
-//             required
-//           >
-//             <option value="">-- Seleccione deporte --</option>
-//             {Array.isArray(deportes) && deportes.map(d => (
-//               <option key={d.id} value={d.id}>{d.nombre}</option>
-//             ))}
-//           </select>
-//         </div>
-//         <div className="form-check mb-3">
-//           <input
-//             className="form-check-input"
-//             type="checkbox"
-//             checked={formData.esPublico}
-//             onChange={(e) => setFormData({...formData, esPublico: e.target.checked})}
-//           />
-//           <label className="form-check-label">
-//             ¿Es público?
-//           </label>
-//         </div>
-//         {!formData.esPublico && (
-//           <div className="mb-3">
-//             <label className="form-label">Contraseña *</label>
-//             <input
-//               type="password"
-//               className="form-control custom-input"
-//               value={formData.contraseña}
-//               onChange={(e) => setFormData({...formData, contraseña: e.target.value})}
-//               placeholder="Ingrese una contraseña"
-//               required
-//             />
-//           </div>
-//         )}
-//         <div className="mb-3">
-//           <label className="form-label">Fecha y hora de inicio de inscripción *</label>
-//           <input
-//             type="datetime-local"
-//             className="form-control custom-input"
-//             value={formData.fechaInicioInscripcion}
-//             onChange={(e) => setFormData({...formData, fechaInicioInscripcion: e.target.value})}
-//             required
-//           />
-//         </div>
-//         <div className="mb-3">
-//           <label className="form-label">Fecha y hora de fin de inscripción *</label>
-//           <input
-//             type="datetime-local"
-//             className="form-control custom-input"
-//             value={formData.fechaFinInscripcion}
-//             onChange={(e) => setFormData({...formData, fechaFinInscripcion: e.target.value})}
-//             required
-//           />
-//         </div>
-//         <div className="mb-3">
-//           <label className="form-label">Fecha y hora de inicio del evento *</label>
-//           <input
-//             type="datetime-local"
-//             className="form-control custom-input"
-//             value={formData.fechaInicioEvento}
-//             onChange={(e) => setFormData({...formData, fechaInicioEvento: e.target.value})}
-//           />
-//         </div>
-//         <div className="mb-3">
-//           <label className="form-label">Fecha y hora de fin del evento *</label>
-//           <input
-//             type="datetime-local"
-//             className="form-control custom-input"
-//             value={formData.fechaFinEvento}
-//             onChange={(e) => setFormData({...formData, fechaFinEvento: e.target.value})}
-//           />
-//         </div>
-//         <div className="d-flex gap-3">
-//           <button className="btn btn-cancel-custom flex-grow-1" onClick={() => setShowModal(false)}>
-//             Cancelar
-//           </button>
-//           <button className="btn btn-save-custom flex-grow-1" onClick={handleSave}>
-//             {editingTorneo ? 'Guardar Cambios' : 'Crear Torneo'}
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }

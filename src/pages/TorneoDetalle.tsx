@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router-dom';
 import type { Equipo, Participation, Partido, Usuario, Stats } from '../types';
+import type { Torneo } from '../contexts/torneo.tsx';
 import { Row, Col } from 'react-bootstrap';
 import { useAuth } from '../hooks/useAuth';
 import './TorneoDetalle.css';
@@ -16,12 +17,14 @@ import TablaPartidos from '../components/TablaPartidos.tsx';
 import TablaParticipantes from '../components/TablaParticipantes.tsx';
 import ModalInscripcion from '../components/ModalInscripcion.tsx';
 import ModalResultados from '../components/ModalResultados.tsx';
+import FormTorneos from '../components/FormTorneos.tsx';
 
 
 export default function TorneoDetalle() {
-  const { torneo, getUnTorneo, borrarTorneo, error: errorTorneo, loading: loadingTorneo } = useTorneo();
+  const { torneo, getUnTorneo, borrarTorneo, modificarTorneo, error: errorTorneo, loading: loadingTorneo } = useTorneo();
   const [showConfirmTorneo, setShowConfirmTorneo] = useState(false);
   const [showConfirmEquipo, setShowConfirmEquipo] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [equipoAEliminar, setEquipoAEliminar] = useState<number>(0);
   const { borrarEquipo, loading: loadingBorrarEquipo, error: errorBorrarEquipo } = useBorrarEquipo();
   const { salirEquipo, loading: loadingSalirEquipo, error: errorSalirEquipo } = useSalirEquipo();
@@ -134,6 +137,13 @@ export default function TorneoDetalle() {
     setEquipoAEliminar(0);
   };
 
+  const handleEditTorneo = async (data: Partial<Torneo>) => {
+    if (!torneo) return;
+    modificarTorneo({ ...data, id: torneo.id } as Torneo); 
+    setShowEditModal(false);
+    getUnTorneo(Number(id));
+  };
+
   const handleDeletePartido = async (id: number) => {
     setPartidoAEliminar(id);
     setShowConfirmPartido(true);
@@ -239,6 +249,16 @@ const handleAbandono = async () => {
         </div>
       </div>
     );
+  
+  if(showEditModal) {
+    return (
+        <FormTorneos
+        setShowModal={setShowEditModal}
+        editingTorneo={torneo}
+        onSave={handleEditTorneo}
+      />
+    )
+  }
   return (
     <div className="torneo-detalle-container">
       <div className="torneo-detalle-inner">
@@ -255,7 +275,7 @@ const handleAbandono = async () => {
               <div className="header-actions">
                 <button
                   className="btn-header-action btn-edit"
-                  onClick={() => navigate(`/home/torneos/${id}/editar`)}
+                  onClick={() => setShowEditModal(true)}
                 >
                   Editar
                 </button>

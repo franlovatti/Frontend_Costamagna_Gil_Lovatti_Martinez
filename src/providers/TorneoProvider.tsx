@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback } from "react";
 import { TorneoContext } from "../contexts/torneo";
 import apiAxios from "../helpers/api";
 import type { Torneo } from "../contexts/torneo";
-import type { Deporte } from "../contexts/deporte";
 import { AxiosError } from "axios";
 
 
@@ -16,8 +15,10 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
 
   interface Payload{
     deporte: number,
+    localidad: number,
     id?: number;
     nombre: string;
+    descripcion: string;
     esPublico: boolean;
     contraseña?: string;
     cantEquiposMax: number;
@@ -25,7 +26,6 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
     fechaFinInscripcion: Date;
     fechaInicioEvento?: Date;
     fechaFinEvento?: Date;
-    deporteC: Deporte;
   }
 
   const getTorneos = useCallback(async () => {
@@ -122,8 +122,20 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
 
   const modificarTorneo = useCallback(async (torneo: Torneo) => {
     try {
-      const payload: Payload = { ...torneo, deporte: torneo.deporte.id, deporteC: torneo.deporte };
-      payload.deporteC = undefined as unknown as Deporte; // No enviar el objeto deporte completo
+      const payload: Payload = {
+        id: torneo.id,
+        nombre: torneo.nombre,
+        descripcion: torneo.descripcion ?? torneo.nombre,
+        esPublico: torneo.esPublico,
+        contraseña: torneo.contraseña,
+        cantEquiposMax: torneo.cantEquiposMax,
+        fechaInicioInscripcion: torneo.fechaInicioInscripcion,
+        fechaFinInscripcion: torneo.fechaFinInscripcion,
+        fechaInicioEvento: torneo.fechaInicioEvento,
+        fechaFinEvento: torneo.fechaFinEvento,
+        deporte: torneo.deporte.id,
+        localidad: torneo.localidad.id,
+      };
       console.log("Payload de torneo a modificar: ", payload);
       await apiAxios.put(`/eventos/${torneo.id}`, payload);
       await getTorneos();
@@ -135,8 +147,19 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
 
   const crearTorneo = useCallback(async (torneo: Torneo) => {
     try {
-      const payload: Payload = { ...torneo, deporte: torneo.deporte.id, deporteC: torneo.deporte };
-      payload.deporteC = undefined as unknown as Deporte; // No enviar el objeto deporte completo
+      const payload: Payload = {
+        nombre: torneo.nombre,
+        descripcion: torneo.descripcion ?? torneo.nombre,
+        esPublico: torneo.esPublico,
+        contraseña: torneo.contraseña,
+        cantEquiposMax: torneo.cantEquiposMax,
+        fechaInicioInscripcion: torneo.fechaInicioInscripcion,
+        fechaFinInscripcion: torneo.fechaFinInscripcion,
+        fechaInicioEvento: torneo.fechaInicioEvento,
+        fechaFinEvento: torneo.fechaFinEvento,
+        deporte: torneo.deporte.id,
+        localidad: torneo.localidad.id,
+      };
       console.log("Payload de torneo a crear payload: ", payload);
       await apiAxios.post("/eventos", payload);
       await getTorneos();

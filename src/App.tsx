@@ -27,7 +27,6 @@ import DeportesAdmin from './pages/admin/DeportesAdmin.tsx';
 import TorneosAdmin from './pages/admin/TorneosAdmin.tsx';
 import LocalidadesAdmin from './pages/admin/LocalidadesAdmin.tsx';
 import AuthLayout from './components/layout/AuthLayout.tsx';
-import FormTorneos from './pages/FormTorneos.tsx';
 import FormEstablecimiento from './pages/FormEstablecimiento.tsx';
 import FormPartido from './pages/FormPartido.tsx';
 import TorneoDetalle from './pages/TorneoDetalle.tsx';
@@ -72,15 +71,7 @@ function App() {
                       <Route path="home" element={<MainLayout />}>
                         <Route index element={<MainHome />} />
                         <Route path="torneos" element={<Torneos />} />
-                        <Route
-                          path="torneos/crear-torneo"
-                          element={<FormTorneos />}
-                        />
                         <Route path="torneos/:id" element={<TorneoDetalle />} />
-                        <Route
-                          path="torneos/:id/editar"
-                          element={<FormTorneos />}
-                        />
                         <Route path="noticias" element={<Noticias />} />
                         <Route
                           path="torneos/:id/crear-equipo"
