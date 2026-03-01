@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useOneEstablecimiento } from '../hooks/useEstablecimientos.tsx';
-import apiAxios from '../helpers/api.tsx';
+import { useOneEstablecimiento, useCrearEstablecimiento, useEditarEstablecimiento } from '../hooks/useEstablecimientos.tsx';
 import MapaLocalidad from '../components/ApiMaps/MapaLocalidad.tsx';
 import './CrearEquipo.css';
 
@@ -20,6 +19,8 @@ export default function FormEstablecimiento() {
   const isEditing = !!idE;
 
   const { establecimiento } = useOneEstablecimiento(idE);
+  const { crearEstablecimiento, error: errorCrear } = useCrearEstablecimiento();
+  const { editarEstablecimiento, error: errorEditar } = useEditarEstablecimiento();
 
 useEffect(() => {
   if (isEditing && establecimiento) {
@@ -47,35 +48,28 @@ useEffect(() => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    
     const payload = {
       nombre: form.nombre,
       direccion: form.direccion,
-      evento: idT,
+      evento: idT || '',
     };
 
-    try {
-      if (isEditing) {
-        await apiAxios.put(`/establecimientos/${idE}`, payload, {
-          headers: { 'Content-Type': 'application/json' },
-        });
-      } else {
-        await apiAxios.post('/establecimientos', payload, {
-          headers: { 'Content-Type': 'application/json' },
-        });
-      }
-
-      setShowSuccess(true);
-    } catch (error: unknown) {
-      if (error instanceof Error === false) {
-        console.error('Error desconocido:', error);
-        // setMessage('Ocurrió un error desconocido.');
-      } else {
-        console.error('Error al crear establecimiento: ', error.message);
-        // setMessage('Error al crear establecimiento: ' + error.message);
-      }
-    } finally {
-      setIsSubmitting(false);
+    let result;
+    if (isEditing && idE) {
+      result = await editarEstablecimiento(idE, payload);
+    } else {
+      result = await crearEstablecimiento(payload);
     }
+
+    if (result) {
+      setShowSuccess(true);
+    } else {
+      const errorMsg = isEditing ? errorEditar : errorCrear;
+      console.error('Error:', errorMsg);
+    }
+
+    setIsSubmitting(false);
   };
 
   return (
@@ -118,7 +112,14 @@ useEffect(() => {
               Dirección del Establecimiento
               <span className="required">*</span>
             </label>
-            <MapaLocalidad onSelect={(place) => setForm({ ...form, direccion: place.formatted_address! })} className="form-input" placeholder='Ej: Zeballos 1341, Rosario' localidad={false} valor={form.direccion} />
+            <MapaLocalidad 
+              key={form.direccion || 'new'}
+              onSelect={(place) => setForm({ ...form, direccion: place.formatted_address! })} 
+              className="form-input" 
+              placeholder='Ej: Zeballos 1341, Rosario' 
+              localidad={false} 
+              valor={form.direccion} 
+            />
             <span className="form-hint">Mínimo 3 caracteres</span>
           </div> 
             {/* Botones */}

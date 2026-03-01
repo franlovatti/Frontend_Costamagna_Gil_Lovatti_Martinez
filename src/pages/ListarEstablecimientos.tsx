@@ -1,15 +1,37 @@
 import { useEstablecimientosEvento } from '../hooks/useEstablecimientos.tsx';
 import { useParams, useNavigate } from 'react-router';
 import type { Establecimiento } from '../types.tsx';
+import { useState } from 'react';
+import ConfirmModal from '../components/ConfirmModal.tsx';
 import Alert from '../components/Alert.tsx';
 import './TorneoDetalle.css';
 
 export default function ListarEstablecimientos() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { establecimientos, errorEstablecimientos, deleteEstablecimiento } =
+  const { establecimientos, errorEstablecimientos, deleteEstablecimiento, loadingEstablecimientos } =
     useEstablecimientosEvento(id);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [establecimientoToDelete, setEstablecimientoToDelete] = useState<number | null>(null);
 
+  const handleDelete = (establecimientoId: number) => {
+    setShowConfirm(true);
+    setEstablecimientoToDelete(establecimientoId);
+  };
+
+  const confirmDelete = () => {
+    if (establecimientoToDelete !== null) {
+      deleteEstablecimiento(establecimientoToDelete);
+      setShowConfirm(false);
+      setEstablecimientoToDelete(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowConfirm(false);
+    setEstablecimientoToDelete(null);
+  };
+  
   return (
     <div className="torneo-detalle-container">
       <div className="torneo-detalle-inner">
@@ -40,7 +62,13 @@ export default function ListarEstablecimientos() {
               </tr>
             </thead>
             <tbody>
-              {establecimientos.length > 0 ? (
+              {loadingEstablecimientos ? (
+                <tr>
+                  <td colSpan={6} className="loading-cell">
+                    Cargando establecimientos...
+                  </td>
+                </tr>
+              ) : establecimientos.length > 0 ? (
                 establecimientos.map((est: Establecimiento, idx: number) => (
                   <tr key={est.id}>
                     <td>{idx + 1}</td>
@@ -60,7 +88,7 @@ export default function ListarEstablecimientos() {
                         </button>
                         <button
                           className="btn-action btn-delete"
-                          onClick={() => deleteEstablecimiento(est.id)}
+                          onClick={() => handleDelete(est.id)}
                         >
                           Eliminar
                         </button>
@@ -90,16 +118,19 @@ export default function ListarEstablecimientos() {
       </div>
       {/* Versión Mobile - Cards */}
       <div className="equipos-mobile-list">
-        {establecimientos.length > 0 ? (
-          establecimientos.map((est: Establecimiento, idx: number) => (
+        { loadingEstablecimientos ? (
+          <div className="loading-cell">
+            Cargando establecimientos...
+          </div>
+        ) :
+        (establecimientos.length > 0) ? (
+          establecimientos.map((est: Establecimiento) => (
             <div key={est.id} className="equipo-mobile-card">
               <div className="equipo-mobile-header">
-                <div className="equipo-mobile-number">{idx + 1}</div>
                 <div className="equipo-mobile-name">{est.nombre}</div>
               </div>
               <div className="equipo-mobile-info">
                 <div className="equipo-info-row">
-                  <span className="equipo-info-label">Dirección</span>
                   <span className="equipo-info-value">{est.direccion}</span>
                 </div>
               </div>
@@ -116,7 +147,7 @@ export default function ListarEstablecimientos() {
                 </button>
                 <button
                   className="btn-action btn-delete"
-                  onClick={() => deleteEstablecimiento(est.id)}
+                  onClick={() => handleDelete(est.id)}
                 >
                   Eliminar
                 </button>
@@ -132,6 +163,15 @@ export default function ListarEstablecimientos() {
           </div>
         )}
       </div>
+
+      {showConfirm && (
+        <ConfirmModal
+          objeto={"el establecimiento"}
+          setShowConfirm={setShowConfirm}
+          handleConfirmDelete={confirmDelete}
+          handleCancelDelete={cancelDelete}
+        />
+        )}
       </div>
     </div>
   );

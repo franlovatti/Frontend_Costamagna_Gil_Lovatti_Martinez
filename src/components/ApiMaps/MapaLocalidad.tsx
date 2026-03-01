@@ -34,14 +34,14 @@ export default function MapaLocalidad({ onSelect, className, placeholder, locali
     });
 
     return () => listener.remove();
-  }, [onSelect]);
+  }, [onSelect, localidad]);
 
   return (
     <input
       ref={inputRef}
       type="text"
       name="localidad"
-      value={valor}
+      defaultValue={valor}
       placeholder={placeholder ?? "Buscar ciudad o localidad"}
       className={`form-control ${className ?? ""}`}
     />

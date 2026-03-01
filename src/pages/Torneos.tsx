@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useTorneo } from '../hooks/useTorneo';
 import CardTorneos from '../components/CardTorneos';
 import { useNavigate } from 'react-router-dom';
-import apiAxios from '../helpers/api';
 import type { Equipo, Usuario } from '../types';
 import type { Torneo } from '../contexts/torneo.tsx';
 import type { Deporte } from '../contexts/deporte.tsx';
@@ -13,7 +12,7 @@ import { useDeporte } from '../hooks/useDeporte.tsx';
 import FormTorneos from '../components/FormTorneos.tsx';
 
 export default function Torneos() {
-  const { torneos, loading, error, getTorneos, crearTorneo } = useTorneo();
+  const { torneos, loading, error, getTorneos, crearTorneo, torneo, getTorneoPorCodigo } = useTorneo();
   const { deportes, getDeportes } = useDeporte();
   const [dataTorneos, setDataTorneos] = useState<Torneo[]>([]);
   const [selectedSport, setSelectedSport] = useState<string>('');
@@ -25,8 +24,7 @@ export default function Torneos() {
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [code, setCode] = useState('');
   const [codeError, setCodeError] = useState<string | null>(null);
-  const [resolving, setResolving] = useState(false);
-  
+
   // Modal de inscripción a evento
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Torneo | null>(null);
@@ -124,22 +122,12 @@ export default function Torneos() {
       setCodeError('Ingrese un código');
       return;
     }
-    setResolving(true);
-    try {
-      const res = await apiAxios.get(
-        `/eventos/codigo/${encodeURIComponent(trimmed)}`
-      );
-      const evento = res.data?.data ?? res.data;
-      if (evento && typeof evento.id === 'number') {
-        setShowCodeModal(false);
-        handleEnrollFromCard(evento as Torneo);
-      } else {
-        setCodeError('Código inválido');
-      }
-    } catch {
-      setCodeError('No se encontró un torneo con ese código');
-    } finally {
-      setResolving(false);
+    getTorneoPorCodigo(trimmed);
+    if (torneo && typeof torneo.id === 'number') {
+      setShowCodeModal(false);
+      handleEnrollFromCard(torneo as Torneo);
+    } else {
+      setCodeError('Código inválido');
     }
   };
 
@@ -260,16 +248,16 @@ export default function Torneos() {
                     type="button"
                     className="modal-btn modal-btn-secondary"
                     onClick={() => setShowCodeModal(false)}
-                    disabled={resolving}
+                    disabled={loading}
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     className="modal-btn modal-btn-primary"
-                    disabled={resolving}
+                    disabled={loading}
                   >
-                    {resolving ? 'Buscando...' : 'Ir al torneo'}
+                    {loading ? 'Buscando...' : 'Ir al torneo'}
                   </button>
                 </div>
               </form>

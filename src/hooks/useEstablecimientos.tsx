@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-import type { Establecimiento } from '../types'; // ajustá el import según tu proyecto
+import axios, { AxiosError } from 'axios';
+import type { Establecimiento } from '../types';
+
+type EstablecimientoPayload = {
+  nombre: string;
+  direccion: string;
+  evento: string | number;
+};
 
 export function useEstablecimientosEvento(eventoId?: string) {
   const [establecimientos, setEstablecimientos] = useState<Establecimiento[]>(
@@ -91,4 +97,52 @@ export function useOneEstablecimiento(establecimientoId?: string) {
     setLoadingEstablecimiento,
     setErrorEstablecimiento,
   };
+}
+
+export function useCrearEstablecimiento() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const crearEstablecimiento = async (payload: EstablecimientoPayload) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.post('http://localhost:3000/api/establecimientos', payload, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      return response.data;
+    } catch (err) {
+      const e = err as AxiosError<{ message: string }>;
+      setError(e.response?.data?.message || e.message || 'Error al crear el establecimiento');
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { crearEstablecimiento, loading, error };
+}
+
+export function useEditarEstablecimiento() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const editarEstablecimiento = async (establecimientoId: string, payload: EstablecimientoPayload) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.put(`http://localhost:3000/api/establecimientos/${establecimientoId}`, payload, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      return response.data;
+    } catch (err) {
+      const e = err as AxiosError<{ message: string }>;
+      setError(e.response?.data?.message || e.message || 'Error al editar el establecimiento');
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { editarEstablecimiento, loading, error };
 }

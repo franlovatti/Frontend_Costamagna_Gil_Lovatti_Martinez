@@ -94,6 +94,21 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(false);
   }, []);
 
+  const getTorneoPorCodigo = useCallback(async (codigo: string) => {
+    setLoading(true);
+    try {
+      const res = await apiAxios.get('/eventos/codigo/' + codigo);
+      setTorneo(res.data.data);
+      setError(null);
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      setError("No se pudo cargar el torneo por código: " + (axiosError.response?.data?.message || axiosError.message));
+    }
+    finally {
+      setLoading(false);
+    }
+  }, []);
+
   const filtrarTorneos = useCallback(async (fechaDesde?: string, fechaHasta?: string, deporte?: string, modalidad?: string, equiposDesde?: number, equiposHasta?: number) => {
     setLoading(true);
     try {
@@ -174,7 +189,7 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
   }, [getTorneos]);
 
   return (
-    <TorneoContext.Provider value={{ torneos, torneo, torneosCreados, torneosInscripto, loading, error, getTorneos, getUnTorneo, borrarTorneo, modificarTorneo, crearTorneo, filtrarTorneos, getTorneosCreadosPorUsuario, getTorneosInscriptoPorUsuario }}>
+    <TorneoContext.Provider value={{ torneos, torneo, torneosCreados, torneosInscripto, loading, error, getTorneos, getUnTorneo, getTorneoPorCodigo, borrarTorneo, modificarTorneo, crearTorneo, filtrarTorneos, getTorneosCreadosPorUsuario, getTorneosInscriptoPorUsuario }}>
       {children}
     </TorneoContext.Provider>
   );

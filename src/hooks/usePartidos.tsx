@@ -3,6 +3,19 @@ import axios from 'axios';
 import type { Partido } from '../types.tsx';
 import { AxiosError } from 'axios';
 
+type PartidoPayload = {
+  id?: number;
+  fecha: string;
+  hora: string;
+  juez: string;
+  resultadoLocal: number | null;
+  resultadoVisitante: number | null;
+  equipoLocal: number;
+  equipoVisitante: number;
+  evento: number;
+  establecimiento: number | null;
+};
+
 export function usePartidosEvento(eventoId?: string) {
   const [partidos, setPartidos] = useState<Partido[]>([]);
   const [loadingPartidos, setLoadingPartidos] = useState(false);
@@ -119,4 +132,52 @@ export function useCargarResultados() {
   };
 
   return { cargarResultados, loading, error };
+}
+
+export function useCrearPartido() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const crearPartido = async (payload: PartidoPayload) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.post('http://localhost:3000/api/partidos', payload, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      return response.data;
+    } catch (err) {
+      const e = err as AxiosError<{ message: string }>;
+      setError(e.response?.data?.message || e.message || 'Error al crear el partido');
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { crearPartido, loading, error };
+}
+
+export function useEditarPartido() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const editarPartido = async (partidoId: number, payload: PartidoPayload) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.put(`http://localhost:3000/api/partidos/${partidoId}`, payload, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      return response.data;
+    } catch (err) {
+      const e = err as AxiosError<{ message: string }>;
+      setError(e.response?.data?.message || e.message || 'Error al editar el partido');
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { editarPartido, loading, error };
 }

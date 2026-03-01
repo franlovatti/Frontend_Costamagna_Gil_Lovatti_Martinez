@@ -38,6 +38,7 @@ export interface TorneoContextType {
   crearTorneo: (torneo: Torneo) => Promise<void>;
   getTorneosCreadosPorUsuario: (id: number) => Promise<void>;
   getTorneosInscriptoPorUsuario: (id: number) => Promise<void>;
+  getTorneoPorCodigo: (codigo: string) => Promise<void>;
 }
 
 export const TorneoContext = createContext<TorneoContextType | null>(null);

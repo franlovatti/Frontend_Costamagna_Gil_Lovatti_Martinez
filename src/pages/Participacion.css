@@ -25,12 +25,15 @@
 
 .equipos-tabs {
   display: flex;
+  width: 100%;
   background-color: var(--background);
   border-bottom: 1px solid var(--border);
+  gap: 0;
 }
 
 .equipo-tab {
   flex: 1;
+  min-width: 0;
   padding: 1.5rem;
   background-color: transparent;
   border: none;
@@ -40,6 +43,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  text-align: center;
 }
 
 .equipo-tab:hover {
