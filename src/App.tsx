@@ -33,7 +33,7 @@ import TorneoDetalle from './pages/TorneoDetalle.tsx';
 import CrearEquipo from './pages/CrearEquipo.tsx';
 import EditarEquipo from './pages/EditarEquipo.tsx';
 import CrearParticipacion from './pages/CrearParticipacion.tsx';
-import MisTorneos from './pages/misTorneos.tsx';
+import MisTorneos from './pages/MisTorneos.tsx';
 import UsuariosAdmin from './pages/admin/UsuariosAdmin.tsx';
 import NoticiasAdmin from './pages/admin/NoticiasAdmin.tsx';
 import PartidoDetalle from './pages/PartidoDetalle.tsx';

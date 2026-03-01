@@ -1,6 +1,5 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { UsuarioContext } from '../contexts/usuario';
-import type { Usuario } from '../types';
+import { UsuarioContext, type Usuario } from '../contexts/usuario';
 import apiAxios from '../helpers/api.tsx';
 
 export const useUsuario = () => {

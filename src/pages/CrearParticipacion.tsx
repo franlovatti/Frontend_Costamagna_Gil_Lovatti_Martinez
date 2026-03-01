@@ -1,7 +1,8 @@
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router';
 import { useEffect, useState } from 'react';
-import type { Usuario, Participation } from '../types.tsx';
+import type { Participation } from '../types.tsx';
+import type { Usuario } from '../contexts/usuario.tsx';
 import type { ParticipacionPayload, ParticipacionEditPayload } from '../hooks/useParticipaciones';
 import './Participacion.css';
 import { useParticipacion } from '../hooks/useParticipaciones.tsx';

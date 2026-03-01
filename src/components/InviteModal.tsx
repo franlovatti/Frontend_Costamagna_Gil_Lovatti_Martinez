@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import apiAxios from '../helpers/api';
+import { useInvitacion } from '../hooks/useInvitacion.tsx';
 
 interface InviteModalProps {
   equipoId: number;
@@ -9,47 +9,27 @@ interface InviteModalProps {
 
 export function InviteModal({ equipoId, isOpen, onClose }: InviteModalProps) {
   const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const { enviarInvitacion, error, loading } = useInvitacion();
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.trim()) return;
-    setLoading(true);
-    setError(null);
     setSuccess(false);
-    try {
-      await apiAxios.post('/invitaciones/enviar', {
-        equipoId,
-        emailInvitado: email.trim(),
-      });
+    enviarInvitacion(equipoId, email)
+    if (!error) {
       setSuccess(true);
       setEmail('');
       setTimeout(() => {
         onClose();
         setSuccess(false);
       }, 2000);
-    } catch (err: unknown) {
-      const errorObj = err as {
-        response?: { data?: { message?: string } };
-        message?: string;
-      };
-      setError(
-        errorObj?.response?.data?.message ??
-          (err as Error).message ??
-          'Error al enviar invitación.',
-      );
-    } finally {
-      setLoading(false);
     }
   }
 
   function handleClose() {
     if (!loading) {
       onClose();
-      setEmail('');
-      setError(null);
       setSuccess(false);
     }
   }
@@ -101,16 +81,10 @@ export function InviteModal({ equipoId, isOpen, onClose }: InviteModalProps) {
                     disabled={loading}
                   />
                 </div>
-                {error && (
-                  <p
-                    style={{
-                      color: 'red',
-                      marginTop: '0.5rem',
-                      fontSize: '0.9rem',
-                    }}
-                  >
-                    {error}
-                  </p>
+                {(error) && (
+                  <div className="alert-danger-custom">
+                    ⚠️ {error}
+                  </div>
                 )}
               </>
             )}

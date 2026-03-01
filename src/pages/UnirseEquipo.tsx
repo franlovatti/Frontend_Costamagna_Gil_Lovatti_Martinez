@@ -1,103 +1,47 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import apiAxios from '../helpers/api';
+import { useInvitacion } from '../hooks/useInvitacion';
 import './Auth.css';
-
-interface InvitacionData {
-  emailInvitado: string;
-  estado: string;
-  expirada: boolean;
-  aceptada: boolean;
-  equipo: {
-    id: number;
-    nombre: string;
-    esPublico: boolean;
-  };
-  evento: {
-    id: number;
-    nombre: string;
-  } | null;
-  capitan: {
-    id: number;
-    nombre: string;
-    apellido: string;
-  };
-}
 
 export default function UnirseEquipo() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { isAuthenticated, loading: authLoading } = useAuth();
+  const { invitacion, loading, error: invitacionError, getInvitacion, aceptarInvitacion } = useInvitacion();
 
   const token = searchParams.get('token');
-
-  const [invitacion, setInvitacion] = useState<InvitacionData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [errorToken, setErrorToken] = useState<string | null>(null);
   const [accepting, setAccepting] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [acceptError, setAcceptError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) {
-      setError('Token de invitación no proporcionado');
-      setLoading(false);
+      setErrorToken('Token de invitación no proporcionado');
       return;
     }
-
-    const fetchInvitacion = async () => {
-      try {
-        const response = await apiAxios.get(`/invitaciones/${token}`);
-        setInvitacion(response.data.data);
-        setError(null);
-      } catch (err: unknown) {
-        const axiosError = err as {
-          response?: { status?: number; data?: { message?: string } };
-        };
-        if (axiosError.response?.status === 404) {
-          setError('Invitación no encontrada');
-        } else {
-          setError(
-            axiosError.response?.data?.message ||
-              'Error al cargar la invitación',
-          );
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchInvitacion();
-  }, [token]);
+    getInvitacion(token)
+  }, [token, getInvitacion]);
 
   const handleAceptarInvitacion = async () => {
-    if (!token) return;
-
-    setAccepting(true);
-    setAcceptError(null);
-
-    try {
-      await apiAxios.post('/invitaciones/aceptar', { token });
-      setSuccess(true);
-
-      // Redirect to team page after a short delay
-      setTimeout(() => {
-        if (invitacion?.equipo?.id) {
-          navigate(`/home/equipos/${invitacion.equipo.id}`);
-        } else {
-          navigate('/home');
-        }
-      }, 2000);
-    } catch (err: unknown) {
-      const axiosError = err as { response?: { data?: { message?: string } } };
-      setAcceptError(
-        axiosError.response?.data?.message || 'Error al aceptar la invitación',
-      );
-    } finally {
-      setAccepting(false);
+    if (!token) {
+      setErrorToken('Token de invitación no proporcionado');
+      return;
     }
+    setAccepting(true);
+    aceptarInvitacion(token);
+    if (!invitacionError) {
+      setAccepting(false);
+      setSuccess(true);
+      setTimeout(() => {
+      if (invitacion?.equipo?.id) {
+        navigate(`/home/equipos/${invitacion.equipo.id}`);
+      } else {
+        navigate('/home');
+      }
+    }, 2000);
   };
+}
 
   if (loading || authLoading) {
     return (
@@ -120,18 +64,10 @@ export default function UnirseEquipo() {
     );
   }
 
-  if (error) {
+  if (errorToken || invitacionError ) {
     return (
-      <div className="auth-container">
-        <div className="auth-card">
-          <h2 className="auth-title">Invitación</h2>
-          <div className="auth-error-alert">{error}</div>
-          <div className="auth-button-group">
-            <Link to="/home" className="auth-btn auth-btn-secondary">
-              Volver al Inicio
-            </Link>
-          </div>
-        </div>
+      <div className="alert-danger-custom">
+        ⚠️ {errorToken || invitacionError}
       </div>
     );
   }
@@ -296,12 +232,6 @@ export default function UnirseEquipo() {
             Correo: <strong>{invitacion.emailInvitado}</strong>
           </p>
         </div>
-
-        {acceptError && (
-          <div className="auth-error-alert" style={{ marginBottom: '1rem' }}>
-            {acceptError}
-          </div>
-        )}
 
         {isAuthenticated ? (
           <>

@@ -1,5 +1,6 @@
 import {  useEffect, useState } from "react";
-import type { Equipo, Partido, Torneo } from "../types";
+import type { Equipo, Partido } from "../types";
+import type { Torneo } from "../contexts/torneo";
 import apiAxios from "../helpers/api";
 import { AxiosError } from "axios";
 
