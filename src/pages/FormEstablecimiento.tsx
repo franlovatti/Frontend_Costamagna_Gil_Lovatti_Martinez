@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useOneEstablecimiento } from '../hooks/useEstablecimientos.tsx';
-import axios from 'axios';
+import apiAxios from '../helpers/api.tsx';
 import MapaLocalidad from '../components/ApiMaps/MapaLocalidad.tsx';
 import './CrearEquipo.css';
 
@@ -55,11 +55,11 @@ useEffect(() => {
 
     try {
       if (isEditing) {
-        await axios.put(`http://localhost:3000/api/establecimientos/${idE}`, payload, {
+        await apiAxios.put(`/establecimientos/${idE}`, payload, {
           headers: { 'Content-Type': 'application/json' },
         });
       } else {
-        await axios.post('http://localhost:3000/api/establecimientos', payload, {
+        await apiAxios.post('/establecimientos', payload, {
           headers: { 'Content-Type': 'application/json' },
         });
       }

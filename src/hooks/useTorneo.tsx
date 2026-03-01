@@ -1,7 +1,7 @@
 import { useContext, useEffect, useCallback, useState } from 'react';
 import { TorneoContext } from '../contexts/torneo.tsx';
 import apiAxios from '../helpers/api.tsx';
-import type { Torneo } from '../types.tsx';
+import type { Torneo } from '../contexts/torneo.tsx';
 
 export const useTorneo = () => {
   const context = useContext(TorneoContext);
