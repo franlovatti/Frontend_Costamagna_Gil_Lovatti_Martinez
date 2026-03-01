@@ -4,8 +4,7 @@ import type { Torneo } from "../contexts/torneo.tsx";
 import { useDeporte } from "../hooks/useDeporte.tsx";
 import { useLocalidad } from "../hooks/useLocalidad.tsx";
 import { toDatetimeLocal, parseDatetimeLocal } from "../helpers/convertirFechas.tsx";
-import '../components/cssComponentes/FormTorneos.css';
-import { useNavigate } from "react-router-dom";
+import './cssComponentes/FormTorneos.css';
 
 type TorneoFormFields = {
   nombre: string;
@@ -27,14 +26,13 @@ interface TorneoFormProps {
   onSave: (data: Partial<Torneo>) => void;
 }
 
-export default function TorneoFormModal({
+export default function FormTorneos({
   setShowModal,
   editingTorneo,
   onSave
 }: TorneoFormProps) {
   const { deportes, getDeportes, error: errorDeporte } = useDeporte();
   const { localidades, getLocalidades, error: errorLocalidad } = useLocalidad();
-  const navigate = useNavigate();
   const isEditing = Boolean(editingTorneo);
 
   const {
@@ -50,10 +48,10 @@ export default function TorneoFormModal({
       esPublico: editingTorneo?.esPublico ? 'true' : 'false',
       contraseña: editingTorneo?.contraseña || '',
       cantEquiposMax: editingTorneo?.cantEquiposMax || 8,
-      fechaInicioInscripcion: toDatetimeLocal(editingTorneo?.fechaInicioInscripcion),
-      fechaFinInscripcion: toDatetimeLocal(editingTorneo?.fechaFinInscripcion),
-      fechaInicioEvento: toDatetimeLocal(editingTorneo?.fechaInicioEvento),
-      fechaFinEvento: toDatetimeLocal(editingTorneo?.fechaFinEvento),
+      fechaInicioInscripcion: toDatetimeLocal(editingTorneo?.fechaInicioInscripcion).split('T')[0] || '',
+      fechaFinInscripcion: toDatetimeLocal(editingTorneo?.fechaFinInscripcion).split('T')[0] || '',
+      fechaInicioEvento: toDatetimeLocal(editingTorneo?.fechaInicioEvento).split('T')[0] || '',
+      fechaFinEvento: toDatetimeLocal(editingTorneo?.fechaFinEvento).split('T')[0] || '',
       deporteId: editingTorneo?.deporte?.id || 0,
       localidadId: editingTorneo?.localidad?.id || 0,
     }
@@ -105,10 +103,10 @@ export default function TorneoFormModal({
         <div className="form-header">
           <button 
             className="btn-back"
-            onClick={() => navigate('/home/torneos')}
+            onClick={() => {setShowModal(false); window.scrollTo({ top: 0, behavior: 'smooth' });}}
             type="button"
           >
-            ← Volver a torneos
+            ← Volver
           </button>
           <h1 className="form-title">
             {isEditing ? 'Editar Torneo' : 'Crear Nuevo Torneo'}
@@ -220,7 +218,7 @@ export default function TorneoFormModal({
                       </label>
                       <input
                         id="fechaInicioInscripcion"
-                        type="datetime-local"
+                        type="date"
                         className={`form-control custom-input ${errors.fechaInicioInscripcion ? 'is-invalid' : ''}`}
                         {...register("fechaInicioInscripcion", { 
                           required: "La fecha de inicio de inscripción es obligatoria"
@@ -237,7 +235,7 @@ export default function TorneoFormModal({
                       </label>
                       <input
                         id="fechaFinInscripcion"
-                        type="datetime-local"
+                        type="date"
                         className={`form-control custom-input ${errors.fechaFinInscripcion ? 'is-invalid' : ''}`}
                         {...register("fechaFinInscripcion", { 
                           required: "La fecha de fin de inscripción es obligatoria",
@@ -267,7 +265,7 @@ export default function TorneoFormModal({
                       </label>
                       <input
                         id="fechaInicioTorneo"
-                        type="datetime-local"
+                        type="date"
                         className={`form-control custom-input ${errors.fechaInicioEvento ? 'is-invalid' : ''}`}
                         {...register("fechaInicioEvento", { 
                           required: "La fecha de inicio del evento es obligatoria",
@@ -289,7 +287,7 @@ export default function TorneoFormModal({
                       </label>
                       <input
                         id="fechaFinTorneo"
-                        type="datetime-local"
+                        type="date"
                         className={`form-control custom-input ${errors.fechaFinEvento ? 'is-invalid' : ''}`}
                         {...register("fechaFinEvento", { 
                           required: "La fecha de fin del evento es obligatoria",
@@ -444,7 +442,7 @@ export default function TorneoFormModal({
             <button
               type="button"
               className="btn-cancel-form"
-              onClick={() => setShowModal(false)}
+              onClick={() => {setShowModal(false); window.scrollTo({ top: 0, behavior: 'smooth' });}}
               disabled={isSubmitting}
             >
               Cancelar
