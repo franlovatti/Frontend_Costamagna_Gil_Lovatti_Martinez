@@ -1,6 +1,8 @@
 import { createContext } from "react";
 import type { User } from "./auth";
-import type { Equipo, Partido, Participation } from "../types";
+import type { Equipo } from "./equipo.tsx";
+import type { Partido } from "./partido.tsx";
+import type { Participation } from "./participacion.tsx"; 
 
 export interface Usuario {
   id: number;

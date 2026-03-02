@@ -1,6 +1,6 @@
 import { useEstablecimientosEvento } from '../hooks/useEstablecimientos.tsx';
 import { useParams, useNavigate } from 'react-router';
-import type { Establecimiento } from '../types.tsx';
+import type { Establecimiento } from '../contexts/establecimiento.tsx';
 import { useState } from 'react';
 import ConfirmModal from '../components/ConfirmModal.tsx';
 import Alert from '../components/Alert.tsx';

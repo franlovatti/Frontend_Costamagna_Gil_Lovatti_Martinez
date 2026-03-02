@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTorneo } from '../hooks/useTorneo';
 import CardTorneos from '../components/CardTorneos';
 import { useNavigate } from 'react-router-dom';
-import type { Equipo } from '../types';
+import type { Equipo } from '../contexts/equipo.tsx';
 import type { Usuario } from '../contexts/usuario.tsx';
 import type { Torneo } from '../contexts/torneo.tsx';
 import type { Deporte } from '../contexts/deporte.tsx';

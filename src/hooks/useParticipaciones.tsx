@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useContext } from 'react';
 import apiAxios from '../helpers/api';
-import type { Participation } from '../types';
+import { ParticipationContext, type Participation } from '../contexts/participacion.tsx';
 import { AxiosError } from 'axios';
 
 // Tipos para los payloads
@@ -14,6 +14,14 @@ export interface ParticipacionPayload {
 
 export interface ParticipacionEditPayload extends ParticipacionPayload {
   id: number;
+}
+
+export function useParticipacion(){
+  const context = useContext(ParticipationContext);
+    if (!context) {
+      throw new Error('useParticipacion must be used within an ParticipationProvider');
+    }
+    return context;
 }
 
 export function useParticipaciones(partidoId: string, equipoId: string) {
@@ -191,7 +199,7 @@ export const useParticipacionesTotalesPorTorneo = (
   return { participaciones, loading, error };
 };
 
-export const useParticipacion = () => {
+export const useParticipacionBasic = () => {
   const [participaciones, setParticipaciones] = useState<Participation[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);

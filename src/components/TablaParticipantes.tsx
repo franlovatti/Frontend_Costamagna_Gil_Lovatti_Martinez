@@ -1,4 +1,5 @@
-import type { Equipo, Participation } from "../types";
+import type { Equipo } from "../contexts/equipo.tsx";
+import type { Participation } from "../contexts/participacion.tsx";
 import type { Usuario } from "../contexts/usuario.tsx";
 
 export default function TablaParticipantes({

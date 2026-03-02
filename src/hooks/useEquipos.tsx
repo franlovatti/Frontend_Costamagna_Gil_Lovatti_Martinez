@@ -1,6 +1,7 @@
-import {  useEffect, useState } from "react";
-import type { Equipo, Partido } from "../types";
-import type { Torneo } from "../contexts/torneo";
+import {  useEffect, useState, useContext } from "react";
+import { EquipoContext, type Equipo } from "../contexts/equipo.tsx";
+import type { Partido } from "../contexts/partido.tsx";
+import type { Torneo } from "../contexts/torneo.tsx";
 import apiAxios from "../helpers/api";
 import { AxiosError } from "axios";
 
@@ -18,6 +19,14 @@ export interface EquiposPayload {
 
 export interface EquiposPayloadEdit extends EquiposPayload {
   id: number;
+}
+
+export function useEquipos() {
+  const context = useContext(EquipoContext);
+    if (!context) {
+      throw new Error('useEquipos must be used within an EquipoProvider');
+    }
+    return context;
 }
 
 export function useEquiposEvento(eventoId?: string) {

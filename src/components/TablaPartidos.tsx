@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import type { Partido } from "../types";
+import type { Partido } from "../contexts/partido.tsx";
 import type { Torneo } from "../contexts/torneo";
 import { formatFecha } from "../helpers/convertirFechas.tsx";
 

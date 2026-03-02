@@ -1,4 +1,4 @@
-import type { Equipo } from "../types";
+import type { Equipo } from "../contexts/equipo.tsx";
 
 export default function ModalInscripcion(
   { selectedTeam, 

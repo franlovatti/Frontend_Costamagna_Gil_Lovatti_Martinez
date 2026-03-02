@@ -1,4 +1,4 @@
-import type { Partido } from "../types";
+import type { Partido } from "../contexts/partido.tsx";
 
 export default function ModalResultados(
   { 

@@ -1,12 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import axios, { AxiosError } from 'axios';
-import type { Establecimiento } from '../types';
+import type { Establecimiento } from '../contexts/establecimiento.tsx';
+import { EstablecimientoContext } from '../contexts/establecimiento.tsx';
 
 type EstablecimientoPayload = {
   nombre: string;
   direccion: string;
   evento: string | number;
 };
+
+export function useEstablecimientos() {
+  const context = useContext(EstablecimientoContext);
+    if (!context) {
+      throw new Error('useEstablecimientos must be used within an EstablecimientoProvider');
+    }
+    return context;
+}
 
 export function useEstablecimientosEvento(eventoId?: string) {
   const [establecimientos, setEstablecimientos] = useState<Establecimiento[]>(

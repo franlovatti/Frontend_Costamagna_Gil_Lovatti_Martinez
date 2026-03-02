@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
-import type { Partido } from '../types.tsx';
+import type { Partido } from '../contexts/partido.tsx';
+import { PartidoContext } from '../contexts/partido.tsx';
 import { AxiosError } from 'axios';
 
 type PartidoPayload = {
@@ -15,6 +16,14 @@ type PartidoPayload = {
   evento: number;
   establecimiento: number | null;
 };
+
+export function usePartidos() {
+  const context = useContext(PartidoContext);
+    if (!context) {
+      throw new Error('usePartidos must be used within an PartidoProvider');
+    }
+    return context;
+  }
 
 export function usePartidosEvento(eventoId?: string) {
   const [partidos, setPartidos] = useState<Partido[]>([]);

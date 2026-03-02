@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useObtenerEquipo, useEditarEquipo, useRemoverMiembroEquipo } from '../hooks/useEquipos';
-import type { Equipo } from '../types';
+import type { Equipo } from '../contexts/equipo.tsx';
 import type { Usuario } from '../contexts/usuario';
 import { Row, Col } from 'react-bootstrap';
 import { InviteModal } from '../components/InviteModal';

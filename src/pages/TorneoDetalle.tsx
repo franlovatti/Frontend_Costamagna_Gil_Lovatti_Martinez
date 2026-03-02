@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router-dom';
-import type { Equipo, Participation, Partido, Stats } from '../types';
+import type { Equipo } from '../contexts/equipo.tsx';
+import type { Participation } from '../contexts/participacion.tsx';
+import type { Partido } from '../contexts/partido.tsx';
 import type { Torneo } from '../contexts/torneo.tsx';
 import type { Usuario } from '../contexts/usuario.tsx';
 import { Row, Col } from 'react-bootstrap';
@@ -48,6 +50,13 @@ export default function TorneoDetalle() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  type Stats = {
+    puntos: number;
+    minutosjugados: number;
+    faltas: number;
+    equipo: number;
+  };
 
   useEffect(() => {
     getUnTorneo(Number(id));

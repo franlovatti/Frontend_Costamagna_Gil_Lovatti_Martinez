@@ -1,18 +1,18 @@
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router';
 import { useEffect, useState } from 'react';
-import type { Participation } from '../types.tsx';
+import type { Participation } from '../contexts/participacion.tsx';
 import type { Usuario } from '../contexts/usuario.tsx';
 import type { ParticipacionPayload, ParticipacionEditPayload } from '../hooks/useParticipaciones';
 import './Participacion.css';
-import { useParticipacion } from '../hooks/useParticipaciones.tsx';
+import { useParticipacionBasic } from '../hooks/useParticipaciones.tsx';
 import { useOnePartido } from '../hooks/usePartidos.tsx';
 import ConfirmModal from '../components/ConfirmModal.tsx';
 
 export default function CrearParticipacion() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { crearParticipacion, editarParticipacion, borrarParticipacion, traerParticipacionesEquipo, loading, error, participaciones } = useParticipacion();
+  const { crearParticipacion, editarParticipacion, borrarParticipacion, traerParticipacionesEquipo, loading, error, participaciones } = useParticipacionBasic();
   const { partido } = useOnePartido(id);
   const [miembrosLocal, setMiembrosLocal] = useState<Usuario[]>([]);
   const [miembrosVisitante, setMiembrosVisitante] = useState<Usuario[]>([]);

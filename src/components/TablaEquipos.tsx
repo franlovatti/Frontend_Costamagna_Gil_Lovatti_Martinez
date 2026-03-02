@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import type { Equipo } from "../types";
+import type { Equipo } from "../contexts/equipo.tsx";
 import type { Torneo } from "../contexts/torneo";
 import { estaAbiertoPeriodo } from "../helpers/convertirFechas.tsx";
 
