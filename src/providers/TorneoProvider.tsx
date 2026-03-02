@@ -151,7 +151,6 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
         deporte: torneo.deporte.id,
         localidad: torneo.localidad.id,
       };
-      console.log("Payload de torneo a modificar: ", payload);
       await apiAxios.put(`/eventos/${torneo.id}`, payload);
       await getTorneos();
     } catch (error) {
@@ -175,7 +174,6 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
         deporte: torneo.deporte.id,
         localidad: torneo.localidad.id,
       };
-      console.log("Payload de torneo a crear payload: ", payload);
       await apiAxios.post("/eventos", payload);
       await getTorneos();
     } catch (error) {

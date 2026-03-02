@@ -17,7 +17,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     try {
       const res = await apiAxios.get(`/usuarios/perfil/${id}`);
       const userData = res.data.data;
-      console.log('Datos del perfil obtenidos:', userData);
       setUser(prevUser => ({ ...prevUser, ...userData }));
     } catch (error) {
       console.error("Error al obtener el perfil del usuario:", error);

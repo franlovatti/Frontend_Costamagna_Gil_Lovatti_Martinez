@@ -44,7 +44,6 @@ const LocalidadProvider = ({ children }: { children: React.ReactNode }) => {
   const crearLocalidad = useCallback(async (localidad: Localidad) => {
     setError(null);
     setLoading(true);
-    console.log("Creando localidad:", localidad);
     try {
       await apiAxios.post("/localidades", localidad);
       await getLocalidades();

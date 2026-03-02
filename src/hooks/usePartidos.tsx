@@ -58,7 +58,6 @@ export function useOnePartido(partidoId?: string) {
           `http://localhost:3000/api/partidos/${partidoId}`
         );
         setPartido(response.data.data);
-        console.log(response.data.data);
       } catch (err) {
         setErrorPartido(err as Error);
       } finally {

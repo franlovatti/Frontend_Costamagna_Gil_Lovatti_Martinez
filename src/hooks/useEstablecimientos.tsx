@@ -78,7 +78,6 @@ export function useOneEstablecimiento(establecimientoId?: string) {
           `http://localhost:3000/api/establecimientos/${establecimientoId}`
         );
         setestablecimiento(response.data.data);
-        console.log(response.data.data);
       } catch (err) {
         setErrorEstablecimiento(err as Error);
       } finally {

@@ -175,7 +175,6 @@ export const useParticipacionesTotalesPorTorneo = (
           params: { eventoId: eventoId },
         },
       );
-      console.log('Participaciones totales por torneo:', response.data.data);
       setParticipaciones(response.data.data);
     } catch (err) {
       console.error('Error fetching participations:', err);
