@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useOneEstablecimiento, useCrearEstablecimiento, useEditarEstablecimiento } from '../hooks/useEstablecimientos.tsx';
+import { useEstablecimientos } from '../hooks/useEstablecimientos.tsx';
 import MapaLocalidad from '../components/ApiMaps/MapaLocalidad.tsx';
 import './CrearEquipo.css';
+import type { Establecimiento, EstablecimientoPayloadEdicion } from '../contexts/establecimiento.tsx';
 
 export default function FormEstablecimiento() {
   const navigate = useNavigate();
   const { idT, idE } = useParams<{ idT: string; idE: string }>();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
+  const [establecimiento, setEstablecimiento] = useState<Establecimiento | null>(null);
 
   const [form, setForm] = useState({
     nombre: '',
@@ -18,9 +20,21 @@ export default function FormEstablecimiento() {
 
   const isEditing = !!idE;
 
-  const { establecimiento } = useOneEstablecimiento(idE);
-  const { crearEstablecimiento, error: errorCrear } = useCrearEstablecimiento();
-  const { editarEstablecimiento, error: errorEditar } = useEditarEstablecimiento();
+  const{error, getOneEstablecimiento, crearEstablecimiento, editarEstablecimiento} = useEstablecimientos();
+
+useEffect(() => {
+  if(!idE || !isEditing) return;
+
+  const fetchEstablecimiento = async () => {
+    const data = await getOneEstablecimiento(Number(idE));
+    if (data) {
+      setEstablecimiento(data);
+    } else {
+      console.error('No se pudo obtener el establecimiento para editar');
+    }
+  };
+  fetchEstablecimiento();
+},[getOneEstablecimiento, isEditing, idE])
 
 useEffect(() => {
   if (isEditing && establecimiento) {
@@ -49,7 +63,7 @@ useEffect(() => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    const payload = {
+    const payload: EstablecimientoPayloadEdicion = {
       nombre: form.nombre,
       direccion: form.direccion,
       evento: idT || '',
@@ -57,7 +71,7 @@ useEffect(() => {
 
     let result;
     if (isEditing && idE) {
-      result = await editarEstablecimiento(idE, payload);
+      result = await editarEstablecimiento(Number(idE), payload);
     } else {
       result = await crearEstablecimiento(payload);
     }
@@ -65,8 +79,7 @@ useEffect(() => {
     if (result) {
       setShowSuccess(true);
     } else {
-      const errorMsg = isEditing ? errorEditar : errorCrear;
-      console.error('Error:', errorMsg);
+      console.error('Error:', error);
     }
 
     setIsSubmitting(false);

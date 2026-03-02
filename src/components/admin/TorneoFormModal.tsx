@@ -12,7 +12,7 @@ type TorneoFormFields = {
   nombre: string;
   descripcion: string;
   esPublico: boolean;
-  contraseña: string;
+  constrasenia: string;
   cantEquiposMax: number;
   fechaInicioInscripcion: string;
   fechaFinInscripcion: string;
@@ -47,7 +47,7 @@ export default function TorneoFormModal({
       nombre: editingTorneo?.nombre || '',
       descripcion: editingTorneo?.descripcion || '',
       esPublico: editingTorneo?.esPublico ?? true,
-      contraseña: editingTorneo?.contraseña || '',
+      constrasenia: editingTorneo?.constrasenia || '',
       cantEquiposMax: editingTorneo?.cantEquiposMax || 8,
       fechaInicioInscripcion: toDatetimeLocal(editingTorneo?.fechaInicioInscripcion),
       fechaFinInscripcion: toDatetimeLocal(editingTorneo?.fechaFinInscripcion),
@@ -78,7 +78,7 @@ export default function TorneoFormModal({
       nombre: data.nombre,
       descripcion: data.descripcion,
       esPublico: data.esPublico,
-      contraseña: data.esPublico ? undefined : data.contraseña,
+      constrasenia: data.esPublico ? undefined : data.constrasenia,
       cantEquiposMax: data.cantEquiposMax,
       fechaInicioInscripcion: parseDatetimeLocal(data.fechaInicioInscripcion)!,
       fechaFinInscripcion: parseDatetimeLocal(data.fechaFinInscripcion)!,
@@ -223,24 +223,24 @@ export default function TorneoFormModal({
             </label>
           </div>
 
-          {/* Contraseña (solo si es privado) */}
+          {/* constrasenia (solo si es privado) */}
           {!esPublico && (
             <div className="mb-3">
-              <label className="form-label">Contraseña *</label>
+              <label className="form-label">constrasenia *</label>
               <input
                 type="password"
-                className={`form-control custom-input ${errors.contraseña ? 'is-invalid' : ''}`}
-                placeholder="Ingrese una contraseña"
-                {...register("contraseña", { 
-                  required: !esPublico ? "La contraseña es obligatoria para torneos privados" : false,
+                className={`form-control custom-input ${errors.constrasenia ? 'is-invalid' : ''}`}
+                placeholder="Ingrese una constrasenia"
+                {...register("constrasenia", { 
+                  required: !esPublico ? "La constrasenia es obligatoria para torneos privados" : false,
                   minLength: {
                     value: 4,
-                    message: "La contraseña debe tener al menos 4 caracteres"
+                    message: "La constrasenia debe tener al menos 4 caracteres"
                   }
                 })}
               />
-              {errors.contraseña && (
-                <span className="auth-error-text">{errors.contraseña.message}</span>
+              {errors.constrasenia && (
+                <span className="auth-error-text">{errors.constrasenia.message}</span>
               )}
             </div>
           )}

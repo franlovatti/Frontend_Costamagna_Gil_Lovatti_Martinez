@@ -173,11 +173,11 @@ export default function TorneoDetalle() {
     }
     
     if (!selectedTeam.esPublico && enrollPassword.trim() === '') {
-      setEnrollError('La contraseña es obligatoria para este equipo');
+      setEnrollError('La constrasenia es obligatoria para este equipo');
       return;
     }
-    if (!selectedTeam.esPublico && enrollPassword !== selectedTeam.contraseña) {
-      setEnrollError('La contraseña es incorrecta');
+    if (!selectedTeam.esPublico && enrollPassword !== selectedTeam.constrasenia) {
+      setEnrollError('La constrasenia es incorrecta');
       return;
     }
     

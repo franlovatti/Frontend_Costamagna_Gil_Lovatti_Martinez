@@ -1,7 +1,8 @@
 import { createContext } from "react";
 import type { Deporte } from "./deporte";
 import type { Localidad } from "./localidad.tsx";
-import type { Equipo, Partido } from "../types.tsx";
+import type { Equipo } from "./equipo.tsx";
+import type { Partido } from "./partido.tsx";
 
 export interface Torneo {
   id?: number;
@@ -18,7 +19,7 @@ export interface Torneo {
   creador: number;
   partidos?: Partido[];
   codigo?: string;
-  contraseña?: string;
+  constrasenia?: string;
   descripcion?: string;
   img?: string;
 } 

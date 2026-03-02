@@ -16,7 +16,7 @@ export default function Registro() {
     apellido: string;
     usuario: string;
     email: string;
-    contraseña: string;
+    constrasenia: string;
     fechaNacimiento: string;
     remember: boolean;
   };
@@ -34,7 +34,7 @@ export default function Registro() {
         data.nombre,
         data.apellido,
         data.usuario,
-        data.contraseña,
+        data.constrasenia,
         data.fechaNacimiento,
         data.email,
         data.remember
@@ -120,17 +120,17 @@ export default function Registro() {
             <input
               type="password"
               className="auth-input"
-              placeholder="Contraseña"
-              {...register("contraseña", { 
+              placeholder="constrasenia"
+              {...register("constrasenia", { 
                 required: "Este campo es obligatorio",
                 minLength: {
                   value: 6,
-                  message: "La contraseña debe tener al menos 6 caracteres"
+                  message: "La constrasenia debe tener al menos 6 caracteres"
                 }
               })}
             />
-            {errors.contraseña && (
-              <span className="auth-error-text">{errors.contraseña.message}</span>
+            {errors.constrasenia && (
+              <span className="auth-error-text">{errors.constrasenia.message}</span>
             )}
           </div>
 
@@ -191,7 +191,7 @@ export default function Registro() {
 
           <div className="auth-link-container">
             <Link to="/ForgotPassword" className="auth-link">
-              ¿Olvidaste tu contraseña?
+              ¿Olvidaste tu constrasenia?
             </Link>
           </div>
         </form>
@@ -219,7 +219,7 @@ export default function Registro() {
 //     apellido: string;
 //     usuario: string;
 //     email: string;
-//     contraseña: string;
+//     constrasenia: string;
 //     fechaNacimiento: string;
 //     remember: boolean;
 //   };
@@ -237,7 +237,7 @@ export default function Registro() {
 //         data.nombre,
 //         data.apellido,
 //         data.usuario,
-//         data.contraseña,
+//         data.constrasenia,
 //         data.fechaNacimiento,
 //         data.email,
 //         data.remember
@@ -294,10 +294,10 @@ export default function Registro() {
 //             <div className="mb-3">
 //               <InputField
 //                 type="password"
-//                 placeholder="Contraseña"
-//                 {...register("contraseña", { required: true })}
+//                 placeholder="constrasenia"
+//                 {...register("constrasenia", { required: true })}
 //               />
-//               {errors.contraseña && <span className="text-danger">Este campo es obligatorio</span>}
+//               {errors.constrasenia && <span className="text-danger">Este campo es obligatorio</span>}
 //             </div>
 //             <div className="mb-3">
 //               <input
@@ -336,7 +336,7 @@ export default function Registro() {
 //           )}
 //           {error && <div className="alert alert-danger mt-3">{error}</div>}
 //           <div className="text-center mt-3">
-//             <Link to="/ForgotPassword">¿Olvidaste tu contraseña?</Link>
+//             <Link to="/ForgotPassword">¿Olvidaste tu constrasenia?</Link>
 //           </div>
 //         </form>
 //       </div>

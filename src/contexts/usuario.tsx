@@ -1,5 +1,22 @@
 import { createContext } from "react";
 import type { User } from "./auth";
+import type {Partido} from "./partido";
+import type { Equipo } from "./equipo";
+import type { Participacion } from "./participacion";
+
+export interface Usuario {
+  id: number;
+  nombre: string;
+  apellido: string;
+  email: string;
+  usuario: string;
+  equipos: Equipo[];
+  mvps: Partido[];
+  maxAnotados: Partido[];
+  participations: Participacion[];
+  equipocomocapitan: Equipo[];
+}
+
 
 type UsuarioContextType = {
   usuarios: User[];

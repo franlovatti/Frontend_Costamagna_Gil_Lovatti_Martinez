@@ -9,6 +9,8 @@ import TorneosProvider from './providers/TorneoProvider.tsx';
 import UsuariosProvider from './providers/UsuarioProvider.tsx';
 import NoticiasProvider from './providers/NoticiaProvider.tsx';
 import LocalidadProvider from './providers/LocalidadProvider.tsx';
+import EstablecimientoProvider from './providers/EstablecimientoProvider.tsx';
+import EquipoProvider from './providers/EquipoProvider.tsx';
 
 // Layouts and Components
 import NotFound from './pages/NotFound.js';
@@ -40,10 +42,14 @@ import PartidoDetalle from './pages/PartidoDetalle.tsx';
 import ListarEstablecimientos from './pages/ListarEstablecimientos.tsx';
 import UnirseEquipo from './pages/UnirseEquipo.tsx';
 
+
+
 function App() {
   return (
     <AuthProvider>
-      <DeportesProvider>
+      <EquipoProvider>
+        <EstablecimientoProvider>
+        <DeportesProvider>
         <TorneosProvider>
           <NoticiasProvider>
             <LocalidadProvider>
@@ -158,6 +164,8 @@ function App() {
           </NoticiasProvider>
         </TorneosProvider>
       </DeportesProvider>
+      </EstablecimientoProvider>
+      </EquipoProvider>
     </AuthProvider>
   );
 }

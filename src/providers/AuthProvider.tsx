@@ -24,11 +24,11 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     }
   }, []);
 
-  const login = useCallback(async (usuario: string, contraseña: string, remember: boolean) => {
+  const login = useCallback(async (usuario: string, constrasenia: string, remember: boolean) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await apiAxios.post('/usuarios/login', { usuario, contraseña, remember });
+      const response = await apiAxios.post('/usuarios/login', { usuario, constrasenia, remember });
       const data = response.data;
       if (data.token) {
         localStorage.setItem('token', data.token);
@@ -42,7 +42,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         await fectchPerfil(data.id);
         return true;
       }
-      setError("Usuario o contraseña incorrectos");
+      setError("Usuario o constrasenia incorrectos");
       return false;
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
@@ -66,7 +66,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     }
   }, []);
 
-  const registro = useCallback(async (nombre: string, apellido: string, usuario: string, contraseña: string, fechaNacimiento: string, email: string, remember: boolean) => {
+  const registro = useCallback(async (nombre: string, apellido: string, usuario: string, constrasenia: string, fechaNacimiento: string, email: string, remember: boolean) => {
     try {
       setLoading(true);
       setError(null);
@@ -74,7 +74,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         nombre,
         apellido,
         usuario,
-        contraseña,
+        constrasenia,
         fechaNacimiento,
         email,
         role: "Usuario",
@@ -82,7 +82,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         estado: true
       });
       if (response.status === 201 || response.status === 200) {
-        const loginSuccess = await login(usuario, contraseña, remember); // Iniciar sesión automáticamente después del registro
+        const loginSuccess = await login(usuario, constrasenia, remember); // Iniciar sesión automáticamente después del registro
         return loginSuccess;
       }
       setError("Error en el registro");

@@ -73,13 +73,13 @@ export default function Torneos() {
     setEventSubmitting(true);
     try {
       if (selectedEvent.esPublico === false) {
-        const requiredPwd = selectedEvent.contraseña;
+        const requiredPwd = selectedEvent.constrasenia;
         if (!eventPwd.trim()) {
-          setEventError('Ingrese la contraseña');
+          setEventError('Ingrese la constrasenia');
           return;
         }
         if (eventPwd !== requiredPwd) {
-          setEventError('Contraseña incorrecta');
+          setEventError('constrasenia incorrecta');
           return;
         }
       }
@@ -286,11 +286,11 @@ export default function Torneos() {
                   </p>
                   {selectedEvent.esPublico === false ? (
                     <div className="modal-form-group">
-                      <label className="modal-form-label">Contraseña del torneo</label>
+                      <label className="modal-form-label">constrasenia del torneo</label>
                       <input
                         type="password"
                         className="modal-form-input"
-                        placeholder="Ingrese la contraseña"
+                        placeholder="Ingrese la constrasenia"
                         value={eventPwd}
                         onChange={(e) => {
                           setEventPwd(e.target.value);
