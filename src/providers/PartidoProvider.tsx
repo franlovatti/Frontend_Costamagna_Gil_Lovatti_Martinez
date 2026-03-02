@@ -32,7 +32,7 @@ const PartidoProvider = ({ children }: { children: React.ReactNode }) => {
     setError(null);
 
     try {
-      const response = await apiAxios.get(`/partido/${partidoId}`);
+      const response = await apiAxios.get(`/partidos/${partidoId}`);
       return response.data.data;
     } catch (err) {
       const axiosError = err as AxiosError<{ message?: string }>;

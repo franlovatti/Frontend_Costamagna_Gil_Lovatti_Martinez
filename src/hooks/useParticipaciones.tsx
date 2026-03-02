@@ -3,19 +3,6 @@ import apiAxios from '../helpers/api';
 import type { Participation } from '../types';
 import { AxiosError } from 'axios';
 
-// Tipos para los payloads
-export interface ParticipacionPayload {
-  usuario: number;
-  minutosjugados: number;
-  faltas: number;
-  puntos: number;
-  partido: number;
-}
-
-export interface ParticipacionEditPayload extends ParticipacionPayload {
-  id: number;
-}
-
 export function useParticipaciones(partidoId: string, equipoId: string) {
   const [participaciones, setParticipaciones] = useState<Participation[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -201,31 +188,40 @@ export const useParticipacion = () => {
     setLoading(true);
     setError(null);
     try {
-      await apiAxios.post("/participaciones", p);
+      await apiAxios.post('/participaciones', p);
       return true;
     } catch (err) {
       const axiosError = err as AxiosError<{ message?: string }>;
-      setError("Error al crear la participación: " + (axiosError.response?.data?.message || axiosError.message));
+      setError(
+        'Error al crear la participación: ' +
+          (axiosError.response?.data?.message || axiosError.message),
+      );
       return false;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const editarParticipacion = useCallback(async (p: ParticipacionEditPayload) => {
-    setLoading(true);
-    setError(null);
-    try {
-      await apiAxios.put(`/participaciones/${p.id}`, p);
-      return true;
-    } catch (err) {
-      const axiosError = err as AxiosError<{ message?: string }>;
-      setError("Error al editar la participación: " + (axiosError.response?.data?.message || axiosError.message));
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const editarParticipacion = useCallback(
+    async (p: ParticipacionEditPayload) => {
+      setLoading(true);
+      setError(null);
+      try {
+        await apiAxios.put(`/participaciones/${p.id}`, p);
+        return true;
+      } catch (err) {
+        const axiosError = err as AxiosError<{ message?: string }>;
+        setError(
+          'Error al editar la participación: ' +
+            (axiosError.response?.data?.message || axiosError.message),
+        );
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
   const borrarParticipacion = async (participacionId: number) => {
     setLoading(true);
@@ -235,34 +231,53 @@ export const useParticipacion = () => {
       return true;
     } catch (err) {
       const e = err as AxiosError<{ message: string }>;
-      setError("Error al borrar la participación: " + (e.response?.data?.message || e.message));
+      setError(
+        'Error al borrar la participación: ' +
+          (e.response?.data?.message || e.message),
+      );
       return false;
     } finally {
       setLoading(false);
     }
   };
 
-  const traerParticipacionesEquipo = useCallback(async (id: string | undefined, equipoid: string) => {
-    if (!id || !equipoid) return;
-    const equipoIdNum = Number(equipoid);
-    if (isNaN(equipoIdNum) || equipoIdNum <= 0) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await apiAxios.get(
-        `/participaciones/participacionesxequipo`,
-        {
-          params: { partidoId: id, equipoid: equipoIdNum },
-        }
-      );
-      setParticipaciones(Array.isArray(response.data.data) ? response.data.data : []);
-    } catch (error) {
-      const e = error as AxiosError<{ message: string }>;
-      setError("Error al traer las participaciones: " + (e.response?.data?.message || e.message));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const traerParticipacionesEquipo = useCallback(
+    async (id: string | undefined, equipoid: string) => {
+      if (!id || !equipoid) return;
+      const equipoIdNum = Number(equipoid);
+      if (isNaN(equipoIdNum) || equipoIdNum <= 0) return;
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await apiAxios.get(
+          `/participaciones/participacionesxequipo`,
+          {
+            params: { partidoId: id, equipoid: equipoIdNum },
+          },
+        );
+        setParticipaciones(
+          Array.isArray(response.data.data) ? response.data.data : [],
+        );
+      } catch (error) {
+        const e = error as AxiosError<{ message: string }>;
+        setError(
+          'Error al traer las participaciones: ' +
+            (e.response?.data?.message || e.message),
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
-  return { crearParticipacion, editarParticipacion, borrarParticipacion, traerParticipacionesEquipo, participaciones, loading, error };
+  return {
+    crearParticipacion,
+    editarParticipacion,
+    borrarParticipacion,
+    traerParticipacionesEquipo,
+    participaciones,
+    loading,
+    error,
+  };
 };
