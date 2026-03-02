@@ -36,7 +36,9 @@ export function useInvitacion() {
       setInvitacion(response.data.data);
     } catch (err) {
       const axiosError = err as AxiosError<{ message?: string }>;
-      setError('Error al obtener la invitación: ' + axiosError.response?.data.message);
+      setError(
+        'Error al obtener la invitación: ' + axiosError.response?.data.message,
+      );
     } finally {
       setLoading(false);
     }
@@ -46,30 +48,44 @@ export function useInvitacion() {
     setLoading(true);
     setError(null);
     try {
-      await apiAxios.post(`/invitaciones/aceptar/${token}`);
+      await apiAxios.post('/invitaciones/aceptar', { token });
     } catch (err) {
       const axiosError = err as AxiosError<{ message?: string }>;
-      setError('Error al aceptar la invitación: ' + axiosError.response?.data.message);
+      setError(
+        'Error al aceptar la invitación: ' + axiosError.response?.data.message,
+      );
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const enviarInvitacion = useCallback(async (equipoId: number, emailInvitado: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      await apiAxios.post('/invitaciones/enviar', {
-        equipoId,
-        emailInvitado,
-      });
-    } catch (err) {
-      const axiosError = err as AxiosError<{ message?: string }>;
-      setError('Error al enviar la invitación: ' + axiosError.response?.data.message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const enviarInvitacion = useCallback(
+    async (equipoId: number, emailInvitado: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        await apiAxios.post('/invitaciones/enviar', {
+          equipoId,
+          emailInvitado,
+        });
+      } catch (err) {
+        const axiosError = err as AxiosError<{ message?: string }>;
+        setError(
+          'Error al enviar la invitación: ' + axiosError.response?.data.message,
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
-  return { invitacion, loading, error, getInvitacion, aceptarInvitacion, enviarInvitacion };
+  return {
+    invitacion,
+    loading,
+    error,
+    getInvitacion,
+    aceptarInvitacion,
+    enviarInvitacion,
+  };
 }

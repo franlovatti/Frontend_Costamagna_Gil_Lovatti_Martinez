@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useInvitacion } from '../hooks/useInvitacion.tsx';
 
 interface InviteModalProps {
@@ -10,25 +10,35 @@ interface InviteModalProps {
 export function InviteModal({ equipoId, isOpen, onClose }: InviteModalProps) {
   const [email, setEmail] = useState('');
   const [success, setSuccess] = useState(false);
+  const operationInProgress = useRef(false);
   const { enviarInvitacion, error, loading } = useInvitacion();
+
+  // Watch for loading state changes to detect when the async operation completes
+  useEffect(() => {
+    // If an operation was in progress and now loading is false, it completed
+    if (operationInProgress.current && !loading) {
+      operationInProgress.current = false;
+      if (!error) {
+        setSuccess(true);
+        setEmail('');
+        setTimeout(() => {
+          onClose();
+          setSuccess(false);
+        }, 2000);
+      }
+    }
+  }, [loading, error, onClose]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.trim()) return;
     setSuccess(false);
-    enviarInvitacion(equipoId, email)
-    if (!error) {
-      setSuccess(true);
-      setEmail('');
-      setTimeout(() => {
-        onClose();
-        setSuccess(false);
-      }, 2000);
-    }
+    operationInProgress.current = true;
+    enviarInvitacion(equipoId, email);
   }
 
   function handleClose() {
-    if (!loading) {
+    if (!(loading && operationInProgress.current)) {
       onClose();
       setSuccess(false);
     }
@@ -47,7 +57,7 @@ export function InviteModal({ equipoId, isOpen, onClose }: InviteModalProps) {
           <button
             className="modal-close-btn"
             onClick={handleClose}
-            disabled={loading}
+            disabled={loading && operationInProgress.current}
           >
             ✕
           </button>
@@ -78,14 +88,10 @@ export function InviteModal({ equipoId, isOpen, onClose }: InviteModalProps) {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="correo@ejemplo.com"
                     required
-                    disabled={loading}
+                    disabled={loading && operationInProgress.current}
                   />
                 </div>
-                {(error) && (
-                  <div className="alert-danger-custom">
-                    ⚠️ {error}
-                  </div>
-                )}
+                {error && <div className="alert-danger-custom">⚠️ {error}</div>}
               </>
             )}
           </div>
@@ -94,7 +100,7 @@ export function InviteModal({ equipoId, isOpen, onClose }: InviteModalProps) {
               type="button"
               className="btn-cancel-custom"
               onClick={handleClose}
-              disabled={loading}
+              disabled={loading && operationInProgress.current}
             >
               Cancelar
             </button>
@@ -102,9 +108,13 @@ export function InviteModal({ equipoId, isOpen, onClose }: InviteModalProps) {
               <button
                 type="submit"
                 className="action-btn btn-primary-action"
-                disabled={loading || !email.trim()}
+                disabled={
+                  (loading && operationInProgress.current) || !email.trim()
+                }
               >
-                {loading ? 'Enviando...' : 'Enviar Invitación'}
+                {loading && operationInProgress.current
+                  ? 'Enviando...'
+                  : 'Enviar Invitación'}
               </button>
             )}
           </div>

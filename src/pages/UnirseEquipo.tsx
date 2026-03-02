@@ -8,7 +8,13 @@ export default function UnirseEquipo() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const { invitacion, loading, error: invitacionError, getInvitacion, aceptarInvitacion } = useInvitacion();
+  const {
+    invitacion,
+    loading,
+    error: invitacionError,
+    getInvitacion,
+    aceptarInvitacion,
+  } = useInvitacion();
 
   const token = searchParams.get('token');
   const [errorToken, setErrorToken] = useState<string | null>(null);
@@ -20,7 +26,7 @@ export default function UnirseEquipo() {
       setErrorToken('Token de invitación no proporcionado');
       return;
     }
-    getInvitacion(token)
+    getInvitacion(token);
   }, [token, getInvitacion]);
 
   const handleAceptarInvitacion = async () => {
@@ -29,19 +35,22 @@ export default function UnirseEquipo() {
       return;
     }
     setAccepting(true);
-    aceptarInvitacion(token);
-    if (!invitacionError) {
+    try {
+      await aceptarInvitacion(token);
       setAccepting(false);
       setSuccess(true);
       setTimeout(() => {
-      if (invitacion?.equipo?.id) {
-        navigate(`/home/equipos/${invitacion.equipo.id}`);
-      } else {
-        navigate('/home');
-      }
-    }, 2000);
+        if (invitacion?.equipo?.id) {
+          navigate(`/home/equipos/${invitacion.equipo.id}`);
+        } else {
+          navigate('/home');
+        }
+      }, 2000);
+    } catch {
+      setAccepting(false);
+      // Error is handled by the hook
+    }
   };
-}
 
   if (loading || authLoading) {
     return (
@@ -64,7 +73,7 @@ export default function UnirseEquipo() {
     );
   }
 
-  if (errorToken || invitacionError ) {
+  if (errorToken || invitacionError) {
     return (
       <div className="alert-danger-custom">
         ⚠️ {errorToken || invitacionError}
