@@ -7,7 +7,7 @@ import type { PartidoPayload, resultadosDto } from '../DTOs/partidosDTO';
 const PartidoProvider = ({ children }: { children: React.ReactNode }) => {
   const [partidos, setPartidos] = useState<Partido[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>('');
+  const [error, setError] = useState<string | null>(null);
 
   const getPartidosEvento = useCallback(async (eventoId: number) => {
     setLoading(true);
@@ -97,13 +97,15 @@ const PartidoProvider = ({ children }: { children: React.ReactNode }) => {
     setError(null);
 
     try {
-      await apiAxios.post(`/partidos`, payload);
+      const response = await apiAxios.post(`/partidos`, payload);
+      return response.data.data;
     } catch (err) {
       const axiosError = err as AxiosError<{ message?: string }>;
       setError(
         'Error al crear Partido: ' +
           (axiosError.response?.data?.message || axiosError.message),
       );
+      return null;
     } finally {
       setLoading(false);
     }

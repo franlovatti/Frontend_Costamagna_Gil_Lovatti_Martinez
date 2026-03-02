@@ -35,14 +35,19 @@ export default function FormPartido() {
   } = useEstablecimientos();
 
   useEffect(() => {
-    getEstablecimientos();
-  }, [getEstablecimientos]);
+    getEstablecimientos(Number(id));
+  }, [getEstablecimientos, id]);
 
   const {
     Equipos: equipos,
     loading: loadingEquipos,
     error: errorEquipos,
+    getEquiposEvento,
   } = useEquipos();
+
+  useEffect(() => {
+    getEquiposEvento(Number(id));
+  }, [getEquiposEvento, id]);
 
   const {
     getOnePartido,
@@ -53,12 +58,13 @@ export default function FormPartido() {
   } = usePartidos();
 
   useEffect(() => {
+    if (createMode) return;
     const fetchPartido = async () => {
       const data = await getOnePartido(Number(partidoId));
       setPartido(data);
     };
     fetchPartido();
-  }, [getOnePartido, partidoId, setPartido]);
+  }, [getOnePartido, partidoId, setPartido, createMode]);
 
   useEffect(() => {
     if (partido && !createMode) {
