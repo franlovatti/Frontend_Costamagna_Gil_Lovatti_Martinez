@@ -29,7 +29,7 @@ export interface PartidoContextType {
   getPartidosEvento: (eventoId: number) => void;
   getOnePartido: (partidoId: number) => Promise<Partido | null>;
   borrarPartido: (partidoId: number) => Promise<Partido | null>;
-  cargarResultado: (resultado: resultadosDto) => Promise<void>;
+  cargarResultado: (resultado: resultadosDto) => Promise<Partido | null>;
   crearPartido: (payload: PartidoPayload) => Promise<void>;
   editarPartido: (
     partidoId: number,

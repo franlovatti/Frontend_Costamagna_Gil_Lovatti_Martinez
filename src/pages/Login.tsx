@@ -11,12 +11,13 @@ const Login = () => {
   const location = useLocation();
 
   const from = (location.state as { from?: Location })?.from;
-  const redirectTo = from ? `${from.pathname}${from.search}${from.hash}` : '/home';
-
+  const redirectTo = from
+    ? `${from.pathname}${from.search}${from.hash}`
+    : '/home';
 
   type LoginFormFields = {
     usuario: string;
-    constrasenia: string;
+    contrasenia: string;
     remember: boolean;
   };
 
@@ -33,7 +34,11 @@ const Login = () => {
   const onSubmit = async (data: LoginFormFields) => {
     setLoading(true);
     try {
-      const success = await login(data.usuario, data.constrasenia, data.remember);
+      const success = await login(
+        data.usuario,
+        data.contrasenia,
+        data.remember,
+      );
       if (!success) {
         throw new Error('Credenciales inválidas');
       }
@@ -67,10 +72,10 @@ const Login = () => {
             <input
               type="password"
               className="auth-input"
-              placeholder="constrasenia"
-              {...register('constrasenia', { required: true })}
+              placeholder="contrasenia"
+              {...register('contrasenia', { required: true })}
             />
-            {errors.constrasenia && (
+            {errors.contrasenia && (
               <span className="auth-error-text">Este campo es obligatorio</span>
             )}
           </div>
@@ -117,7 +122,7 @@ const Login = () => {
 
           <div className="auth-link-container">
             <Link to="/ForgotPassword" className="auth-link">
-              ¿Olvidaste tu constrasenia?
+              ¿Olvidaste tu contrasenia?
             </Link>
           </div>
         </form>

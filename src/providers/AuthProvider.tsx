@@ -1,13 +1,15 @@
 import { useState, useCallback } from 'react';
-import { AuthContext} from '../contexts/auth';
+import { AuthContext } from '../contexts/auth';
 import type { AuthContextType, User } from '../contexts/auth';
 import { useEffect } from 'react';
-import { jwtDecode } from "jwt-decode";
+import { jwtDecode } from 'jwt-decode';
 import apiAxios from '../helpers/api';
 import { useMemo } from 'react';
 import { AxiosError } from 'axios';
 
-const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -18,42 +20,58 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       const res = await apiAxios.get(`/usuarios/perfil/${id}`);
       const userData = res.data.data;
       console.log('Datos del perfil obtenidos:', userData);
-      setUser(prevUser => ({ ...prevUser, ...userData }));
+      setUser((prevUser) => ({ ...prevUser, ...userData }));
     } catch (error) {
-      console.error("Error al obtener el perfil del usuario:", error);
+      console.error('Error al obtener el perfil del usuario:', error);
     }
   }, []);
 
-  const login = useCallback(async (usuario: string, constrasenia: string, remember: boolean) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await apiAxios.post('/usuarios/login', { usuario, constrasenia, remember });
-      const data = response.data;
-      if (data.token) {
-        localStorage.setItem('token', data.token);
-        if (remember) {
-          localStorage.setItem('recuerdame', data.recuerdame);
-        } else {
-          localStorage.removeItem('recuerdame');
+  const login = useCallback(
+    async (usuario: string, contrasenia: string, remember: boolean) => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await apiAxios.post('/usuarios/login', {
+          usuario,
+          contrasenia,
+          remember,
+        });
+        const data = response.data;
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+          if (remember) {
+            localStorage.setItem('recuerdame', data.recuerdame);
+          } else {
+            localStorage.removeItem('recuerdame');
+          }
+          setIsAuthenticated(true);
+          setUser({
+            usuario,
+            role: data.role,
+            id: data.id,
+            nombre: data.nombre,
+            apellido: data.apellido,
+            email: data.email,
+            estado: data.estado,
+          });
+          await fectchPerfil(data.id);
+          return true;
         }
-        setIsAuthenticated(true);
-        setUser({ usuario, role: data.role, id: data.id, nombre: data.nombre, apellido: data.apellido, email: data.email, estado: data.estado });
-        await fectchPerfil(data.id);
-        return true;
+        setError('Usuario o contrasenia incorrectos');
+        return false;
+      } catch (error) {
+        const axiosError = error as AxiosError<{ message?: string }>;
+        const errorMsg =
+          axiosError.response?.data?.message || 'Credenciales inválidas';
+        setError(errorMsg);
+        setUser(null);
+        return false;
+      } finally {
+        setLoading(false);
       }
-      setError("Usuario o constrasenia incorrectos");
-      return false;
-    } catch (error) {
-      const axiosError = error as AxiosError<{ message?: string }>;
-      const errorMsg = axiosError.response?.data?.message || "Credenciales inválidas";
-      setError(errorMsg);
-      setUser(null);
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  }, [fectchPerfil]);
+    },
+    [fectchPerfil],
+  );
 
   const logout = useCallback(async () => {
     localStorage.removeItem('token');
@@ -62,65 +80,90 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     try {
       await apiAxios.post('/usuarios/logout'); // Llamada al endpoint de logout para borrar la cookie
     } catch (error) {
-      console.error("Error al hacer logout:", error);
+      console.error('Error al hacer logout:', error);
     }
   }, []);
 
-  const registro = useCallback(async (nombre: string, apellido: string, usuario: string, constrasenia: string, fechaNacimiento: string, email: string, remember: boolean) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await apiAxios.post('/usuarios', {
-        nombre,
-        apellido,
-        usuario,
-        constrasenia,
-        fechaNacimiento,
-        email,
-        role: "Usuario",
-        participations: [],
-        estado: true
-      });
-      if (response.status === 201 || response.status === 200) {
-        const loginSuccess = await login(usuario, constrasenia, remember); // Iniciar sesión automáticamente después del registro
-        return loginSuccess;
+  const registro = useCallback(
+    async (
+      nombre: string,
+      apellido: string,
+      usuario: string,
+      contrasenia: string,
+      fechaNacimiento: string,
+      email: string,
+      remember: boolean,
+    ) => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await apiAxios.post('/usuarios', {
+          nombre,
+          apellido,
+          usuario,
+          contrasenia,
+          fechaNacimiento,
+          email,
+          role: 'Usuario',
+          participations: [],
+          estado: true,
+        });
+        if (response.status === 201 || response.status === 200) {
+          const loginSuccess = await login(usuario, contrasenia, remember); // Iniciar sesión automáticamente después del registro
+          return loginSuccess;
+        }
+        setError('Error en el registro');
+        return false;
+      } catch (error) {
+        const axiosError = error as AxiosError<{ message?: string }>;
+        const errorMsg =
+          axiosError.response?.data?.message || 'Error en la conexión';
+        setError(errorMsg);
+        return false;
+      } finally {
+        setLoading(false);
       }
-      setError("Error en el registro");
-      return false;
-    } catch (error) {
-      const axiosError = error as AxiosError<{ message?: string }>;
-      const errorMsg = axiosError.response?.data?.message || "Error en la conexión";
-      setError(errorMsg);
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  }, [login]);
+    },
+    [login],
+  );
 
   const bajaUsuario = useCallback(async (id: string) => {
     try {
       await apiAxios.post(`/usuarios/baja/${id}`);
     } catch (error) {
-      console.error("Error al dar de baja el usuario:", error);
+      console.error('Error al dar de baja el usuario:', error);
     }
   }, []);
 
   const updateUser = useCallback((userData: Partial<User>) => {
-    setUser(prevUser => prevUser ? { ...prevUser, ...userData } : null);
+    setUser((prevUser) => (prevUser ? { ...prevUser, ...userData } : null));
   }, []);
 
-  const authValue: AuthContextType = useMemo(() => ({
-    isAuthenticated,
-    user,
-    loading,
-    error,
-    setError,
-    login,
-    logout,
-    registro,
-    bajaUsuario,
-    updateUser
-  }), [isAuthenticated, user, loading, error, login, logout, registro, bajaUsuario, updateUser]);
+  const authValue: AuthContextType = useMemo(
+    () => ({
+      isAuthenticated,
+      user,
+      loading,
+      error,
+      setError,
+      login,
+      logout,
+      registro,
+      bajaUsuario,
+      updateUser,
+    }),
+    [
+      isAuthenticated,
+      user,
+      loading,
+      error,
+      login,
+      logout,
+      registro,
+      bajaUsuario,
+      updateUser,
+    ],
+  );
 
   // Al renderizar verifica si hay un token o cookie "recuerdame" válida y restaura la sesión
   useEffect(() => {
@@ -128,64 +171,69 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       setLoading(true);
       const token = localStorage.getItem('token');
       try {
-      if (token) {
-        const decoded = jwtDecode<{ id: string; usuario: string; role: string; exp?: number; email: string; estado: boolean }>(token);
-        
-        // Verificamos expiración
-        if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-          // Token expirado
-          localStorage.removeItem('token');
-          setIsAuthenticated(false);
-          setUser(null);
-          return; // Salir del try, pero el finally ejecutará setLoading(false)
+        if (token) {
+          const decoded = jwtDecode<{
+            id: string;
+            usuario: string;
+            role: string;
+            exp?: number;
+            email: string;
+            estado: boolean;
+          }>(token);
+
+          // Verificamos expiración
+          if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+            // Token expirado
+            localStorage.removeItem('token');
+            setIsAuthenticated(false);
+            setUser(null);
+            return; // Salir del try, pero el finally ejecutará setLoading(false)
+          }
+
+          // Token válido
+          const userFromToken: User = {
+            id: decoded.id,
+            usuario: decoded.usuario,
+            email: decoded.email,
+            role: decoded.role,
+            estado: decoded.estado,
+          };
+          setUser(userFromToken);
+          setIsAuthenticated(true);
+          await fectchPerfil(decoded.id);
+          return; // El finally ejecutará setLoading(false)
         }
-        
-        // Token válido
-        const userFromToken: User = {
-          id: decoded.id,
-          usuario: decoded.usuario,
-          email: decoded.email,
-          role: decoded.role,
-          estado: decoded.estado
-        };
-        setUser(userFromToken);
-        setIsAuthenticated(true);
-        await fectchPerfil(decoded.id);
-        return; // El finally ejecutará setLoading(false)
+
+        // Si no hay token, intentar con cookie
+        const response = await apiAxios.post('/usuarios/restaurar');
+        const data = response.data;
+
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+          const userFromToken: User = {
+            id: data.id,
+            role: data.role,
+            estado: data.estado,
+            usuario: data.usuario,
+            email: data.email,
+          };
+          setUser(userFromToken);
+          setIsAuthenticated(true);
+          await fectchPerfil(data.id);
+        }
+      } catch {
+        localStorage.removeItem('token');
+        setIsAuthenticated(false);
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-      
-      // Si no hay token, intentar con cookie
-      const response = await apiAxios.post('/usuarios/restaurar');
-      const data = response.data;
-      
-      if (data.token) {
-        localStorage.setItem('token', data.token);
-        const userFromToken: User = {
-          id: data.id,
-          role: data.role,
-          estado: data.estado,
-          usuario: data.usuario,
-          email: data.email
-        };
-        setUser(userFromToken);
-        setIsAuthenticated(true);
-        await fectchPerfil(data.id);
-      }
-    } catch {
-      localStorage.removeItem('token');
-      setIsAuthenticated(false);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
     };
     restaurarSesion();
   }, [fectchPerfil]);
 
   return (
-    <AuthContext.Provider value={authValue}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>
   );
 };
 

@@ -141,7 +141,7 @@ export default function EditarEquipo() {
                   <Col md={6}>
                     <div className="form-group-custom">
                       <label className="form-label-custom">
-                        Nueva constrasenia (opcional)
+                        Nueva contrasenia (opcional)
                       </label>
                       <div style={{ position: 'relative' }}>
                         <input

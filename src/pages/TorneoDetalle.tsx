@@ -7,11 +7,16 @@ import { Row, Col } from 'react-bootstrap';
 import { useAuth } from '../hooks/useAuth';
 import './TorneoDetalle.css';
 import { useParticipantesEvento } from '../hooks/useUsuario.tsx';
-import { useTorneo } from '../hooks/useTorneo.tsx'; 
-import { useBorrarEquipo, useInscribirseEquipo, useSalirEquipo } from '../hooks/useEquipos.tsx';
-import { useBorrarPartido, useCargarResultados } from '../hooks/usePartidos.tsx';
+import { useTorneo } from '../hooks/useTorneo.tsx';
+import { useEquipos } from '../hooks/useEquipos.tsx';
+import { usePartidos } from '../hooks/usePartidos.tsx';
 import ConfirmModal from '../components/ConfirmModal.tsx';
-import {formatFecha, compararFechas, estaAbiertoPeriodo, getFechaString} from '../helpers/convertirFechas';
+import {
+  formatFecha,
+  compararFechas,
+  estaAbiertoPeriodo,
+  getFechaString,
+} from '../helpers/convertirFechas';
 import TablaEquipos from '../components/TablaEquipos.tsx';
 import TablaPartidos from '../components/TablaPartidos.tsx';
 import TablaParticipantes from '../components/TablaParticipantes.tsx';
@@ -19,20 +24,37 @@ import ModalInscripcion from '../components/ModalInscripcion.tsx';
 import ModalResultados from '../components/ModalResultados.tsx';
 import FormTorneos from '../components/FormTorneos.tsx';
 
-
 export default function TorneoDetalle() {
-  const { torneo, getUnTorneo, borrarTorneo, modificarTorneo, error: errorTorneo, loading: loadingTorneo } = useTorneo();
+  const {
+    torneo,
+    getUnTorneo,
+    borrarTorneo,
+    modificarTorneo,
+    error: errorTorneo,
+    loading: loadingTorneo,
+  } = useTorneo();
   const [showConfirmTorneo, setShowConfirmTorneo] = useState(false);
   const [showConfirmEquipo, setShowConfirmEquipo] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [equipoAEliminar, setEquipoAEliminar] = useState<number>(0);
-  const { borrarEquipo, loading: loadingBorrarEquipo, error: errorBorrarEquipo } = useBorrarEquipo();
-  const { salirEquipo, loading: loadingSalirEquipo, error: errorSalirEquipo } = useSalirEquipo();
-  const { borrarPartido, loading: loadingBorrarPartido, error: errorBorrarPartido } = useBorrarPartido();
-  const { cargarResultados, loading: loadingCargarResultados, error: errorCargarResultados } = useCargarResultados();
+
+  const {
+    borrarEquipo,
+    loading: loadingEquipo,
+    error: errorEquipo,
+    salirEquipo,
+    inscribirseEquipo,
+  } = useEquipos();
+
+  const {
+    cargarResultado,
+    borrarPartido,
+    loading: loadingPartido,
+    error: errorPartido,
+  } = usePartidos();
+
   const [showConfirmPartido, setShowConfirmPartido] = useState(false);
   const [partidoAEliminar, setPartidoAEliminar] = useState<number>(0);
-  const { inscribirseEquipo, loading: loadingInscribirse, error: errorInscribirse } = useInscribirseEquipo();
   const [showEnrollModal, setShowEnrollModal] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<Equipo | null>(null);
   const [enrollPassword, setEnrollPassword] = useState('');
@@ -41,8 +63,10 @@ export default function TorneoDetalle() {
   const [resultadoModal, setResultadoModal] = useState(false);
   const [resultadoLocal, setResultadoLocal] = useState<string>('');
   const [resultadoVisitante, setResultadoVisitante] = useState<string>('');
-  const [partidoSeleccionado, setPartidoSeleccionado] = useState<Partido | null>(null);
-  const [ordenarParticipanteCriterio, setOrdenarParticipanteCriterio] = useState<string>('puntos');
+  const [partidoSeleccionado, setPartidoSeleccionado] =
+    useState<Partido | null>(null);
+  const [ordenarParticipanteCriterio, setOrdenarParticipanteCriterio] =
+    useState<string>('puntos');
   const [tabKey, setTabKey] = useState<string>('');
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
@@ -59,7 +83,8 @@ export default function TorneoDetalle() {
     }
   }, [torneo]);
 
-  const { participantes: participantesDesordenados } = useParticipantesEvento(id);
+  const { participantes: participantesDesordenados } =
+    useParticipantesEvento(id);
 
   const calcularStats = (participations: Participation[] | undefined) => {
     if (!participations)
@@ -87,7 +112,9 @@ export default function TorneoDetalle() {
     });
   };
 
-  const participantes = ordenarParticipantes( participantesDesordenados, ordenarParticipanteCriterio as keyof Stats,
+  const participantes = ordenarParticipantes(
+    participantesDesordenados,
+    ordenarParticipanteCriterio as keyof Stats,
   );
 
   const userIsMember = (): boolean => {
@@ -139,7 +166,7 @@ export default function TorneoDetalle() {
 
   const handleEditTorneo = async (data: Partial<Torneo>) => {
     if (!torneo) return;
-    modificarTorneo({ ...data, id: torneo.id } as Torneo); 
+    modificarTorneo({ ...data, id: torneo.id } as Torneo);
     setShowEditModal(false);
     getUnTorneo(Number(id));
   };
@@ -165,24 +192,36 @@ export default function TorneoDetalle() {
 
   const handleInscribe = async () => {
     if (!selectedTeam) return;
-    
+
     // Validar que las inscripciones estén abiertas
-    if (!estaAbiertoPeriodo(torneo?.fechaInicioInscripcion, torneo?.fechaFinInscripcion)) {
+    if (
+      !estaAbiertoPeriodo(
+        torneo?.fechaInicioInscripcion,
+        torneo?.fechaFinInscripcion,
+      )
+    ) {
       setEnrollError('Las inscripciones no están abiertas en este momento');
       return;
     }
-    
+
     if (!selectedTeam.esPublico && enrollPassword.trim() === '') {
-      setEnrollError('La constrasenia es obligatoria para este equipo');
+      setEnrollError('La contrasenia es obligatoria para este equipo');
       return;
     }
-    if (!selectedTeam.esPublico && enrollPassword !== selectedTeam.constrasenia) {
-      setEnrollError('La constrasenia es incorrecta');
+    if (
+      !selectedTeam.esPublico &&
+      enrollPassword !== selectedTeam.contrasenia
+    ) {
+      setEnrollError('La contrasenia es incorrecta');
       return;
     }
-    
+
     const userId = Number(user?.id);
-    const success = await inscribirseEquipo(selectedTeam, enrollPassword, userId);
+    const success = await inscribirseEquipo(
+      selectedTeam,
+      enrollPassword,
+      userId,
+    );
     if (success) {
       setShowEnrollModal(false);
       await getUnTorneo(Number(id));
@@ -191,11 +230,11 @@ export default function TorneoDetalle() {
 
   const handleCargarResultado = async () => {
     if (!partidoSeleccionado) return;
-    const success = await cargarResultados(
-      partidoSeleccionado.id,
+    const success = await cargarResultado({
+      partidoId: partidoSeleccionado.id,
       resultadoLocal,
-      resultadoVisitante
-    );
+      resultadoVisitante,
+    });
     if (success) {
       setResultadoModal(false);
       setResultadoLocal('');
@@ -213,9 +252,9 @@ export default function TorneoDetalle() {
     setShowConfirmTorneo(false);
   };
 
-const handleAbandono = async () => {
+  const handleAbandono = async () => {
     if (!selectedTeam) return;
-    
+
     const success = await salirEquipo(selectedTeam.id, Number(user?.id));
     if (success) {
       setAbandono(false);
@@ -223,9 +262,8 @@ const handleAbandono = async () => {
     }
   };
 
-
-  const partidosOrdenados = [...(torneo?.partidos || [])].sort(
-    (a, b) => compararFechas(a.fecha, b.fecha),
+  const partidosOrdenados = [...(torneo?.partidos || [])].sort((a, b) =>
+    compararFechas(a.fecha, b.fecha),
   );
 
   const partidosPorFecha = partidosOrdenados.reduce(
@@ -249,15 +287,15 @@ const handleAbandono = async () => {
         </div>
       </div>
     );
-  
-  if(showEditModal) {
+
+  if (showEditModal) {
     return (
-        <FormTorneos
+      <FormTorneos
         setShowModal={setShowEditModal}
         editingTorneo={torneo}
         onSave={handleEditTorneo}
       />
-    )
+    );
   }
   return (
     <div className="torneo-detalle-container">
@@ -293,15 +331,14 @@ const handleAbandono = async () => {
             <Col>
               <p>
                 <strong>Duracion:</strong>{' '}
-                {formatFecha(torneo.fechaInicioEvento)}{' '}
-                {' - '} {formatFecha(torneo.fechaFinEvento)}
+                {formatFecha(torneo.fechaInicioEvento)} {' - '}{' '}
+                {formatFecha(torneo.fechaFinEvento)}
               </p>
             </Col>
             <Col>
               <p>
                 <strong>Inscripciones:</strong>{' '}
-                {formatFecha(torneo.fechaInicioInscripcion)}{' '}
-                {' - '}{' '}
+                {formatFecha(torneo.fechaInicioInscripcion)} {' - '}{' '}
                 {formatFecha(torneo.fechaFinInscripcion)}
               </p>
             </Col>
@@ -320,12 +357,15 @@ const handleAbandono = async () => {
           </Row>
         </div>
 
-      {/* Error de conexión */}
-      {(errorTorneo || errorBorrarPartido || errorBorrarEquipo || errorSalirEquipo) && (!loadingTorneo && !loadingBorrarPartido && !loadingBorrarEquipo && !loadingSalirEquipo) && (
-        <div className="alert-danger-custom">
-          ⚠️ {errorTorneo || errorBorrarPartido || errorBorrarEquipo || errorSalirEquipo}
-        </div>
-      )}
+        {/* Error de conexión */}
+        {(errorTorneo || errorPartido || errorEquipo) &&
+          !loadingTorneo &&
+          !loadingPartido &&
+          !loadingEquipo && (
+            <div className="alert-danger-custom">
+              ⚠️ {errorTorneo || errorPartido || errorEquipo}
+            </div>
+          )}
 
         {/* Equipos Info y Status */}
         <div className="equipos-status-section">
@@ -362,17 +402,18 @@ const handleAbandono = async () => {
           )}
           {!userIsMember() ? (
             estaAbiertoPeriodo(
-                  torneo.fechaInicioInscripcion,
-                  torneo.fechaFinInscripcion
-                ) ? (
-            <button
-              onClick={() =>
-                navigate(`/home/torneos/${torneo.id}/crear-equipo`)
-              }
-              className="action-btn btn-primary-action"
-            >
-              Inscribir Equipo
-            </button>) : (
+              torneo.fechaInicioInscripcion,
+              torneo.fechaFinInscripcion,
+            ) ? (
+              <button
+                onClick={() =>
+                  navigate(`/home/torneos/${torneo.id}/crear-equipo`)
+                }
+                className="action-btn btn-primary-action"
+              >
+                Inscribir Equipo
+              </button>
+            ) : (
               <button className="action-btn btn-disabled" disabled>
                 Inscribir Equipo
               </button>
@@ -382,22 +423,21 @@ const handleAbandono = async () => {
               ✓ Equipo Inscrito
             </button>
           )}
-          {isCreator && (
-            (torneo.equipos && torneo.equipos.length > 1) ? (
-            <button
-              onClick={() =>
-                navigate(`/home/torneos/${torneo.id}/crearPartido`)
-              }
-              className="action-btn btn-secondary-action"
-            >
-              Crear Partidos
-            </button>
+          {isCreator &&
+            (torneo.equipos && torneo.equipos.length > 1 ? (
+              <button
+                onClick={() =>
+                  navigate(`/home/torneos/${torneo.id}/crearPartido`)
+                }
+                className="action-btn btn-secondary-action"
+              >
+                Crear Partidos
+              </button>
             ) : (
               <button className="action-btn btn-disabled" disabled>
                 Crear Partidos
               </button>
-            )
-          )}
+            ))}
         </div>
 
         {/* Tabla de Equipos */}
@@ -433,8 +473,7 @@ const handleAbandono = async () => {
           participantes={participantes}
           setOrdenarParticipanteCriterio={setOrdenarParticipanteCriterio}
           calcularStats={calcularStats}
-         />
-
+        />
       </div>
 
       {/* Modal de Inscripción */}
@@ -446,8 +485,8 @@ const handleAbandono = async () => {
           setShowEnrollModal={setShowEnrollModal}
           handleInscribe={handleInscribe}
           enrollError={enrollError}
-          errorInscribirse={errorInscribirse}
-          loadingInscribirse={loadingInscribirse}
+          errorInscribirse={errorEquipo}
+          loadingInscribirse={loadingEquipo}
         />
       )}
 
@@ -461,16 +500,16 @@ const handleAbandono = async () => {
           setResultadoVisitante={setResultadoVisitante}
           handleCargarResultado={handleCargarResultado}
           setResultadoModal={setResultadoModal}
-          errorCargarResultados={errorCargarResultados}
-          loadingCargarResultados={loadingCargarResultados}
+          errorCargarResultados={errorEquipo}
+          loadingCargarResultados={loadingEquipo}
         />
       )}
 
-      { /*Modals de Confirmación para todas las cosas*/ }
+      {/*Modals de Confirmación para todas las cosas*/}
 
       {showConfirmEquipo && (
         <ConfirmModal
-          objeto={"eliminar el equipo"}
+          objeto={'eliminar el equipo'}
           setShowConfirm={setShowConfirmEquipo}
           handleConfirmDelete={handleConfirmDeleteEquipo}
           handleCancelDelete={handleCancelDeleteEquipo}
@@ -479,7 +518,7 @@ const handleAbandono = async () => {
 
       {showConfirmTorneo && (
         <ConfirmModal
-          objeto={"eliminar el torneo " + (torneo ? ` "${torneo.nombre}"` : '')}
+          objeto={'eliminar el torneo ' + (torneo ? ` "${torneo.nombre}"` : '')}
           setShowConfirm={setShowConfirmTorneo}
           handleConfirmDelete={handleConfirmDeleteTorneo}
           handleCancelDelete={() => setShowConfirmTorneo(false)}
@@ -488,7 +527,7 @@ const handleAbandono = async () => {
 
       {showConfirmPartido && (
         <ConfirmModal
-          objeto={"eliminar el partido"}
+          objeto={'eliminar el partido'}
           setShowConfirm={setShowConfirmPartido}
           handleConfirmDelete={handleConfirmDeletePartido}
           handleCancelDelete={handleCancelDeletePartido}
@@ -497,13 +536,12 @@ const handleAbandono = async () => {
 
       {abandono && (
         <ConfirmModal
-          objeto={"abandonar el equipo"}
+          objeto={'abandonar el equipo'}
           setShowConfirm={setAbandono}
           handleConfirmDelete={handleAbandono}
           handleCancelDelete={() => setAbandono(false)}
         />
       )}
-
     </div>
   );
 }

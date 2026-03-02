@@ -11,7 +11,7 @@ export interface Equipo {
   capitan: User;
   puntos: number;
   esPublico: boolean;
-  constrasenia: string;
+  contrasenia: string;
   miembros: User[];
   evento: Torneo;
   partidoVisitante: Partido[];
@@ -24,7 +24,7 @@ export interface EquipoContextType {
   error: string | null;
   getEquiposEvento: (eventoId: number) => Promise<void>;
   getMisEquipos: (usuarioId: number) => Promise<void>;
-  borrarEquipo: (equipoId: number) => Promise<void>;
+  borrarEquipo: (equipoId: number) => Promise<boolean>;
   crearEquipo: (payload: EquiposPayload) => Promise<Equipo | null>;
   inscribirseEquipo: (
     equipo: Equipo,

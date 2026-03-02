@@ -50,12 +50,14 @@ const EquipoProvider = ({ children }: { children: React.ReactNode }) => {
 
     try {
       await apiAxios.delete(`/equipos/${equipoId}`);
+      return true;
     } catch (err) {
       const axiosError = err as AxiosError<{ message?: string }>;
       setError(
         'Error al borrar el equipo: ' +
           (axiosError.response?.data?.message || axiosError.message),
       );
+      return false;
     } finally {
       setLoading(false);
     }
@@ -86,7 +88,7 @@ const EquipoProvider = ({ children }: { children: React.ReactNode }) => {
       setError(null);
       try {
         const body: Record<string, unknown> = { usuarioId };
-        if (!equipo.esPublico) body.constrasenia = contrasenia;
+        if (!equipo.esPublico) body.contrasenia = contrasenia;
         await apiAxios.post(`/equipos/${equipo.id}/miembros`, body);
         return true;
       } catch (err) {
@@ -152,7 +154,7 @@ const EquipoProvider = ({ children }: { children: React.ReactNode }) => {
         const payload: Record<string, unknown> = {};
         if (datos.nombre) payload.nombre = datos.nombre;
         if (datos.contrasenia) payload.contrasenia = datos.contrasenia;
-        const response = await apiAxios.patch(`/equipos/${equipoId}`);
+        const response = await apiAxios.patch(`/equipos/${equipoId}`, payload);
         return response.data.data;
       } catch (err) {
         const axiosError = err as AxiosError<{ message?: string }>;
