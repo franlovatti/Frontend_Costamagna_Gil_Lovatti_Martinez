@@ -1,8 +1,12 @@
-import { createContext } from "react";
-import type { Partido } from "./partido";
-import type { Usuario } from "./usuario";
+import { createContext } from 'react';
+import type {
+  ParticipacionEditPayload,
+  ParticipacionPayload,
+} from '../DTOs/participacionesDTO.tsx';
+import type { Usuario } from './usuario';
+import type { Partido } from './partido';
 
-export interface Participation {
+export interface Participacion {
   id: number;
   usuario: Usuario;
   minutosjugados: number;
@@ -11,19 +15,25 @@ export interface Participation {
   partido: Partido;
 }
 
-export interface ParticipationContextType {
-  participaciones: Participation[];
-  participacion: Participation | null;
+export interface ParticipacionContextType {
   loading: boolean;
   error: string | null;
-  getParticipaciones: (partidoId: string, equipoId: string) => void;
-  getParticipacionesPorUsuarioEnTorneo: (usuarioId: string, eventoId: string) => void;
-  getParticipacionesPorTorneo: (eventoId: string) => void;
-  getParticipacionesPorUsuario: (usuarioId: string) => void;
-  getParticipacionesEquipo: (equipoId: string, partidoId: string) => void;
-  crearParticipacion: (participacion: Omit<Participation, 'id'>) => Promise<void>;
-  modificarParticipacion: (participacion: Participation) => Promise<void>;
-  borrarParticipacion: (id: number) => Promise<void>;
+  participaciones: Participacion[];
+  getParticipacionesPartidoEquipo(
+    partidoId: number,
+    equipoId: number,
+  ): Promise<void>;
+  getParticipacionesUsuarioTorneo(
+    usuarioId: number,
+    eventoId: number,
+  ): Promise<void>;
+  getParticipacionesPorTorneo(eventoId: number): Promise<void>;
+  getParticipacionesPorUsuario(usuarioId: number): Promise<void>;
+  getParticipacionesTotalesPorTorneo(eventoId: number): Promise<void>;
+  crearParticipacion(payload: ParticipacionPayload): Promise<boolean>;
+  editarParticipacion(payload: ParticipacionEditPayload): Promise<boolean>;
+  borrarParticipacion(id: number): Promise<boolean>;
 }
 
-export const ParticipationContext = createContext<ParticipationContextType | null>(null);
+export const ParticipacionContext =
+  createContext<ParticipacionContextType | null>(null);

@@ -1,8 +1,8 @@
-import { createContext } from "react";
-import type { User } from "./auth";
-import type { Equipo } from "./equipo.tsx";
-import type { Partido } from "./partido.tsx";
-import type { Participation } from "./participacion.tsx"; 
+import { createContext } from 'react';
+import type { User } from './auth';
+import type { Partido } from './partido';
+import type { Equipo } from './equipo';
+import type { Participacion } from './participacion';
 
 export interface Usuario {
   id: number;
@@ -13,7 +13,7 @@ export interface Usuario {
   equipos: Equipo[];
   mvps: Partido[];
   maxAnotados: Partido[];
-  participations: Participation[];
+  participations: Participacion[];
   equipocomocapitan: Equipo[];
 }
 

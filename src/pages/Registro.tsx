@@ -1,22 +1,22 @@
-import { useState } from "react";
-import { useAuth } from "../hooks/useAuth.tsx";
-import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
-import "./Auth.css";
+import { useState } from 'react';
+import { useAuth } from '../hooks/useAuth.tsx';
+import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
+import './Auth.css';
 
 export default function Registro() {
   const { registro, loading: cargandoAuth, error, setError } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
-  const [tipoFecha, setTipoFecha] = useState<"text" | "date">("text");
+  const [tipoFecha, setTipoFecha] = useState<'text' | 'date'>('text');
 
   type RegistroFormFields = {
     nombre: string;
     apellido: string;
     usuario: string;
     email: string;
-    contraseña: string;
+    contrasenia: string;
     fechaNacimiento: string;
     remember: boolean;
   };
@@ -24,7 +24,7 @@ export default function Registro() {
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm<RegistroFormFields>({ mode: 'onBlur' });
 
   const onSubmit = async (data: RegistroFormFields) => {
@@ -34,17 +34,17 @@ export default function Registro() {
         data.nombre,
         data.apellido,
         data.usuario,
-        data.contraseña,
+        data.contrasenia,
         data.fechaNacimiento,
         data.email,
-        data.remember
+        data.remember,
       );
       if (!response) {
-        throw new Error("Error en la solicitud");
+        throw new Error('Error en la solicitud');
       }
-      navigate("/");
+      navigate('/');
     } catch (error) {
-      console.error("Error al Registrarse:", error);
+      console.error('Error al Registrarse:', error);
     } finally {
       setLoading(false);
     }
@@ -54,7 +54,7 @@ export default function Registro() {
     <div className="auth-container">
       <div className="auth-card">
         <h2 className="auth-title  mb-4">Crear Cuenta</h2>
-        
+
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="row g-3">
             <div className="col-12 col-md-6">
@@ -63,10 +63,12 @@ export default function Registro() {
                   type="text"
                   className="auth-input"
                   placeholder="Nombre"
-                  {...register("nombre", { required: true })}
+                  {...register('nombre', { required: true })}
                 />
                 {errors.nombre && (
-                  <span className="auth-error-text">Este campo es obligatorio</span>
+                  <span className="auth-error-text">
+                    Este campo es obligatorio
+                  </span>
                 )}
               </div>
             </div>
@@ -77,10 +79,12 @@ export default function Registro() {
                   type="text"
                   className="auth-input"
                   placeholder="Apellido"
-                  {...register("apellido", { required: true })}
+                  {...register('apellido', { required: true })}
                 />
                 {errors.apellido && (
-                  <span className="auth-error-text">Este campo es obligatorio</span>
+                  <span className="auth-error-text">
+                    Este campo es obligatorio
+                  </span>
                 )}
               </div>
             </div>
@@ -91,7 +95,7 @@ export default function Registro() {
               type="text"
               className="auth-input"
               placeholder="Usuario"
-              {...register("usuario", { required: true })}
+              {...register('usuario', { required: true })}
             />
             {errors.usuario && (
               <span className="auth-error-text">Este campo es obligatorio</span>
@@ -103,12 +107,12 @@ export default function Registro() {
               type="email"
               className="auth-input"
               placeholder="Correo electrónico"
-              {...register("email", { 
-                required: "Este campo es obligatorio",
+              {...register('email', {
+                required: 'Este campo es obligatorio',
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: "Correo electrónico inválido"
-                }
+                  message: 'Correo electrónico inválido',
+                },
               })}
             />
             {errors.email && (
@@ -120,17 +124,19 @@ export default function Registro() {
             <input
               type="password"
               className="auth-input"
-              placeholder="Contraseña"
-              {...register("contraseña", { 
-                required: "Este campo es obligatorio",
+              placeholder="contrasenia"
+              {...register('contrasenia', {
+                required: 'Este campo es obligatorio',
                 minLength: {
                   value: 6,
-                  message: "La contraseña debe tener al menos 6 caracteres"
-                }
+                  message: 'La contrasenia debe tener al menos 6 caracteres',
+                },
               })}
             />
-            {errors.contraseña && (
-              <span className="auth-error-text">{errors.contraseña.message}</span>
+            {errors.contrasenia && (
+              <span className="auth-error-text">
+                {errors.contrasenia.message}
+              </span>
             )}
           </div>
 
@@ -139,10 +145,10 @@ export default function Registro() {
               type={tipoFecha}
               className="auth-input"
               placeholder="Fecha de Nacimiento"
-              {...register("fechaNacimiento", { required: true })}
-              onFocus={() => setTipoFecha("date")}
+              {...register('fechaNacimiento', { required: true })}
+              onFocus={() => setTipoFecha('date')}
               onBlur={(e) => {
-                if (!e.target.value) setTipoFecha("text");
+                if (!e.target.value) setTipoFecha('text');
               }}
             />
             {errors.fechaNacimiento && (
@@ -155,7 +161,7 @@ export default function Registro() {
               type="checkbox"
               id="remember"
               className="auth-checkbox"
-              {...register("remember")}
+              {...register('remember')}
             />
             <label htmlFor="remember" className="auth-checkbox-label">
               Recordarme
@@ -166,7 +172,10 @@ export default function Registro() {
             <button
               type="button"
               className="auth-btn auth-btn-secondary"
-              onClick={() => {setError(null); navigate('/Login');}}
+              onClick={() => {
+                setError(null);
+                navigate('/Login');
+              }}
             >
               Iniciar Sesión
             </button>
@@ -175,7 +184,7 @@ export default function Registro() {
               className="auth-btn auth-btn-primary"
               disabled={loading || cargandoAuth}
             >
-              {loading ? "Registrando..." : "Registrarse"}
+              {loading ? 'Registrando...' : 'Registrarse'}
             </button>
           </div>
 
@@ -185,13 +194,11 @@ export default function Registro() {
             </div>
           )}
 
-          {error && (
-            <div className="auth-error-alert">{error}</div>
-          )}
+          {error && <div className="auth-error-alert">{error}</div>}
 
           <div className="auth-link-container">
             <Link to="/ForgotPassword" className="auth-link">
-              ¿Olvidaste tu contraseña?
+              ¿Olvidaste tu contrasenia?
             </Link>
           </div>
         </form>
@@ -219,7 +226,7 @@ export default function Registro() {
 //     apellido: string;
 //     usuario: string;
 //     email: string;
-//     contraseña: string;
+//     contrasenia: string;
 //     fechaNacimiento: string;
 //     remember: boolean;
 //   };
@@ -237,7 +244,7 @@ export default function Registro() {
 //         data.nombre,
 //         data.apellido,
 //         data.usuario,
-//         data.contraseña,
+//         data.contrasenia,
 //         data.fechaNacimiento,
 //         data.email,
 //         data.remember
@@ -294,10 +301,10 @@ export default function Registro() {
 //             <div className="mb-3">
 //               <InputField
 //                 type="password"
-//                 placeholder="Contraseña"
-//                 {...register("contraseña", { required: true })}
+//                 placeholder="contrasenia"
+//                 {...register("contrasenia", { required: true })}
 //               />
-//               {errors.contraseña && <span className="text-danger">Este campo es obligatorio</span>}
+//               {errors.contrasenia && <span className="text-danger">Este campo es obligatorio</span>}
 //             </div>
 //             <div className="mb-3">
 //               <input
@@ -336,11 +343,10 @@ export default function Registro() {
 //           )}
 //           {error && <div className="alert alert-danger mt-3">{error}</div>}
 //           <div className="text-center mt-3">
-//             <Link to="/ForgotPassword">¿Olvidaste tu contraseña?</Link>
+//             <Link to="/ForgotPassword">¿Olvidaste tu contrasenia?</Link>
 //           </div>
 //         </form>
 //       </div>
 //     </div>
 //   );
 // }
-

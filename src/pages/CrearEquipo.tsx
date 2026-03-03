@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { useCrearEquipo, type EquiposPayload } from '../hooks/useEquipos';
+import { useEquipos } from '../hooks/useEquipos';
 import './CrearEquipo.css';
+import type { EquiposPayload } from '../DTOs/equipoDTO.tsx';
 
 export default function CrearEquipo() {
   const navigate = useNavigate();
@@ -12,10 +13,11 @@ export default function CrearEquipo() {
   const [form, setForm] = useState({
     nombre: '',
     esPublico: true,
-    contraseña: '',
+    contrasenia: '',
   });
 
-  const { crearEquipo, loading, error: crearEquipoError, equipo } = useCrearEquipo();
+  const { loading, error: crearEquipoError, crearEquipo } = useEquipos();
+
   const [error, setError] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
   const [createdTeamId, setCreatedTeamId] = useState<number | null>(null);
@@ -36,11 +38,11 @@ export default function CrearEquipo() {
       return;
     }
 
-    if (!form.esPublico && !form.contraseña) {
-      setError('La contraseña es obligatoria si el equipo es privado.');
+    if (!form.esPublico && !form.contrasenia) {
+      setError('La contrasenia es obligatoria si el equipo es privado.');
       return;
     }
-    
+
     if (form.nombre.trim().length < 3) {
       setError('El nombre del equipo debe tener al menos 3 caracteres.');
       return;
@@ -55,14 +57,14 @@ export default function CrearEquipo() {
       puntos: 0,
       esPublico: form.esPublico,
       privado: !form.esPublico,
-      contraseña: !form.esPublico ? form.contraseña : null,
+      contrasenia: !form.esPublico ? form.contrasenia : null,
       miembros: [user.id],
       evento: Number(id),
     };
 
-    const success = await crearEquipo(nuevoEquipo);
-    if (success) {
-      setCreatedTeamId(equipo?.id ?? null);
+    const equipoCreado = await crearEquipo(nuevoEquipo);
+    if (equipoCreado) {
+      setCreatedTeamId(equipoCreado?.id ?? null);
       setShowSuccess(true);
     } else {
       setError(crearEquipoError || 'Error desconocido al crear el equipo.');
@@ -74,7 +76,7 @@ export default function CrearEquipo() {
       <div className="crear-equipo-inner">
         {/* Header */}
         <div className="form-header">
-          <button 
+          <button
             className="btn-back"
             onClick={() => navigate(`/home/torneos/${id}`)}
           >
@@ -119,7 +121,9 @@ export default function CrearEquipo() {
                 value={user?.nombre || ''}
                 readOnly
               />
-              <span className="form-hint">Tú serás el capitán de este equipo</span>
+              <span className="form-hint">
+                Tú serás el capitán de este equipo
+              </span>
             </div>
 
             {/* Visibilidad */}
@@ -131,7 +135,13 @@ export default function CrearEquipo() {
                     type="radio"
                     name="esPublico"
                     checked={form.esPublico === true}
-                    onChange={() => setForm(prev => ({ ...prev, esPublico: true, contraseña: '' }))}
+                    onChange={() =>
+                      setForm((prev) => ({
+                        ...prev,
+                        esPublico: true,
+                        contrasenia: '',
+                      }))
+                    }
                   />
                   <div className="radio-content">
                     <div className="radio-icon">🌍</div>
@@ -149,14 +159,16 @@ export default function CrearEquipo() {
                     type="radio"
                     name="esPublico"
                     checked={form.esPublico === false}
-                    onChange={() => setForm(prev => ({ ...prev, esPublico: false }))}
+                    onChange={() =>
+                      setForm((prev) => ({ ...prev, esPublico: false }))
+                    }
                   />
                   <div className="radio-content">
                     <div className="radio-icon">🔒</div>
                     <div className="radio-text">
                       <div className="radio-title">Privado</div>
                       <div className="radio-description">
-                        Requiere contraseña para unirse
+                        Requiere contrasenia para unirse
                       </div>
                     </div>
                   </div>
@@ -164,43 +176,40 @@ export default function CrearEquipo() {
               </div>
             </div>
 
-            {/* Contraseña (solo si es privado) */}
+            {/* contrasenia (solo si es privado) */}
             {!form.esPublico && (
               <div className="form-group password-group">
-                <label htmlFor="contraseña" className="form-label">
-                  Contraseña del Equipo
+                <label htmlFor="contrasenia" className="form-label">
+                  contrasenia del Equipo
                   <span className="required">*</span>
                 </label>
                 <input
-                  id="contraseña"
+                  id="contrasenia"
                   type="password"
-                  name="contraseña"
+                  name="contrasenia"
                   className="form-input"
-                  placeholder="Ingrese una contraseña segura"
-                  value={form.contraseña}
+                  placeholder="Ingrese una contrasenia segura"
+                  value={form.contrasenia}
                   onChange={handleChange}
                   required={!form.esPublico}
                   minLength={4}
                 />
                 <span className="form-hint">
-                  Comparte esta contraseña con los miembros que quieras invitar
+                  Comparte esta contrasenia con los miembros que quieras invitar
                 </span>
               </div>
             )}
 
             {/* Error */}
-            {error && (
-              <div className="alert-danger-custom">
-                ⚠️ {error}
-              </div>
-            )}
+            {error && <div className="alert-danger-custom">⚠️ {error}</div>}
 
             {/* Info adicional */}
             <div className="info-box">
               <div className="info-icon">ℹ️</div>
               <div className="info-text">
-                <strong>Importante:</strong> Como capitán, podrás gestionar el equipo, 
-                agregar o remover jugadores, y editar la información del equipo.
+                <strong>Importante:</strong> Como capitán, podrás gestionar el
+                equipo, agregar o remover jugadores, y editar la información del
+                equipo.
               </div>
             </div>
           </div>
@@ -226,9 +235,7 @@ export default function CrearEquipo() {
                   Creando equipo...
                 </>
               ) : (
-                <>
-                  Crear Equipo
-                </>
+                <>Crear Equipo</>
               )}
             </button>
           </div>
@@ -237,8 +244,14 @@ export default function CrearEquipo() {
 
       {/* Modal de éxito */}
       {showSuccess && (
-        <div className="modal-custom-overlay" onClick={() => setShowSuccess(false)}>
-          <div className="modal-custom-content modal-success" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="modal-custom-overlay"
+          onClick={() => setShowSuccess(false)}
+        >
+          <div
+            className="modal-custom-content modal-success"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-custom-header">
               <h2 className="modal-custom-title">¡Equipo Creado!</h2>
             </div>

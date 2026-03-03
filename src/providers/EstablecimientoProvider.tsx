@@ -1,98 +1,155 @@
-import { EstablecimientoContext } from "../contexts/establecimiento.tsx";
-import type { Establecimiento } from "../contexts/establecimiento.tsx";
-import { AxiosError } from "axios";
-import { useState, useCallback } from "react";
-import apiAxios from "../helpers/api";
+import {
+  EstablecimientoContext,
+  type Establecimiento,
+} from '../contexts/establecimiento';
+import type { EstablecimientoPayloadEdicion } from '../DTOs/establecimientosDTO';
+import { AxiosError } from 'axios';
+import { useCallback, useMemo, useState } from 'react';
+import apiAxios from '../helpers/api';
 
-const EstablecimientoProvider = ({ children }: { children: React.ReactNode }) => {
-  const [establecimientos, setEstablecimientos] = useState<Establecimiento[]>([]);
-  const [establecimiento, setEstablecimiento] = useState<Establecimiento | null>(null);
+const EstablecimientoProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  const [establecimientos, setEstablecimientos] = useState<Establecimiento[]>(
+    [],
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const getEstablecimientosTorneo = useCallback(async (eventoId: number) => {
+  const getEstablecimientos = useCallback(async (eventoId: number) => {
     setLoading(true);
     setError(null);
+
     try {
-      const response = await apiAxios.get(`/establecimientos/evento/${eventoId}`);
-      const data = Array.isArray(response.data.data) ? response.data.data : [];
-      setEstablecimientos(data);
+      const response = await apiAxios.get(
+        '/establecimientos/evento/' + eventoId,
+      );
+      setEstablecimientos(
+        Array.isArray(response.data.data) ? response.data.data : [],
+      );
     } catch (err) {
-      const e = err as AxiosError<{ message: string }>;
-      setError("Error al recuperar establecimientos del torneo: " + (e.response?.data?.message ?? e.message));
+      const axiosError = err as AxiosError<{ message?: string }>;
+      setError(
+        'Error al cargar los establecimientos: ' +
+          (axiosError.response?.data?.message || axiosError.message),
+      );
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const getUnEstablecimiento = useCallback(async (id: number) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await apiAxios.get(`/establecimientos/${id}`);
-      setEstablecimiento(response.data.data);
-    } catch (err) {
-      const e = err as AxiosError<{ message: string }>;
-      setError("Error al recuperar el establecimiento: " + (e.response?.data?.message ?? e.message));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const crearEstablecimiento = useCallback(
+    async (payload: EstablecimientoPayloadEdicion) => {
+      setLoading(true);
+      setError(null);
 
-  const crearEstablecimiento = useCallback(async (e: Omit<Establecimiento, 'id'>) => {
-    setError(null);
-    setLoading(true);
-    try {
-      const payload = {
-        nombre: e.nombre,
-        direccion: e.direccion,
-        eventoId: e.evento,
-      };
-      await apiAxios.post(`/establecimientos`, payload);
-    } catch (err) {
-      const e = err as AxiosError<{ message: string }>;
-      setError("Error al crear el establecimiento: " + (e.response?.data?.message ?? e.message));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+      try {
+        const response = await apiAxios.post('/establecimientos', payload);
+        return response.data.data as Establecimiento;
+      } catch (err) {
+        const axiosError = err as AxiosError<{ message?: string }>;
+        setError(
+          'Error al crear el establecimiento: ' +
+            (axiosError.response?.data?.message || axiosError.message),
+        );
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
-  const modificarEstablecimiento = useCallback(async (e: Establecimiento) => {
-    setError(null);
+  const deleteEstablecimiento = useCallback(async (id: number) => {
     setLoading(true);
-    try {
-      const payload = {
-        nombre: e.nombre,
-        direccion: e.direccion,
-        eventoId: e.evento,
-      };
-      await apiAxios.put(`/establecimientos/${e.id}`, payload);
-    } catch (err) {
-      const e = err as AxiosError<{ message: string }>;
-      setError("Error al modificar el establecimiento: " + (e.response?.data?.message ?? e.message));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    setError(null);
 
-  const borrarEstablecimiento = useCallback(async (id: number) => {
-    setError(null);
-    setLoading(true);
     try {
       await apiAxios.delete(`/establecimientos/${id}`);
+      return true;
     } catch (err) {
-      const e = err as AxiosError<{ message: string }>;
-      setError("Error al borrar el establecimiento: " + (e.response?.data?.message ?? e.message));
+      const axiosError = err as AxiosError<{ message?: string }>;
+      setError(
+        'Error al eliminar el establecimiento: ' +
+          (axiosError.response?.data?.message || axiosError.message),
+      );
+      return false;
     } finally {
       setLoading(false);
     }
   }, []);
 
+  const getOneEstablecimiento = useCallback(async (id: number) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await apiAxios.get(`/establecimientos/${id}`);
+      return response.data.data as Establecimiento;
+    } catch (err) {
+      const axiosError = err as AxiosError<{ message?: string }>;
+      setError(
+        'Error al obtener el establecimiento: ' +
+          (axiosError.response?.data?.message || axiosError.message),
+      );
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const editarEstablecimiento = useCallback(
+    async (id: number, payload: EstablecimientoPayloadEdicion) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await apiAxios.put(`/establecimientos/${id}`, payload);
+        return response.data.data as Establecimiento;
+      } catch (err) {
+        const axiosError = err as AxiosError<{ message?: string }>;
+        setError(
+          'Error al editar el establecimiento: ' +
+            (axiosError.response?.data?.message || axiosError.message),
+        );
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  const value = useMemo(
+    () => ({
+      establecimientos,
+      loading,
+      error,
+      getEstablecimientos,
+      crearEstablecimiento,
+      deleteEstablecimiento,
+      getOneEstablecimiento,
+      editarEstablecimiento,
+    }),
+    [
+      establecimientos,
+      loading,
+      error,
+      getEstablecimientos,
+      crearEstablecimiento,
+      deleteEstablecimiento,
+      getOneEstablecimiento,
+      editarEstablecimiento,
+    ],
+  );
+
   return (
-    <EstablecimientoContext.Provider value={{ establecimientos, establecimiento, loading, error, getEstablecimientosTorneo, getUnEstablecimiento, crearEstablecimiento, modificarEstablecimiento, borrarEstablecimiento }}>
+    <EstablecimientoContext.Provider value={value}>
       {children}
     </EstablecimientoContext.Provider>
   );
-}
+};
 
 export default EstablecimientoProvider;

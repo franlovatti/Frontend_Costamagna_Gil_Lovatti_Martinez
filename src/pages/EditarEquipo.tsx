@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { useObtenerEquipo, useEditarEquipo, useRemoverMiembroEquipo } from '../hooks/useEquipos';
-import type { Equipo } from '../contexts/equipo.tsx';
 import type { Usuario } from '../contexts/usuario';
+import { useEquipos } from '../hooks/useEquipos';
+import type { Equipo } from '../contexts/equipo.tsx';
 import { Row, Col } from 'react-bootstrap';
 import { InviteModal } from '../components/InviteModal';
 import ConfirmModal from '../components/ConfirmModal.tsx';
@@ -13,25 +13,29 @@ export default function EditarEquipo() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const [ equipo, setEquipo] = useState<Equipo | null>(null);
-  const { equipo: equipoObtenido, error: loadError, loading: loadingEquipo, refetch } = useObtenerEquipo(id);
-  const { editarEquipo, error: editError, loading: loadingEditar } = useEditarEquipo();
-  const { removerMiembro, error: removeError, loading: loadingRemoverMiembro } = useRemoverMiembroEquipo();
+  const [equipo, setEquipo] = useState<Equipo | null>(null);
+
+  const { obtenerEquipo, editarEquipo, removerMiembro, loading, error } =
+    useEquipos();
+
+  useEffect(() => {
+    const fetchEquipo = async () => {
+      const data = await obtenerEquipo(Number(id));
+      setEquipo(data);
+      setNameInput(data.nombre ?? '');
+      setPasswordInput('');
+    };
+    fetchEquipo();
+  }, [obtenerEquipo, id]);
 
   const [nameInput, setNameInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
-  const [memberToRemove, setMemberToRemove] = useState<string | number | null>(null);
+  const [memberToRemove, setMemberToRemove] = useState<string | number | null>(
+    null,
+  );
   const [showInviteModal, setShowInviteModal] = useState(false);
-
-  useEffect(() => {
-    if (equipoObtenido) {
-      setEquipo(equipoObtenido);
-      setNameInput(equipoObtenido.nombre ?? '');
-      setPasswordInput('');
-    }
-  }, [equipoObtenido]);
 
   const userIdStr = user ? String(user.id) : undefined;
   const capId = String(equipo?.capitan.id);
@@ -46,7 +50,8 @@ export default function EditarEquipo() {
     const success = await removerMiembro(Number(id), Number(memberToRemove));
     if (success) {
       setMemberToRemove(null);
-      refetch();
+      const data = await obtenerEquipo(Number(id));
+      setEquipo(data);
     }
     setShowRemoveModal(false);
   }
@@ -56,15 +61,16 @@ export default function EditarEquipo() {
     if (!id) return;
     const success = await editarEquipo(Number(id), {
       nombre: nameInput,
-      contraseña: passwordInput || undefined,
+      contrasenia: passwordInput || '',
     });
     if (success) {
       setPasswordInput('');
-      refetch();
+      const data = await obtenerEquipo(Number(id));
+      setEquipo(data);
     }
   }
 
-  if (loadingEquipo || !equipo) {
+  if (loading || !equipo) {
     return (
       <div className="torneo-detalle-container">
         <div className="loading-state">
@@ -107,10 +113,8 @@ export default function EditarEquipo() {
         </div>
 
         {/* Error de conexión */}
-        {(loadError || editError || removeError) && ( !loadingEditar && !loadingRemoverMiembro && !loadingEquipo) && (
-          <div className="alert-danger-custom">
-            ⚠️ {loadError || editError || removeError}
-          </div>
+        {error && loading && (
+          <div className="alert-danger-custom">⚠️ {error}</div>
         )}
 
         {/* Formulario de edición (solo si es capitán) */}
@@ -137,7 +141,7 @@ export default function EditarEquipo() {
                   <Col md={6}>
                     <div className="form-group-custom">
                       <label className="form-label-custom">
-                        Nueva contraseña (opcional)
+                        Nueva contrasenia (opcional)
                       </label>
                       <div style={{ position: 'relative' }}>
                         <input
@@ -265,17 +269,15 @@ export default function EditarEquipo() {
             <button
               className="action-btn btn-primary-action"
               onClick={() => handleSaveAll()}
-              disabled={loadingEditar}
+              disabled={loading}
             >
-              {loadingEditar ? (
+              {loading ? (
                 <>
                   <span className="spinner"></span>
                   Guardando...
                 </>
               ) : (
-                <>
-                  Guardar Cambios
-                </>
+                <>Guardar Cambios</>
               )}
             </button>
           )}
@@ -283,18 +285,17 @@ export default function EditarEquipo() {
       </div>
 
       {/* Modal de confirmación para eliminar miembro */}
-      {showRemoveModal && (  
+      {showRemoveModal && (
         <ConfirmModal
-          objeto= {"eliminar al miembro del equipo"}
-          setShowConfirm= {setShowRemoveModal}
+          objeto={'eliminar al miembro del equipo'}
+          setShowConfirm={setShowRemoveModal}
           handleConfirmDelete={confirmRemoveMember}
           handleCancelDelete={() => {
             setShowRemoveModal(false);
             setMemberToRemove(null);
           }}
-        />  
-      )
-      }
+        />
+      )}
 
       {/* Modal para invitar miembros */}
       {showInviteModal && id && (

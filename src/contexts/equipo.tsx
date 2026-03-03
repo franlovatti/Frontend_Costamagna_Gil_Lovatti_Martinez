@@ -1,7 +1,8 @@
-import { createContext } from "react";
-import type { Partido } from "./partido";
-import type { Usuario } from "./usuario";
-import type { Torneo } from "./torneo";
+import type { Partido } from './partido';
+import type { Usuario } from './usuario.tsx';
+import type { Torneo } from './torneo';
+import type { EquiposPayload, EquipoEditPayload } from '../DTOs/equipoDTO.tsx';
+import { createContext } from 'react';
 
 export interface Equipo {
   id: number;
@@ -10,7 +11,7 @@ export interface Equipo {
   capitan: Usuario;
   puntos: number;
   esPublico: boolean;
-  contraseña: string;
+  contrasenia: string;
   miembros: Usuario[];
   evento: Torneo;
   partidoVisitante: Partido[];
@@ -18,19 +19,27 @@ export interface Equipo {
 }
 
 export interface EquipoContextType {
-  equipos: Equipo[];
-  equipo: Equipo | null;
+  Equipos: Equipo[];
   loading: boolean;
   error: string | null;
-  getEquiposEvento: (eventoId: number) => void;
-  getUnEquipo: (id: number) => void;
-  getMisEquipos: (usuarioId: string) => void;
-  inscribirseAEquipo: (equipo: Equipo, usuarioId: string, contraseña?: string) => Promise<boolean>;
-  salirDeEquipo: (equipoId: number, usuarioId?: string) => Promise<boolean>;
-  removerMiembro: (equipoId: number, usuarioId: string) => Promise<boolean>;
-  borrarEquipo: (id: number) => Promise<void>;
-  modificarEquipo: (equipo: Equipo) => Promise<void>;
-  crearEquipo: (equipo: Omit<Equipo, 'id'>) => Promise<void>;
+  getEquiposEvento: (eventoId: number) => Promise<void>;
+  getMisEquipos: (usuarioId: number) => Promise<void>;
+  borrarEquipo: (equipoId: number) => Promise<boolean>;
+  crearEquipo: (payload: EquiposPayload) => Promise<Equipo | null>;
+  inscribirseEquipo: (
+    equipo: Equipo,
+    contrseña: string,
+    usuarioId: number,
+  ) => Promise<boolean>;
+  salirEquipo: (equipoId: number, usuarioId: number) => Promise<boolean>;
+  obtenerEquipo: (equipoId: number) => Promise<Equipo>;
+  editarEquipo: (
+    equipoId: number,
+    payload: EquipoEditPayload,
+  ) => Promise<Equipo | null>;
+  removerMiembro: (
+    equipoId: number,
+    usuarioId: number,
+  ) => Promise<Equipo | null>;
 }
-
 export const EquipoContext = createContext<EquipoContextType | null>(null);

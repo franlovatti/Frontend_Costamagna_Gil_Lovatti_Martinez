@@ -17,9 +17,21 @@ export interface AuthContextType {
   loading: boolean;
   error: string | null;
   setError: (error: string | null) => void;
-  login: (usuario: string, contraseña: string, remember: boolean) => Promise<boolean>;
+  login: (
+    usuario: string,
+    contrasenia: string,
+    remember: boolean,
+  ) => Promise<boolean>;
   logout: () => void;
-  registro: (nombre: string, apellido: string, usuario: string, contraseña: string, fechaNacimiento: string, email: string, remember: boolean) => Promise<boolean>;
+  registro: (
+    nombre: string,
+    apellido: string,
+    usuario: string,
+    contrasenia: string,
+    fechaNacimiento: string,
+    email: string,
+    remember: boolean,
+  ) => Promise<boolean>;
   bajaUsuario: (id: string) => Promise<void>;
   updateUser: (userData: Partial<User>) => void;
 }

@@ -13,14 +13,22 @@ import { useDeporte } from '../hooks/useDeporte.tsx';
 import FormTorneos from '../components/FormTorneos.tsx';
 
 export default function Torneos() {
-  const { torneos, loading, error, getTorneos, crearTorneo, torneo, getTorneoPorCodigo } = useTorneo();
+  const {
+    torneos,
+    loading,
+    error,
+    getTorneos,
+    crearTorneo,
+    torneo,
+    getTorneoPorCodigo,
+  } = useTorneo();
   const { deportes, getDeportes } = useDeporte();
   const [dataTorneos, setDataTorneos] = useState<Torneo[]>([]);
   const [selectedSport, setSelectedSport] = useState<string>('');
   const [selectedLocalidad, setSelectedLocalidad] = useState<string>('');
   const [dataDeportes, setDataDeportes] = useState<Deporte[]>([]);
   const [showForm, setShowForm] = useState(false);
-  
+
   // Modal de código
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [code, setCode] = useState('');
@@ -32,7 +40,7 @@ export default function Torneos() {
   const [eventPwd, setEventPwd] = useState('');
   const [eventError, setEventError] = useState<string | null>(null);
   const [eventSubmitting, setEventSubmitting] = useState(false);
-  
+
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -74,13 +82,13 @@ export default function Torneos() {
     setEventSubmitting(true);
     try {
       if (selectedEvent.esPublico === false) {
-        const requiredPwd = selectedEvent.contraseña;
+        const requiredPwd = selectedEvent.contrasenia;
         if (!eventPwd.trim()) {
-          setEventError('Ingrese la contraseña');
+          setEventError('Ingrese la contrasenia');
           return;
         }
         if (eventPwd !== requiredPwd) {
-          setEventError('Contraseña incorrecta');
+          setEventError('contrasenia incorrecta');
           return;
         }
       }
@@ -104,11 +112,11 @@ export default function Torneos() {
   };
 
   const userIsCreadorOf = (torneo: Torneo): boolean => {
-      if (!user || !torneo?.equipos) return false;
-      const userIdStr = String(user.id);
-      const torneoCreadorId = String(torneo.creador);
-      return torneoCreadorId === userIdStr;
-    };
+    if (!user || !torneo?.equipos) return false;
+    const userIdStr = String(user.id);
+    const torneoCreadorId = String(torneo.creador);
+    return torneoCreadorId === userIdStr;
+  };
 
   const openCodeModal = () => {
     setCode('');
@@ -135,17 +143,18 @@ export default function Torneos() {
   const torneosFiltrados = dataTorneos.filter(
     (torneo) =>
       (!selectedSport || String(torneo.deporte.nombre) === selectedSport) &&
-      (!selectedLocalidad || String(torneo.localidad.codigo) === selectedLocalidad)
+      (!selectedLocalidad ||
+        String(torneo.localidad.codigo) === selectedLocalidad),
   );
 
   if (showForm) {
     return (
-          <FormTorneos
-            setShowModal={setShowForm}
-            editingTorneo={null}
-            onSave={handleCreateTorneo}
-          />
-        )
+      <FormTorneos
+        setShowModal={setShowForm}
+        editingTorneo={null}
+        onSave={handleCreateTorneo}
+      />
+    );
   }
   return (
     <div className="torneos-page-container">
@@ -164,7 +173,10 @@ export default function Torneos() {
             <button className="btn-toolbar" onClick={openCodeModal}>
               Ingresar código
             </button>
-            <button className="btn-save-custom" onClick={() => setShowForm(true)}>
+            <button
+              className="btn-save-custom"
+              onClick={() => setShowForm(true)}
+            >
               Crear Torneo
             </button>
             <select
@@ -179,15 +191,17 @@ export default function Torneos() {
                 </option>
               ))}
             </select>
-            <MapaLocalidad onSelect={(place) => setSelectedLocalidad(place.place_id!)} localidad={true} className='filtro-select-toolbar' />
+            <MapaLocalidad
+              onSelect={(place) => setSelectedLocalidad(place.place_id!)}
+              localidad={true}
+              className="filtro-select-toolbar"
+            />
           </div>
         </div>
 
         {/* Error de conexión */}
         {error && !loading && (
-          <div className="alert-danger-custom">
-            ⚠️ {error}
-          </div>
+          <div className="alert-danger-custom">⚠️ {error}</div>
         )}
 
         {/* Grid de torneos */}
@@ -200,29 +214,40 @@ export default function Torneos() {
           <div className="torneos-empty-state">
             <div className="empty-state-icon">🏆</div>
             <p className="empty-state-text">No se encontraron torneos</p>
-            </div>
-          ) : (
-            <div className="torneos-grid">
-              {torneosFiltrados.map((torneo) => (
-                <CardTorneos
-                  key={torneo.id}
-                  torneo={torneo}
-                  handleClick={handleClick}
-                  isMember={userIsMemberOf(torneo)}
-                  onEnroll={handleEnrollFromCard}
-                  isCreador={userIsCreadorOf(torneo)}
-                />
-              ))}
-            </div>
-          )}
+          </div>
+        ) : (
+          <div className="torneos-grid">
+            {torneosFiltrados.map((torneo) => (
+              <CardTorneos
+                key={torneo.id}
+                torneo={torneo}
+                handleClick={handleClick}
+                isMember={userIsMemberOf(torneo)}
+                onEnroll={handleEnrollFromCard}
+                isCreador={userIsCreadorOf(torneo)}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Modal de código */}
         {showCodeModal && (
-          <div className="modal-custom-overlay" onClick={() => setShowCodeModal(false)}>
-            <div className="modal-custom-content" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-custom-overlay"
+            onClick={() => setShowCodeModal(false)}
+          >
+            <div
+              className="modal-custom-content"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="modal-custom-header">
-                <h2 className="modal-custom-title">Ingresar código de torneo</h2>
-                <button className="modal-custom-close" onClick={() => setShowCodeModal(false)}>
+                <h2 className="modal-custom-title">
+                  Ingresar código de torneo
+                </h2>
+                <button
+                  className="modal-custom-close"
+                  onClick={() => setShowCodeModal(false)}
+                >
                   ✕
                 </button>
               </div>
@@ -241,7 +266,9 @@ export default function Torneos() {
                       }}
                       autoFocus
                     />
-                    {codeError && <div className="modal-error-text">{codeError}</div>}
+                    {codeError && (
+                      <div className="modal-error-text">{codeError}</div>
+                    )}
                   </div>
                 </div>
                 <div className="modal-custom-footer">
@@ -268,15 +295,24 @@ export default function Torneos() {
 
         {/* Modal de inscripción al evento */}
         {showEventModal && selectedEvent && (
-          <div className="modal-custom-overlay" onClick={() => setShowEventModal(false)}>
-            <div className="modal-custom-content" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-custom-overlay"
+            onClick={() => setShowEventModal(false)}
+          >
+            <div
+              className="modal-custom-content"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="modal-custom-header">
                 <h2 className="modal-custom-title">
                   {selectedEvent.esPublico === false
                     ? 'Inscribirse a torneo privado'
                     : 'Inscribirse al torneo'}
                 </h2>
-                <button className="modal-custom-close" onClick={() => setShowEventModal(false)}>
+                <button
+                  className="modal-custom-close"
+                  onClick={() => setShowEventModal(false)}
+                >
                   ✕
                 </button>
               </div>
@@ -287,11 +323,13 @@ export default function Torneos() {
                   </p>
                   {selectedEvent.esPublico === false ? (
                     <div className="modal-form-group">
-                      <label className="modal-form-label">Contraseña del torneo</label>
+                      <label className="modal-form-label">
+                        contrasenia del torneo
+                      </label>
                       <input
                         type="password"
                         className="modal-form-input"
-                        placeholder="Ingrese la contraseña"
+                        placeholder="Ingrese la contrasenia"
                         value={eventPwd}
                         onChange={(e) => {
                           setEventPwd(e.target.value);
@@ -302,11 +340,13 @@ export default function Torneos() {
                     </div>
                   ) : (
                     <p className="modal-info-text">
-                      Este torneo es público. ¿Desea continuar y ver los detalles para
-                      inscribirse?
+                      Este torneo es público. ¿Desea continuar y ver los
+                      detalles para inscribirse?
                     </p>
                   )}
-                  {eventError && <div className="modal-error-text">{eventError}</div>}
+                  {eventError && (
+                    <div className="modal-error-text">{eventError}</div>
+                  )}
                 </div>
                 <div className="modal-custom-footer">
                   <button

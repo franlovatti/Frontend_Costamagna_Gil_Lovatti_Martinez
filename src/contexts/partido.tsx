@@ -1,9 +1,10 @@
-import { createContext } from "react";
-import type { Equipo } from "./equipo";
-import type { Establecimiento } from "./establecimiento";
-import type { Participation } from "./participacion";
-import type { Torneo } from "./torneo";
-import type { Usuario } from "./usuario";
+import type { Establecimiento } from './establecimiento';
+import type { Torneo } from './torneo';
+import type { Equipo } from './equipo';
+import type { Usuario } from './usuario';
+import type { Participacion } from './participacion.tsx';
+import { createContext } from 'react';
+import type { PartidoPayload, resultadosDto } from '../DTOs/partidosDTO.tsx';
 
 export interface Partido {
   id: number;
@@ -15,7 +16,7 @@ export interface Partido {
   fecha: Date;
   hora: string;
   establecimiento?: Establecimiento;
-  participations?: Participation[];
+  participations?: Participacion[];
   resultadoLocal: number | null;
   resultadoVisitante: number | null;
   juez: string;
@@ -23,15 +24,17 @@ export interface Partido {
 
 export interface PartidoContextType {
   partidos: Partido[];
-  partido: Partido | null;
   loading: boolean;
   error: string | null;
-  getPartidos: () => void;
   getPartidosEvento: (eventoId: number) => void;
-  getUnPartido: (id: number) => void;
-  borrarPartido: (id: number) => Promise<void>;
-  modificarPartido: (partido: Partido) => Promise<void>;
-  crearPartido: (partido: Partido) => Promise<void>;
+  getOnePartido: (partidoId: number) => Promise<Partido | null>;
+  borrarPartido: (partidoId: number) => Promise<Partido | null>;
+  cargarResultado: (resultado: resultadosDto) => Promise<Partido | null>;
+  crearPartido: (payload: PartidoPayload) => Promise<Partido | null>;
+  editarPartido: (
+    partidoId: number,
+    payload: PartidoPayload,
+  ) => Promise<Partido | null>;
 }
 
 export const PartidoContext = createContext<PartidoContextType | null>(null);
