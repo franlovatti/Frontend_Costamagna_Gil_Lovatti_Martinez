@@ -9,24 +9,5 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <!-- Google Maps API -->
-    <script type="module">
-      // Espera a que el DOM esté listo
-      document.addEventListener('DOMContentLoaded', () => {
-        const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-        
-        if (!apiKey) {
-          console.error('ERROR: VITE_GOOGLE_MAPS_API_KEY no está definida en .env');
-          return;
-        }
-
-        // Cargar Google Maps API
-        const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
-        script.async = true;
-        script.defer = true;
-        document.body.appendChild(script);
-      });
-    </script>
   </body>
 </html>

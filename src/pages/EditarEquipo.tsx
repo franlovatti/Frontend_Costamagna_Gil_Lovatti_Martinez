@@ -7,6 +7,7 @@ import { Row, Col } from 'react-bootstrap';
 import { InviteModal } from '../components/InviteModal';
 import ConfirmModal from '../components/ConfirmModal.tsx';
 import type { User } from '../contexts/auth.tsx';
+import { estaAbiertoPeriodo } from '../helpers/convertirFechas.tsx';
 
 export default function EditarEquipo() {
   const { id } = useParams() as { id?: string };
@@ -190,9 +191,10 @@ export default function EditarEquipo() {
             <h2 className="section-title">Miembros del Equipo</h2>
             {capId === userIdStr && (
               <button
-                className="action-btn btn-primary-action flex-grow-0"
+                className="action-btn btn-primary-action btn-inscribirse flex-grow-0"
                 onClick={() => setShowInviteModal(true)}
                 style={{ padding: '8px 16px', fontSize: '0.9rem' }}
+                disabled={(equipo.evento.deporte.cantMaxJugadores <= (equipo.miembros?.length ?? 0)) || !estaAbiertoPeriodo(equipo.evento.fechaInicioInscripcion, equipo.evento.fechaFinInscripcion)}
               >
                 + Invitar Miembro
               </button>

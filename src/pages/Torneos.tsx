@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useTorneo } from '../hooks/useTorneo';
 import CardTorneos from '../components/CardTorneos';
 import { useNavigate, useLocation } from 'react-router-dom';
-import type { Equipo, Usuario } from '../types';
+import type { Equipo } from '../contexts/equipo.tsx';
+import type { Usuario } from '../contexts/usuario';
 import type { Torneo } from '../contexts/torneo.tsx';
 import type { Deporte } from '../contexts/deporte.tsx';
 import { useAuth } from '../hooks/useAuth';
@@ -111,7 +112,7 @@ export default function Torneos() {
     if (!user || !torneo?.equipos) return false;
     const userIdStr = String(user.id);
     return torneo.equipos.some((e: Equipo) => {
-      const miembros = (e.miembros as Usuario[]) ?? [];
+      const miembros = (e.miembros as unknown as Usuario[]) ?? [];
       return miembros.some((m) => String(m.id) === userIdStr);
     });
   };

@@ -151,13 +151,13 @@ const ParticipacionesPerfil = ({
         ) : (
           participacionesPorEvento.map((evento, idx) => (
             <div key={idx} className="participacion-item">
-              <div className="participacion-header">
+              <div className="torneo-header">
                 <div>
-                  <h4 className="participacion-evento">
+                  <h4 className="torneo-nombre">
                     {evento.nombreEvento}
                   </h4>
                   <div className="d-flex align-items-center gap-2 flex-wrap">
-                    <span className="participacion-deporte">
+                    <span className="torneo-deporte">
                       ⚽ {evento.deporte}
                     </span>
                     <span className="badge-estado badge-en-curso">

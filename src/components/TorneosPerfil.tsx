@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { useMisEquipos } from '../hooks/useEquipos.tsx';
 import { useNavigate } from 'react-router-dom';
 import './cssComponentes/TorneosPerfil.css';
+import type { Equipo } from '../contexts/equipo.tsx';
             
 type TorneosPerfilProps = {
-  equipos: ReturnType<typeof useMisEquipos>['equipos'];
-  loadingEquipos: ReturnType<typeof useMisEquipos>['loadingEquipos'];
-  errorEquipos: ReturnType<typeof useMisEquipos>['errorEquipos'];
+  equipos: Equipo[];
+  loadingEquipos: boolean;
+  errorEquipos: string | null;
 };
 
 const TorneosPerfil = ({ equipos, loadingEquipos, errorEquipos }: TorneosPerfilProps) => {
@@ -28,6 +28,9 @@ const TorneosPerfil = ({ equipos, loadingEquipos, errorEquipos }: TorneosPerfilP
         fechaFin: torneo.fechaFinEvento,
         estado: (() => {
           const ahora = new Date();
+          if (!torneo.fechaInicioEvento || !torneo.fechaFinEvento || !torneo.fechaFinInscripcion) {
+            return 'pendiente';
+          }
           const inicioEvento = new Date(torneo.fechaInicioEvento);
           const finEvento = new Date(torneo.fechaFinEvento);
           const finInscripcion = new Date(torneo.fechaFinInscripcion);
@@ -109,7 +112,10 @@ const TorneosPerfil = ({ equipos, loadingEquipos, errorEquipos }: TorneosPerfilP
                 <div className="torneo-detail-item">
                   <span className="detail-label">Fechas:</span>
                   <span className="detail-value">
-                    {new Date(torneo.fechaInicio).toLocaleDateString()} - {new Date(torneo.fechaFin).toLocaleDateString()}
+                    {torneo.fechaInicio && torneo.fechaFin 
+                      ? `${new Date(torneo.fechaInicio).toLocaleDateString()} - ${new Date(torneo.fechaFin).toLocaleDateString()}`
+                      : 'Fechas no definidas'
+                    }
                   </span>
                 </div>
                 {torneo.partidosJugados > 0 && (

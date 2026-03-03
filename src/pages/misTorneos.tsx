@@ -3,6 +3,8 @@ import CardTorneos from '../components/CardTorneos.tsx';
 import { useNavigate } from 'react-router';
 import { useEffect, useState } from 'react';
 import type { Torneo } from '../contexts/torneo.tsx';
+import type { Equipo } from '../contexts/equipo.tsx';
+import type { Usuario } from '../contexts/usuario';
 import { useAuth } from '../hooks/useAuth.tsx';
 import { useTorneo } from '../hooks/useTorneo.tsx';
 
@@ -33,6 +35,15 @@ export default function MisTorneos() {
   useEffect(() => {
     setDataTorneosInscripto(torneosInscripto);
   }, [torneosInscripto]);
+
+  const userIsMemberOf = (torneo: Torneo): boolean => {
+    if (!user || !torneo?.equipos) return false;
+    const userIdStr = String(user.id);
+    return torneo.equipos.some((e: Equipo) => {
+      const miembros = (e.miembros as unknown as Usuario[]) ?? [];
+      return miembros.some((m) => String(m.id) === userIdStr);
+    });
+  };
 
   return (
     <div className="torneos-page-container">
@@ -82,6 +93,7 @@ export default function MisTorneos() {
                     torneo={torneo}
                     handleClick={handleClick}
                     isCreador={true}
+                    isMember={userIsMemberOf(torneo)}
                   />
                 </Col>
               ))}
