@@ -19,7 +19,10 @@ import { estaAbiertoPeriodo } from '../helpers/convertirFechas.tsx';
 const navigateMock = vi.fn();
 
 vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  const actual =
+    await vi.importActual<typeof import('react-router-dom')>(
+      'react-router-dom',
+    );
   return {
     ...actual,
     useNavigate: () => navigateMock,
@@ -39,9 +42,11 @@ vi.mock('../hooks/useInvitacion.tsx', () => ({
 }));
 
 vi.mock('../helpers/convertirFechas.tsx', () => ({
-  toDatetimeLocal: (value?: Date | string | null) => (value ? '2026-03-01T00:00' : ''),
+  toDatetimeLocal: (value?: Date | string | null) =>
+    value ? '2026-03-01T00:00' : '',
   parseDatetimeLocal: (value: string) => new Date(`${value}T00:00:00.000Z`),
-  formatFecha: (value: Date | string) => (typeof value === 'string' ? value : '2026-03-01'),
+  formatFecha: (value: Date | string) =>
+    typeof value === 'string' ? value : '2026-03-01',
   estaAbiertoPeriodo: vi.fn(() => true),
 }));
 
@@ -149,26 +154,39 @@ describe('FormTorneos', () => {
     );
 
     await user.type(screen.getByLabelText(/Nombre del Torneo/i), 'Copa Test');
-    await user.type(screen.getByLabelText(/Descripción/i), 'Descripción válida');
+    await user.type(
+      screen.getByLabelText(/Descripción/i),
+      'Descripción válida',
+    );
 
     await user.selectOptions(screen.getByLabelText(/Deporte/i), '1');
     await user.selectOptions(screen.getByLabelText(/Localidad/i), '1');
 
-    const inicioInscripcion = document.getElementById('fechaInicioInscripcion') as HTMLInputElement;
-    const finInscripcion = document.getElementById('fechaFinInscripcion') as HTMLInputElement;
-    const inicioTorneo = document.getElementById('fechaInicioTorneo') as HTMLInputElement;
-    const finTorneo = document.getElementById('fechaFinTorneo') as HTMLInputElement;
+    const inicioInscripcion = document.getElementById(
+      'fechaInicioInscripcion',
+    ) as HTMLInputElement;
+    const finInscripcion = document.getElementById(
+      'fechaFinInscripcion',
+    ) as HTMLInputElement;
+    const inicioTorneo = document.getElementById(
+      'fechaInicioTorneo',
+    ) as HTMLInputElement;
+    const finTorneo = document.getElementById(
+      'fechaFinTorneo',
+    ) as HTMLInputElement;
 
     await user.type(inicioInscripcion, '2026-03-01');
     await user.type(finInscripcion, '2026-03-05');
     await user.type(inicioTorneo, '2026-03-06');
     await user.type(finTorneo, '2026-03-10');
 
-    const cantidadEquipos = document.getElementById('cantidadEquipos') as HTMLInputElement;
+    const cantidadEquipos = document.getElementById(
+      'cantidadEquipos',
+    ) as HTMLInputElement;
     await user.clear(cantidadEquipos);
     await user.type(cantidadEquipos, '10');
 
-    await user.type(screen.getByLabelText(/Contraseña del Torneo/i), '1234');
+    await user.type(screen.getByLabelText(/contrasenia del Torneo/i), '1234');
 
     await user.click(screen.getByRole('button', { name: /crear torneo/i }));
 
@@ -190,7 +208,9 @@ describe('FormTorneos', () => {
 
     await user.click(screen.getByRole('button', { name: /crear torneo/i }));
 
-    expect(await screen.findByText(/El nombre es obligatorio/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/El nombre es obligatorio/i),
+    ).toBeInTheDocument();
     expect(onSave).not.toHaveBeenCalled();
   });
 
@@ -206,19 +226,28 @@ describe('FormTorneos', () => {
       />,
     );
 
-    await user.type(screen.getByLabelText(/Nombre del Torneo/i), 'Copa inválida');
+    await user.type(
+      screen.getByLabelText(/Nombre del Torneo/i),
+      'Copa inválida',
+    );
     await user.selectOptions(screen.getByLabelText(/Deporte/i), '1');
     await user.selectOptions(screen.getByLabelText(/Localidad/i), '1');
 
-    const inicioInscripcion = document.getElementById('fechaInicioInscripcion') as HTMLInputElement;
-    const finInscripcion = document.getElementById('fechaFinInscripcion') as HTMLInputElement;
+    const inicioInscripcion = document.getElementById(
+      'fechaInicioInscripcion',
+    ) as HTMLInputElement;
+    const finInscripcion = document.getElementById(
+      'fechaFinInscripcion',
+    ) as HTMLInputElement;
 
     await user.type(inicioInscripcion, '2026-03-10');
     await user.type(finInscripcion, '2026-03-09');
 
     fireEvent.blur(finInscripcion);
 
-    expect(await screen.findByText(/Debe ser posterior al inicio de inscripción/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Debe ser posterior al inicio de inscripción/i),
+    ).toBeInTheDocument();
     expect(onSave).not.toHaveBeenCalled();
   });
 });
@@ -242,7 +271,9 @@ describe('ConfirmModal e InviteModal', () => {
 
     await user.click(screen.getByRole('button', { name: /confirmar/i }));
     await user.click(screen.getByRole('button', { name: /cancelar/i }));
-    fireEvent.click(screen.getByText(/¿Estás seguro/i).closest('.modal-overlay') as Element);
+    fireEvent.click(
+      screen.getByText(/¿Estás seguro/i).closest('.modal-overlay') as Element,
+    );
 
     expect(handleConfirmDelete).toHaveBeenCalled();
     expect(handleCancelDelete).toHaveBeenCalled();
@@ -270,7 +301,9 @@ describe('ConfirmModal e InviteModal', () => {
     fireEvent.click(screen.getByRole('button', { name: /enviar invitación/i }));
 
     expect(enviarInvitacion).toHaveBeenCalledWith(55, 'jugador@test.com');
-    expect(screen.getByText(/Invitación enviada correctamente/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Invitación enviada correctamente/i),
+    ).toBeInTheDocument();
 
     act(() => {
       vi.runAllTimers();
@@ -290,7 +323,9 @@ describe('ConfirmModal e InviteModal', () => {
 
     render(<InviteModal equipoId={99} isOpen={true} onClose={vi.fn()} />);
 
-    expect(screen.getByText(/No se pudo enviar la invitación/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/No se pudo enviar la invitación/i),
+    ).toBeInTheDocument();
   });
 
   it('InviteModal bloquea cierre mientras loading es true', async () => {
@@ -333,7 +368,9 @@ describe('TablaPartidos', () => {
       />,
     );
 
-    expect(screen.getByText(/No hay partidos programados aún/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/No hay partidos programados aún/i),
+    ).toBeInTheDocument();
   });
 
   it('abre modal de resultado al hacer click en Resultado', async () => {
@@ -404,9 +441,15 @@ describe('TablaPartidos', () => {
       />,
     );
 
-    expect(screen.queryByRole('button', { name: /resultado/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /eliminar/i })).not.toBeInTheDocument();
-    expect(screen.getAllByRole('button', { name: /ver partido/i }).length).toBeGreaterThan(0);
+    expect(
+      screen.queryByRole('button', { name: /resultado/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /eliminar/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getAllByRole('button', { name: /ver partido/i }).length,
+    ).toBeGreaterThan(0);
   });
 });
 
@@ -427,7 +470,9 @@ describe('TablaEquipos', () => {
       />,
     );
 
-    expect(screen.getAllByText(/No hay equipos inscritos aún/i).length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText(/No hay equipos inscritos aún/i).length,
+    ).toBeGreaterThan(0);
   });
 
   it('permite unirse cuando no es miembro', async () => {

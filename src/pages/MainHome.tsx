@@ -78,7 +78,7 @@ export default function MainHome() {
           <div className="hero-actions">
             <button 
               className="btn-hero-primary"
-              onClick={() => navigate('/home/torneos/crear-torneo')}
+              onClick={() => navigate('/home/torneos', { state: { showForm: true } })}
             >
               Crear Torneo
             </button>

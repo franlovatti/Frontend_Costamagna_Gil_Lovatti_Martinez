@@ -13,7 +13,7 @@ export default function CrearEquipo() {
   const [form, setForm] = useState({
     nombre: '',
     esPublico: true,
-    contraseña: '',
+    contrasenia: '',
   });
 
   const { loading, error: crearEquipoError, crearEquipo } = useEquipos();
@@ -38,8 +38,8 @@ export default function CrearEquipo() {
       return;
     }
 
-    if (!form.esPublico && !form.contraseña) {
-      setError('La contraseña es obligatoria si el equipo es privado.');
+    if (!form.esPublico && !form.contrasenia) {
+      setError('La contrasenia es obligatoria si el equipo es privado.');
       return;
     }
 
@@ -57,7 +57,7 @@ export default function CrearEquipo() {
       puntos: 0,
       esPublico: form.esPublico,
       privado: !form.esPublico,
-      contraseña: !form.esPublico ? form.contraseña : null,
+      contrasenia: !form.esPublico ? form.contrasenia?.trim() || null : null,
       miembros: [user.id],
       evento: Number(id),
     };
@@ -139,7 +139,7 @@ export default function CrearEquipo() {
                       setForm((prev) => ({
                         ...prev,
                         esPublico: true,
-                        contraseña: '',
+                        contrasenia: '',
                       }))
                     }
                   />
@@ -168,7 +168,7 @@ export default function CrearEquipo() {
                     <div className="radio-text">
                       <div className="radio-title">Privado</div>
                       <div className="radio-description">
-                        Requiere contraseña para unirse
+                        Requiere contrasenia para unirse
                       </div>
                     </div>
                   </div>
@@ -176,26 +176,26 @@ export default function CrearEquipo() {
               </div>
             </div>
 
-            {/* contraseña (solo si es privado) */}
+            {/* contrasenia (solo si es privado) */}
             {!form.esPublico && (
               <div className="form-group password-group">
-                <label htmlFor="contraseña" className="form-label">
-                  contraseña del Equipo
+                <label htmlFor="contrasenia" className="form-label">
+                  contrasenia del Equipo
                   <span className="required">*</span>
                 </label>
                 <input
-                  id="contraseña"
+                  id="contrasenia"
                   type="password"
-                  name="contraseña"
+                  name="contrasenia"
                   className="form-input"
-                  placeholder="Ingrese una contraseña segura"
-                  value={form.contraseña}
+                  placeholder="Ingrese una contrasenia segura"
+                  value={form.contrasenia}
                   onChange={handleChange}
                   required={!form.esPublico}
                   minLength={4}
                 />
                 <span className="form-hint">
-                  Comparte esta contraseña con los miembros que quieras invitar
+                  Comparte esta contrasenia con los miembros que quieras invitar
                 </span>
               </div>
             )}

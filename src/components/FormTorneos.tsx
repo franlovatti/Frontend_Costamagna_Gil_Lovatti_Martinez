@@ -13,7 +13,7 @@ type TorneoFormFields = {
   nombre: string;
   descripcion: string;
   esPublico: 'true' | 'false';
-  contraseña: string;
+  contrasenia: string;
   cantEquiposMax: number;
   fechaInicioInscripcion: string;
   fechaFinInscripcion: string;
@@ -49,7 +49,7 @@ export default function FormTorneos({
       nombre: editingTorneo?.nombre || '',
       descripcion: editingTorneo?.descripcion || '',
       esPublico: editingTorneo?.esPublico ? 'true' : 'false',
-      contraseña: editingTorneo?.contraseña || '',
+      contrasenia: editingTorneo?.contrasenia || '',
       cantEquiposMax: editingTorneo?.cantEquiposMax || 8,
       fechaInicioInscripcion:
         toDatetimeLocal(editingTorneo?.fechaInicioInscripcion).split('T')[0] ||
@@ -90,7 +90,9 @@ export default function FormTorneos({
       nombre: data.nombre,
       descripcion: data.descripcion,
       esPublico: esPublico,
-      contraseña: data.esPublico ? undefined : data.contraseña,
+      contrasenia: esPublico
+        ? undefined
+        : data.contrasenia?.trim() || undefined,
       cantEquiposMax: data.cantEquiposMax,
       fechaInicioInscripcion: parseDatetimeLocal(data.fechaInicioInscripcion)!,
       fechaFinInscripcion: parseDatetimeLocal(data.fechaFinInscripcion)!,
@@ -459,7 +461,7 @@ export default function FormTorneos({
                       <div className="radio-text">
                         <div className="radio-title">Privado</div>
                         <div className="radio-description">
-                          Requiere código o contraseña
+                          Requiere código o contrasenia
                         </div>
                       </div>
                     </div>
@@ -467,36 +469,36 @@ export default function FormTorneos({
                 </div>
               </div>
 
-              {/* contraseña si es privado */}
+              {/* contrasenia si es privado */}
               {!esPublico && (
                 <div className="form-group password-group">
-                  <label htmlFor="contraseña" className="form-label">
-                    contraseña del Torneo
+                  <label htmlFor="contrasenia" className="form-label">
+                    contrasenia del Torneo
                     <span className="required">*</span>
                   </label>
                   <input
-                    id="contraseña"
+                    id="contrasenia"
                     type="password"
-                    className={`form-control custom-input ${errors.contraseña ? 'is-invalid' : ''}`}
-                    placeholder="Ingrese una contraseña"
-                    {...register('contraseña', {
+                    className={`form-control custom-input ${errors.contrasenia ? 'is-invalid' : ''}`}
+                    placeholder="Ingrese una contrasenia"
+                    {...register('contrasenia', {
                       required: !esPublico
-                        ? 'La contraseña es obligatoria para torneos privados'
+                        ? 'La contrasenia es obligatoria para torneos privados'
                         : false,
                       minLength: {
                         value: 4,
                         message:
-                          'La contraseña debe tener al menos 4 caracteres',
+                          'La contrasenia debe tener al menos 4 caracteres',
                       },
                     })}
                   />
-                  {errors.contraseña && (
+                  {errors.contrasenia && (
                     <span className="auth-error-text">
-                      {errors.contraseña.message}
+                      {errors.contrasenia.message}
                     </span>
                   )}
                   <span className="form-hint">
-                    Los usuarios necesitarán esta contraseña para acceder al
+                    Los usuarios necesitarán esta contrasenia para acceder al
                     torneo
                   </span>
                 </div>

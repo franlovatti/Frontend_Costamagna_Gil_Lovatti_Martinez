@@ -83,12 +83,12 @@ const EquipoProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const inscribirseEquipo = useCallback(
-    async (equipo: Equipo, contraseña?: string, usuarioId?: number) => {
+    async (equipo: Equipo, contrasenia?: string, usuarioId?: number) => {
       setLoading(true);
       setError(null);
       try {
         const body: Record<string, unknown> = { usuarioId };
-        if (!equipo.esPublico) body.contraseña = contraseña;
+        if (!equipo.esPublico) body.contrasenia = contrasenia;
         await apiAxios.post(`/equipos/${equipo.id}/miembros`, body);
         return true;
       } catch (err) {
@@ -152,7 +152,7 @@ const EquipoProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         const payload: Record<string, unknown> = {};
         if (datos.nombre) payload.nombre = datos.nombre;
-        if (datos.contraseña) payload.contraseña = datos.contraseña;
+        if (datos.contrasenia) payload.contrasenia = datos.contrasenia;
         const response = await apiAxios.patch(`/equipos/${equipoId}`, payload);
         return response.data.data;
       } catch (err) {

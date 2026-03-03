@@ -26,13 +26,13 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const login = useCallback(
-    async (usuario: string, contraseña: string, remember: boolean) => {
+    async (usuario: string, contrasenia: string, remember: boolean) => {
       try {
         setLoading(true);
         setError(null);
         const response = await apiAxios.post('/usuarios/login', {
           usuario,
-          contraseña,
+          contrasenia,
           remember,
         });
         const data = response.data;
@@ -56,7 +56,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           await fectchPerfil(data.id);
           return true;
         }
-        setError('Usuario o contraseña incorrectos');
+        setError('Usuario o contrasenia incorrectos');
         return false;
       } catch (error) {
         const axiosError = error as AxiosError<{ message?: string }>;
@@ -88,7 +88,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       nombre: string,
       apellido: string,
       usuario: string,
-      contraseña: string,
+      contrasenia: string,
       fechaNacimiento: string,
       email: string,
       remember: boolean,
@@ -100,7 +100,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           nombre,
           apellido,
           usuario,
-          contraseña,
+          contrasenia,
           fechaNacimiento,
           email,
           role: 'Usuario',
@@ -108,7 +108,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           estado: true,
         });
         if (response.status === 201 || response.status === 200) {
-          const loginSuccess = await login(usuario, contraseña, remember); // Iniciar sesión automáticamente después del registro
+          const loginSuccess = await login(usuario, contrasenia, remember); // Iniciar sesión automáticamente después del registro
           return loginSuccess;
         }
         setError('Error en el registro');

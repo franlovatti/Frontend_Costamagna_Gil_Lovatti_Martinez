@@ -15,7 +15,7 @@ type TorneoFormFields = {
   nombre: string;
   descripcion: string;
   esPublico: boolean;
-  contraseña: string;
+  contrasenia: string;
   cantEquiposMax: number;
   fechaInicioInscripcion: string;
   fechaFinInscripcion: string;
@@ -50,7 +50,7 @@ export default function TorneoFormModal({
       nombre: editingTorneo?.nombre || '',
       descripcion: editingTorneo?.descripcion || '',
       esPublico: editingTorneo?.esPublico ?? true,
-      contraseña: editingTorneo?.contraseña || '',
+      contrasenia: editingTorneo?.contrasenia || '',
       cantEquiposMax: editingTorneo?.cantEquiposMax || 8,
       fechaInicioInscripcion: toDatetimeLocal(
         editingTorneo?.fechaInicioInscripcion,
@@ -87,7 +87,7 @@ export default function TorneoFormModal({
       nombre: data.nombre,
       descripcion: data.descripcion,
       esPublico: data.esPublico,
-      contraseña: data.esPublico ? undefined : data.contraseña,
+      contrasenia: data.esPublico ? undefined : data.contrasenia,
       cantEquiposMax: data.cantEquiposMax,
       fechaInicioInscripcion: parseDatetimeLocal(data.fechaInicioInscripcion)!,
       fechaFinInscripcion: parseDatetimeLocal(data.fechaFinInscripcion)!,
@@ -248,27 +248,27 @@ export default function TorneoFormModal({
             </label>
           </div>
 
-          {/* contraseña (solo si es privado) */}
+          {/* contrasenia (solo si es privado) */}
           {!esPublico && (
             <div className="mb-3">
-              <label className="form-label">contraseña *</label>
+              <label className="form-label">contrasenia *</label>
               <input
                 type="password"
-                className={`form-control custom-input ${errors.contraseña ? 'is-invalid' : ''}`}
-                placeholder="Ingrese una contraseña"
-                {...register('contraseña', {
+                className={`form-control custom-input ${errors.contrasenia ? 'is-invalid' : ''}`}
+                placeholder="Ingrese una contrasenia"
+                {...register('contrasenia', {
                   required: !esPublico
-                    ? 'La contraseña es obligatoria para torneos privados'
+                    ? 'La contrasenia es obligatoria para torneos privados'
                     : false,
                   minLength: {
                     value: 4,
-                    message: 'La contraseña debe tener al menos 4 caracteres',
+                    message: 'La contrasenia debe tener al menos 4 caracteres',
                   },
                 })}
               />
-              {errors.contraseña && (
+              {errors.contrasenia && (
                 <span className="auth-error-text">
-                  {errors.contraseña.message}
+                  {errors.contrasenia.message}
                 </span>
               )}
             </div>

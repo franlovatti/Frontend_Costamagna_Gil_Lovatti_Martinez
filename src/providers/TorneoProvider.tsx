@@ -19,7 +19,7 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
     nombre: string;
     descripcion: string;
     esPublico: boolean;
-    contraseña?: string;
+    contrasenia?: string;
     cantEquiposMax: number;
     fechaInicioInscripcion: Date;
     fechaFinInscripcion: Date;
@@ -27,20 +27,24 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
     fechaFinEvento?: Date;
   }
 
+  function ordenarTorneos(torneos: Torneo[]): Torneo[] {
+    return torneos.sort((a: Torneo, b: Torneo) => {
+      const fechaA = a.fechaInicioEvento
+        ? new Date(a.fechaInicioEvento).getTime()
+        : 0;
+      const fechaB = b.fechaInicioEvento
+        ? new Date(b.fechaInicioEvento).getTime()
+        : 0;
+      return fechaB - fechaA;
+    });
+  }
+
   const getTorneos = useCallback(async () => {
     setLoading(true);
     try {
       const res = await apiAxios.get('/eventos');
       const data = Array.isArray(res.data.data) ? res.data.data : [];
-      const ordenados = data.sort((a: Torneo, b: Torneo) => {
-        const fechaA = a.fechaInicioEvento
-          ? new Date(a.fechaInicioEvento).getTime()
-          : 0;
-        const fechaB = b.fechaInicioEvento
-          ? new Date(b.fechaInicioEvento).getTime()
-          : 0;
-        return fechaB - fechaA;
-      });
+      const ordenados = ordenarTorneos(data);
       setTorneos(ordenados);
       setError(null);
     } catch (error) {
@@ -77,7 +81,8 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const res = await apiAxios.get('/eventos/creador/' + id);
       const data = Array.isArray(res.data.data) ? res.data.data : [];
-      setTorneosCreados(data);
+      const ordenados = ordenarTorneos(data);
+      setTorneosCreados(ordenados);
       setError(null);
     } catch (error) {
       setTorneosCreados([]);
@@ -95,7 +100,8 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const res = await apiAxios.get('/eventos/participacion/' + id);
       const data = Array.isArray(res.data.data) ? res.data.data : [];
-      setTorneosInscripto(data);
+      const ordenados = ordenarTorneos(data);
+      setTorneosInscripto(ordenados);
       setError(null);
     } catch (error) {
       setTorneosInscripto([]);
@@ -185,7 +191,7 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
           nombre: torneo.nombre,
           descripcion: torneo.descripcion ?? torneo.nombre,
           esPublico: torneo.esPublico,
-          contraseña: torneo.contraseña,
+          contrasenia: torneo.contrasenia,
           cantEquiposMax: torneo.cantEquiposMax,
           fechaInicioInscripcion: torneo.fechaInicioInscripcion,
           fechaFinInscripcion: torneo.fechaFinInscripcion,
@@ -215,7 +221,7 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
           nombre: torneo.nombre,
           descripcion: torneo.descripcion ?? torneo.nombre,
           esPublico: torneo.esPublico,
-          contraseña: torneo.contraseña,
+          contrasenia: torneo.contrasenia,
           cantEquiposMax: torneo.cantEquiposMax,
           fechaInicioInscripcion: torneo.fechaInicioInscripcion,
           fechaFinInscripcion: torneo.fechaFinInscripcion,
@@ -224,7 +230,6 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
           deporte: torneo.deporte.id,
           localidad: torneo.localidad.id,
         };
-        console.log('Payload de torneo a crear payload: ', payload);
         await apiAxios.post('/eventos', payload);
         await getTorneos();
       } catch (error) {

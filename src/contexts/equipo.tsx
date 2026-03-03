@@ -11,7 +11,7 @@ export interface Equipo {
   capitan: Usuario;
   puntos: number;
   esPublico: boolean;
-  contraseña: string;
+  contrasenia: string;
   miembros: Usuario[];
   evento: Torneo;
   partidoVisitante: Partido[];

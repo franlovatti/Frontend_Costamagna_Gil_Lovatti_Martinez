@@ -17,7 +17,7 @@ const Login = () => {
 
   type LoginFormFields = {
     usuario: string;
-    contraseña: string;
+    contrasenia: string;
     remember: boolean;
   };
 
@@ -34,7 +34,11 @@ const Login = () => {
   const onSubmit = async (data: LoginFormFields) => {
     setLoading(true);
     try {
-      const success = await login(data.usuario, data.contraseña, data.remember);
+      const success = await login(
+        data.usuario,
+        data.contrasenia,
+        data.remember,
+      );
       if (!success) {
         throw new Error('Credenciales inválidas');
       }
@@ -68,10 +72,10 @@ const Login = () => {
             <input
               type="password"
               className="auth-input"
-              placeholder="contraseña"
-              {...register('contraseña', { required: true })}
+              placeholder="Contraseña"
+              {...register('contrasenia', { required: true })}
             />
-            {errors.contraseña && (
+            {errors.contrasenia && (
               <span className="auth-error-text">Este campo es obligatorio</span>
             )}
           </div>
@@ -118,7 +122,7 @@ const Login = () => {
 
           <div className="auth-link-container">
             <Link to="/ForgotPassword" className="auth-link">
-              ¿Olvidaste tu contraseña?
+              ¿Olvidaste tu contrasenia?
             </Link>
           </div>
         </form>

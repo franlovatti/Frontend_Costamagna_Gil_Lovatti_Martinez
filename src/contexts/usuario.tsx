@@ -25,7 +25,7 @@ type UsuarioContextType = {
   filtrarUsuarios: (rol?: string, estado?: string) => Promise<void>;
   modificarUsuario: (usuario: User) => Promise<boolean>;
   clearError: () => void;
-  getUsuariosEvento: (eventoId: number) => Promise<Usuario[] | null>;
+  getParticipantesEvento: (eventoId: number) => Promise<Usuario[] | null>;
 };
 
 export const UsuarioContext = createContext<UsuarioContextType | null>(null);

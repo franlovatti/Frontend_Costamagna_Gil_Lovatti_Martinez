@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { UsuarioContext, type Usuario } from '../contexts/usuario';
 import apiAxios from '../helpers/api';
 import type { User } from '../contexts/auth';
@@ -6,14 +6,14 @@ import { AxiosError } from 'axios';
 
 const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
   const [usuarios, setUsuarios] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Inicia en false porque no cargamos automáticamente
   const [error, setError] = useState<string | null>(null);
 
   const getUsuarios = useCallback(
     async (opts?: { q?: string; page?: number }) => {
       setLoading(true);
       try {
-        const res = await apiAxios.get('/usuarios', { params: opts });
+        const res = await apiAxios.get('/usuarios', { params: { opts } });
         setUsuarios(Array.isArray(res.data.data) ? res.data.data : []);
         setError(null);
       } catch (error) {
@@ -52,7 +52,6 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setError(null);
       await apiAxios.put(`/usuarios/${usuario.id}`, usuario);
-      await getUsuarios();
       return true;
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
@@ -65,13 +64,13 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const getUsuariosEvento = useCallback(async (eventoId: number) => {
+  const getParticipantesEvento = useCallback(async (eventoId: number) => {
     setLoading(true);
     setError(null);
 
     try {
       const response = await apiAxios.get('/usuarios/usuariosPorEvento', {
-        params: eventoId,
+        params: { eventoId },
       });
       return response.data.data as Usuario[];
     } catch (err) {
@@ -90,9 +89,8 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
     setError(null);
   };
 
-  useEffect(() => {
-    getUsuarios();
-  }, [getUsuarios]);
+  // No cargamos automáticamente los usuarios porque requiere permisos de admin
+  // Cada página debe llamar a getUsuarios() o filtrarUsuarios() manualmente si lo necesita
 
   return (
     <UsuarioContext.Provider
@@ -104,7 +102,7 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
         modificarUsuario,
         filtrarUsuarios,
         clearError,
-        getUsuariosEvento,
+        getParticipantesEvento,
       }}
     >
       {children}
