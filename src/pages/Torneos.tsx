@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTorneo } from '../hooks/useTorneo';
 import CardTorneos from '../components/CardTorneos';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import type { Equipo, Usuario } from '../types';
 import type { Torneo } from '../contexts/torneo.tsx';
 import type { Deporte } from '../contexts/deporte.tsx';
@@ -41,12 +41,17 @@ export default function Torneos() {
   const [eventSubmitting, setEventSubmitting] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
 
   useEffect(() => {
     getTorneos();
     getDeportes();
-  }, [getTorneos, getDeportes]);
+    // Si vienes desde crear torneo, abre el formulario
+    if (location.state?.showForm) {
+      setShowForm(true);
+    }
+  }, [getTorneos, getDeportes, location]);
 
   useEffect(() => {
     setDataTorneos(torneos);
