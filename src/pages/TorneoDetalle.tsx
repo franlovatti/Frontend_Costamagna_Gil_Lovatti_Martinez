@@ -20,6 +20,8 @@ import {
   compararFechas,
   estaAbiertoPeriodo,
   getFechaString,
+  parseFecha,
+  toDatetimeLocal,
 } from '../helpers/convertirFechas';
 import TablaEquipos from '../components/TablaEquipos.tsx';
 import TablaPartidos from '../components/TablaPartidos.tsx';
@@ -27,6 +29,7 @@ import TablaParticipantes from '../components/TablaParticipantes.tsx';
 import ModalInscripcion from '../components/ModalInscripcion.tsx';
 import ModalResultados from '../components/ModalResultados.tsx';
 import FormTorneos from '../components/FormTorneos.tsx';
+import type { PartidoPayload } from '../DTOs/partidosDTO.tsx';
 
 export default function TorneoDetalle() {
   const {
@@ -51,7 +54,7 @@ export default function TorneoDetalle() {
   } = useEquipos();
 
   const {
-    cargarResultado,
+    editarPartido,
     borrarPartido,
     loading: loadingPartido,
     error: errorPartido,
@@ -67,6 +70,7 @@ export default function TorneoDetalle() {
   const [resultadoModal, setResultadoModal] = useState(false);
   const [resultadoLocal, setResultadoLocal] = useState<string>('');
   const [resultadoVisitante, setResultadoVisitante] = useState<string>('');
+  const [loadingResultado, setLoadingResultado] = useState(false);
   const [partidoSeleccionado, setPartidoSeleccionado] =
     useState<Partido | null>(null);
   const [ordenarParticipanteCriterio, setOrdenarParticipanteCriterio] =
@@ -121,7 +125,7 @@ export default function TorneoDetalle() {
   };
 
   const participantes = ordenarParticipantes(
-    participantesDesordenados,
+    participantesDesordenados as unknown as Usuario[],
     ordenarParticipanteCriterio as keyof Stats,
   );
 
@@ -139,13 +143,13 @@ export default function TorneoDetalle() {
 
   const isCaptain = (equipo: Equipo): boolean => {
     if (!user) return false;
-    const capitan = equipo.capitan as Usuario;
+    const capitan = equipo.capitan as unknown as Usuario;
     return capitan !== undefined && String(capitan.id) === String(user.id);
   };
 
   const isMember = (equipo: Equipo): boolean => {
     if (!user) return false;
-    const miembros = (equipo.miembros as Usuario[]) ?? [];
+    const miembros = (equipo.miembros as unknown as Usuario[]) ?? [];
     const userIdStr = String(user.id);
     return miembros.some((m) => {
       const memberId = m.id;
@@ -238,18 +242,38 @@ export default function TorneoDetalle() {
 
   const handleCargarResultado = async () => {
     if (!partidoSeleccionado) return;
-    const success = await cargarResultado({
-      partidoId: partidoSeleccionado.id,
-      resultadoLocal,
-      resultadoVisitante,
-    });
-    if (success) {
-      setResultadoLocal('');
-      setResultadoVisitante('');
-      setPartidoSeleccionado(null);
-      await getUnTorneo(Number(id));
+    setLoadingResultado(true);
+    try {
+      const fechaNormalizada = parseFecha(partidoSeleccionado.fecha);
+      if (!fechaNormalizada) {
+        return;
+      }
+
+      const payload: PartidoPayload = {
+        id: partidoSeleccionado.id,
+        fecha: toDatetimeLocal(fechaNormalizada).split('T')[0],
+        hora: partidoSeleccionado.hora,
+        juez: partidoSeleccionado.juez,
+        resultadoLocal: resultadoLocal === '' ? null : Number(resultadoLocal),
+        resultadoVisitante:
+          resultadoVisitante === '' ? null : Number(resultadoVisitante),
+        equipoLocal: partidoSeleccionado.equipoLocal.id,
+        equipoVisitante: partidoSeleccionado.equipoVisitante.id,
+        evento: partidoSeleccionado.evento.id!,
+        establecimiento: partidoSeleccionado.establecimiento?.id ?? null,
+      };
+
+      const success = await editarPartido(partidoSeleccionado.id!, payload);
+      if (success) {
+        setResultadoModal(false);
+        setResultadoLocal('');
+        setResultadoVisitante('');
+        setPartidoSeleccionado(null);
+        await getUnTorneo(Number(id));
+      }
+    } finally {
+      setLoadingResultado(false);
     }
-    setResultadoModal(false);
   };
 
   const handleConfirmDeleteTorneo = async () => {
@@ -509,8 +533,8 @@ export default function TorneoDetalle() {
           setResultadoVisitante={setResultadoVisitante}
           handleCargarResultado={handleCargarResultado}
           setResultadoModal={setResultadoModal}
-          errorCargarResultados={errorEquipo}
-          loadingCargarResultados={loadingEquipo}
+          errorCargarResultados={errorPartido}
+          loadingCargarResultados={loadingResultado}
         />
       )}
 

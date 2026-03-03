@@ -117,7 +117,14 @@ const PartidoProvider = ({ children }: { children: React.ReactNode }) => {
       setError(null);
 
       try {
-        const response = await apiAxios.put(`/partidos/${partidoId}`, payload);
+        const requestPayload: Partial<PartidoPayload> = { ...payload };
+        if (requestPayload.establecimiento === null) {
+          delete requestPayload.establecimiento;
+        }
+        const response = await apiAxios.put(
+          `/partidos/${partidoId}`,
+          requestPayload,
+        );
         return response.data.data;
       } catch (err) {
         const axiosError = err as AxiosError<{ message?: string }>;
