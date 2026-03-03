@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router-dom';
-import type { Equipo, Participation, Partido, Usuario, Stats } from '../types';
+import type { Stats } from '../types.tsx';
+import type { Equipo } from '../contexts/equipo.tsx';
+import type { Partido } from '../contexts/partido.tsx';
+import type { Usuario } from '../contexts/usuario.tsx';
+import type { Participacion } from '../contexts/participacion.tsx';
 import type { Torneo } from '../contexts/torneo.tsx';
 import { Row, Col } from 'react-bootstrap';
 import { useAuth } from '../hooks/useAuth';
@@ -86,7 +90,7 @@ export default function TorneoDetalle() {
   const { participantes: participantesDesordenados } =
     useParticipantesEvento(id);
 
-  const calcularStats = (participations: Participation[] | undefined) => {
+  const calcularStats = (participations: Participacion[] | undefined) => {
     if (!participations)
       return { faltas: 0, minutosjugados: 0, puntos: 0, equipo: 0 };
 
