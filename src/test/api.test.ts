@@ -2,8 +2,11 @@ import { describe, it, expect } from 'vitest';
 import apiAxios from '../helpers/api';
 
 describe('API Helper', () => {
-  it('debería tener la baseURL correcta', () => {
-    expect(apiAxios.defaults.baseURL).toBe('http://localhost:3000/api');
+  it('debería tener baseURL configurada desde VITE_API_URL o localhost:3000', () => {
+    const expectedURL = import.meta.env.VITE_API_URL 
+      ? `${import.meta.env.VITE_API_URL}/api` 
+      : 'http://localhost:3000/api';
+    expect(apiAxios.defaults.baseURL).toBe(expectedURL);
   });
 
   it('debería enviar cookies en las peticiones', () => {

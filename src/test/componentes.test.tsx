@@ -343,10 +343,17 @@ describe('ConfirmModal e InviteModal', () => {
 
     render(<InviteModal equipoId={99} isOpen={true} onClose={onClose} />);
 
-    const cancelButton = screen.getByRole('button', { name: /cancelar/i });
-    await user.click(cancelButton);
+    // Llenar el email y hacer click en enviar para establecer operationInProgress = true
+    const input = screen.getByPlaceholderText('correo@ejemplo.com');
+    await user.type(input, 'test@test.com');
+    await user.click(screen.getByRole('button', { name: /enviar invitación/i }));
 
+    // Ahora loading = true y operationInProgress = true, así que el botón debe estar deshabilitado
+    const cancelButton = screen.getByRole('button', { name: /cancelar/i });
     expect(cancelButton).toBeDisabled();
+    
+    // Intentar hacer click en cancelar no debería ejecutar onClose
+    await user.click(cancelButton);
     expect(onClose).not.toHaveBeenCalled();
   });
 });
@@ -461,6 +468,7 @@ describe('TablaEquipos', () => {
         isMember={() => false}
         userIsMember={() => false}
         isCaptain={() => false}
+        isCreator={false}
         setSelectedTeam={vi.fn()}
         setEnrollPassword={vi.fn()}
         setEnrollError={vi.fn()}
@@ -495,6 +503,7 @@ describe('TablaEquipos', () => {
         isMember={() => false}
         userIsMember={() => false}
         isCaptain={() => false}
+        isCreator={false}
         setSelectedTeam={setSelectedTeam}
         setEnrollPassword={setEnrollPassword}
         setEnrollError={setEnrollError}
@@ -527,6 +536,7 @@ describe('TablaEquipos', () => {
         torneo={{ ...torneoBase, equipos: [equipo] }}
         isMember={() => false}
         userIsMember={() => true}
+        isCreator={false}
         isCaptain={() => true}
         setSelectedTeam={vi.fn()}
         setEnrollPassword={vi.fn()}
@@ -558,6 +568,7 @@ describe('TablaEquipos', () => {
         torneo={{ ...torneoBase, equipos: [equipo] }}
         isMember={() => true}
         userIsMember={() => true}
+        isCreator={false}
         isCaptain={() => false}
         setSelectedTeam={setSelectedTeam}
         setEnrollPassword={vi.fn()}
@@ -587,6 +598,7 @@ describe('TablaEquipos', () => {
       <TablaEquipos
         torneo={{ ...torneoBase, equipos: [equipo] }}
         isMember={() => false}
+        isCreator={false}
         userIsMember={() => false}
         isCaptain={() => false}
         setSelectedTeam={vi.fn()}
