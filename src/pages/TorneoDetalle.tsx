@@ -13,6 +13,7 @@ import { useUsuario } from '../hooks/useUsuario.tsx';
 import { useTorneo } from '../hooks/useTorneo.tsx';
 import { useEquipos } from '../hooks/useEquipos.tsx';
 import { usePartidos } from '../hooks/usePartidos.tsx';
+import type { Stats } from '../DTOs/participacionesDTO.tsx';
 import ConfirmModal from '../components/ConfirmModal.tsx';
 import {
   formatFecha,
@@ -81,13 +82,6 @@ export default function TorneoDetalle() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
-
-  type Stats = {
-    puntos: number;
-    minutosjugados: number;
-    faltas: number;
-    equipo: number;
-  };
 
   useEffect(() => {
     getUnTorneo(Number(id));

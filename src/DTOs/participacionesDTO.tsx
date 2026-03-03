@@ -9,3 +9,10 @@ export interface ParticipacionPayload {
 export interface ParticipacionEditPayload extends ParticipacionPayload {
   id: number;
 }
+
+export type Stats = {
+  puntos: number;
+  minutosjugados: number;
+  faltas: number;
+  equipo: number;
+};
