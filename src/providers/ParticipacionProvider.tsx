@@ -11,6 +11,7 @@ import type {
 } from '../DTOs/participacionesDTO.tsx';
 
 const ParticipacionProvider = ({ children }: { children: React.ReactNode }) => {
+  const [participaciones, setParticipaciones] = useState<Participacion[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,14 +25,13 @@ const ParticipacionProvider = ({ children }: { children: React.ReactNode }) => {
           `participaciones/participacionesxequipo`,
           { params: { partidoId, eventoId } },
         );
-        return result.data.data as Participacion[] as Participacion[];
+        setParticipaciones(result.data.data as Participacion[]);
       } catch (err) {
         const axiosError = err as AxiosError<{ message?: string }>;
         setError(
           'Error al cargar las participaciones: ' +
             (axiosError.response?.data?.message || axiosError.message),
         );
-        return null;
       } finally {
         setLoading(false);
       }
@@ -48,14 +48,13 @@ const ParticipacionProvider = ({ children }: { children: React.ReactNode }) => {
           `participaciones/participacionesPorUsuarioEnTorneo`,
           { params: { usuarioId, eventoId } },
         );
-        return result.data.data as Participacion[];
+        setParticipaciones(result.data.data as Participacion[]);
       } catch (err) {
         const axiosError = err as AxiosError<{ message?: string }>;
         setError(
           'Error al cargar las participaciones: ' +
             (axiosError.response?.data?.message || axiosError.message),
         );
-        return null;
       } finally {
         setLoading(false);
       }
@@ -72,14 +71,13 @@ const ParticipacionProvider = ({ children }: { children: React.ReactNode }) => {
         `participaciones/participacionesPorTorneo`,
         { params: { eventoId } },
       );
-      return result.data.data as Participacion[];
+      setParticipaciones(result.data.data as Participacion[]);
     } catch (err) {
       const axiosError = err as AxiosError<{ message?: string }>;
       setError(
         'Error al cargar las participacioes: ' +
           (axiosError.response?.data?.message || axiosError.message),
       );
-      return null;
     } finally {
       setLoading(false);
     }
@@ -93,16 +91,15 @@ const ParticipacionProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         const result = await apiAxios.get(
           `participaciones/participacionesPorUsuario`,
-          { params: usuarioId },
+          { params: { usuarioId } },
         );
-        return result.data.data as Participacion[];
+        setParticipaciones(result.data.data as Participacion[]);
       } catch (err) {
         const axiosError = err as AxiosError<{ message?: string }>;
         setError(
           'Error al cargar las participacioes: ' +
             (axiosError.response?.data?.message || axiosError.message),
         );
-        return null;
       } finally {
         setLoading(false);
       }
@@ -118,16 +115,15 @@ const ParticipacionProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         const result = await apiAxios.get(
           `participaciones/participacionesPorUsuario`,
-          { params: eventoId },
+          { params: { eventoId } },
         );
-        return result.data.data as Participacion[];
+        setParticipaciones(result.data.data as Participacion[]);
       } catch (err) {
         const axiosError = err as AxiosError<{ message?: string }>;
         setError(
           'Error al cargar las participacioes: ' +
             (axiosError.response?.data?.message || axiosError.message),
         );
-        return null;
       } finally {
         setLoading(false);
       }
@@ -200,6 +196,7 @@ const ParticipacionProvider = ({ children }: { children: React.ReactNode }) => {
     () => ({
       loading,
       error,
+      participaciones,
       borrarParticipacion,
       getParticipacionesPartidoEquipo,
       getParticipacionesPorTorneo,
@@ -212,6 +209,7 @@ const ParticipacionProvider = ({ children }: { children: React.ReactNode }) => {
     [
       loading,
       error,
+      participaciones,
       borrarParticipacion,
       getParticipacionesPartidoEquipo,
       getParticipacionesPorTorneo,
