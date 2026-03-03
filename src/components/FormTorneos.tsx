@@ -1,16 +1,19 @@
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import type { Torneo } from "../contexts/torneo.tsx";
-import { useDeporte } from "../hooks/useDeporte.tsx";
-import { useLocalidad } from "../hooks/useLocalidad.tsx";
-import { toDatetimeLocal, parseDatetimeLocal } from "../helpers/convertirFechas.tsx";
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import type { Torneo } from '../contexts/torneo.tsx';
+import { useDeporte } from '../hooks/useDeporte.tsx';
+import { useLocalidad } from '../hooks/useLocalidad.tsx';
+import {
+  toDatetimeLocal,
+  parseDatetimeLocal,
+} from '../helpers/convertirFechas.tsx';
 import './cssComponentes/FormTorneos.css';
 
 type TorneoFormFields = {
   nombre: string;
   descripcion: string;
   esPublico: 'true' | 'false';
-  contraseña: string;
+  contrasenia: string;
   cantEquiposMax: number;
   fechaInicioInscripcion: string;
   fechaFinInscripcion: string;
@@ -29,7 +32,7 @@ interface TorneoFormProps {
 export default function FormTorneos({
   setShowModal,
   editingTorneo,
-  onSave
+  onSave,
 }: TorneoFormProps) {
   const { deportes, getDeportes, error: errorDeporte } = useDeporte();
   const { localidades, getLocalidades, error: errorLocalidad } = useLocalidad();
@@ -39,22 +42,27 @@ export default function FormTorneos({
     register,
     handleSubmit,
     watch,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
   } = useForm<TorneoFormFields>({
     mode: 'onBlur',
     defaultValues: {
       nombre: editingTorneo?.nombre || '',
       descripcion: editingTorneo?.descripcion || '',
       esPublico: editingTorneo?.esPublico ? 'true' : 'false',
-      contraseña: editingTorneo?.contraseña || '',
+      contrasenia: editingTorneo?.contrasenia || '',
       cantEquiposMax: editingTorneo?.cantEquiposMax || 8,
-      fechaInicioInscripcion: toDatetimeLocal(editingTorneo?.fechaInicioInscripcion).split('T')[0] || '',
-      fechaFinInscripcion: toDatetimeLocal(editingTorneo?.fechaFinInscripcion).split('T')[0] || '',
-      fechaInicioEvento: toDatetimeLocal(editingTorneo?.fechaInicioEvento).split('T')[0] || '',
-      fechaFinEvento: toDatetimeLocal(editingTorneo?.fechaFinEvento).split('T')[0] || '',
+      fechaInicioInscripcion:
+        toDatetimeLocal(editingTorneo?.fechaInicioInscripcion).split('T')[0] ||
+        '',
+      fechaFinInscripcion:
+        toDatetimeLocal(editingTorneo?.fechaFinInscripcion).split('T')[0] || '',
+      fechaInicioEvento:
+        toDatetimeLocal(editingTorneo?.fechaInicioEvento).split('T')[0] || '',
+      fechaFinEvento:
+        toDatetimeLocal(editingTorneo?.fechaFinEvento).split('T')[0] || '',
       deporteId: editingTorneo?.deporte?.id || 0,
       localidadId: editingTorneo?.localidad?.id || 0,
-    }
+    },
   });
 
   const esPublico = watch('esPublico') === 'true';
@@ -71,14 +79,18 @@ export default function FormTorneos({
   }, [getLocalidades]);
 
   const onSubmit = (data: TorneoFormFields) => {
-    const deporteSeleccionado = deportes?.find(d => d.id === Number(data.deporteId));
-    const localidadSeleccionada = localidades?.find(l => l.id === Number(data.localidadId));
+    const deporteSeleccionado = deportes?.find(
+      (d) => d.id === Number(data.deporteId),
+    );
+    const localidadSeleccionada = localidades?.find(
+      (l) => l.id === Number(data.localidadId),
+    );
     const esPublico = data.esPublico === 'true';
     const torneoData: Partial<Torneo> = {
       nombre: data.nombre,
       descripcion: data.descripcion,
       esPublico: esPublico,
-      contraseña: data.esPublico ? undefined : data.contraseña,
+      contrasenia: esPublico ? undefined : data.contrasenia?.trim() || undefined,
       cantEquiposMax: data.cantEquiposMax,
       fechaInicioInscripcion: parseDatetimeLocal(data.fechaInicioInscripcion)!,
       fechaFinInscripcion: parseDatetimeLocal(data.fechaFinInscripcion)!,
@@ -101,9 +113,12 @@ export default function FormTorneos({
       <div className="form-torneos-inner">
         {/* Header */}
         <div className="form-header">
-          <button 
+          <button
             className="btn-back"
-            onClick={() => {setShowModal(false); window.scrollTo({ top: 0, behavior: 'smooth' });}}
+            onClick={() => {
+              setShowModal(false);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             type="button"
           >
             ← Volver
@@ -112,8 +127,8 @@ export default function FormTorneos({
             {isEditing ? 'Editar Torneo' : 'Crear Nuevo Torneo'}
           </h1>
           <p className="form-subtitle">
-            {isEditing 
-              ? 'Modifica la información de tu torneo' 
+            {isEditing
+              ? 'Modifica la información de tu torneo'
               : 'Completa la información para crear tu torneo deportivo'}
           </p>
         </div>
@@ -142,16 +157,18 @@ export default function FormTorneos({
                     type="text"
                     className="form-input"
                     placeholder="Ej: Copa de Verano 2024"
-                    {...register("nombre", { 
-                      required: "El nombre es obligatorio",
+                    {...register('nombre', {
+                      required: 'El nombre es obligatorio',
                       minLength: {
                         value: 3,
-                        message: "El nombre debe tener al menos 3 caracteres"
-                      }
+                        message: 'El nombre debe tener al menos 3 caracteres',
+                      },
                     })}
                   />
                   {errors.nombre && (
-                    <span className="auth-error-text">{errors.nombre.message}</span>
+                    <span className="auth-error-text">
+                      {errors.nombre.message}
+                    </span>
                   )}
                 </div>
 
@@ -163,18 +180,24 @@ export default function FormTorneos({
                   <select
                     id="deporte"
                     className={`form-select custom-input ${errors.deporteId ? 'is-invalid' : ''}`}
-                    {...register("deporteId", { 
-                      required: "Debe seleccionar un deporte",
-                      validate: (value) => value > 0 || "Debe seleccionar un deporte válido",
+                    {...register('deporteId', {
+                      required: 'Debe seleccionar un deporte',
+                      validate: (value) =>
+                        value > 0 || 'Debe seleccionar un deporte válido',
                     })}
                   >
                     <option value="0">-- Seleccione un deporte --</option>
-                    {Array.isArray(deportes) && deportes.map(d => (
-                      <option key={d.id} value={d.id}>{d.nombre}</option>
-                    ))}
+                    {Array.isArray(deportes) &&
+                      deportes.map((d) => (
+                        <option key={d.id} value={d.id}>
+                          {d.nombre}
+                        </option>
+                      ))}
                   </select>
                   {errors.deporteId && (
-                    <span className="auth-error-text">{errors.deporteId.message}</span>
+                    <span className="auth-error-text">
+                      {errors.deporteId.message}
+                    </span>
                   )}
                 </div>
               </div>
@@ -189,15 +212,18 @@ export default function FormTorneos({
                   className="form-textarea"
                   rows={4}
                   placeholder="Describe el torneo, reglas especiales, premios, etc."
-                  {...register("descripcion", { 
+                  {...register('descripcion', {
                     minLength: {
                       value: 3,
-                      message: "La descripción debe tener al menos 3 caracteres"
-                    }
+                      message:
+                        'La descripción debe tener al menos 3 caracteres',
+                    },
                   })}
                 />
                 {errors.descripcion && (
-                  <span className="auth-error-text">{errors.descripcion.message}</span>
+                  <span className="auth-error-text">
+                    {errors.descripcion.message}
+                  </span>
                 )}
               </div>
             </div>
@@ -209,10 +235,15 @@ export default function FormTorneos({
             <div className="form-card">
               <div className="dates-section">
                 <div className="dates-group">
-                  <h3 className="dates-group-title">Período de Inscripciones</h3>
+                  <h3 className="dates-group-title">
+                    Período de Inscripciones
+                  </h3>
                   <div className="form-grid">
                     <div className="form-group">
-                      <label htmlFor="fechaInicioInscripcion" className="form-label">
+                      <label
+                        htmlFor="fechaInicioInscripcion"
+                        className="form-label"
+                      >
                         Inicio
                         <span className="required">*</span>
                       </label>
@@ -220,16 +251,22 @@ export default function FormTorneos({
                         id="fechaInicioInscripcion"
                         type="date"
                         className={`form-control custom-input ${errors.fechaInicioInscripcion ? 'is-invalid' : ''}`}
-                        {...register("fechaInicioInscripcion", { 
-                          required: "La fecha de inicio de inscripción es obligatoria"
+                        {...register('fechaInicioInscripcion', {
+                          required:
+                            'La fecha de inicio de inscripción es obligatoria',
                         })}
                       />
                       {errors.fechaInicioInscripcion && (
-                        <span className="auth-error-text">{errors.fechaInicioInscripcion.message}</span>
+                        <span className="auth-error-text">
+                          {errors.fechaInicioInscripcion.message}
+                        </span>
                       )}
                     </div>
                     <div className="form-group">
-                      <label htmlFor="fechaFinInscripcion" className="form-label">
+                      <label
+                        htmlFor="fechaFinInscripcion"
+                        className="form-label"
+                      >
                         Fin
                         <span className="required">*</span>
                       </label>
@@ -237,17 +274,23 @@ export default function FormTorneos({
                         id="fechaFinInscripcion"
                         type="date"
                         className={`form-control custom-input ${errors.fechaFinInscripcion ? 'is-invalid' : ''}`}
-                        {...register("fechaFinInscripcion", { 
-                          required: "La fecha de fin de inscripción es obligatoria",
+                        {...register('fechaFinInscripcion', {
+                          required:
+                            'La fecha de fin de inscripción es obligatoria',
                           validate: (value) => {
                             if (!fechaInicioInscripcion) return true;
-                            return new Date(value) > new Date(fechaInicioInscripcion) || 
-                              "Debe ser posterior al inicio de inscripción";
-                          }
+                            return (
+                              new Date(value) >
+                                new Date(fechaInicioInscripcion) ||
+                              'Debe ser posterior al inicio de inscripción'
+                            );
+                          },
                         })}
                       />
                       {errors.fechaFinInscripcion && (
-                        <span className="auth-error-text">{errors.fechaFinInscripcion.message}</span>
+                        <span className="auth-error-text">
+                          {errors.fechaFinInscripcion.message}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -267,17 +310,23 @@ export default function FormTorneos({
                         id="fechaInicioTorneo"
                         type="date"
                         className={`form-control custom-input ${errors.fechaInicioEvento ? 'is-invalid' : ''}`}
-                        {...register("fechaInicioEvento", { 
-                          required: "La fecha de inicio del evento es obligatoria",
+                        {...register('fechaInicioEvento', {
+                          required:
+                            'La fecha de inicio del evento es obligatoria',
                           validate: (value) => {
                             if (!fechaFinInscripcion) return true;
-                            return new Date(value) >= new Date(fechaFinInscripcion) || 
-                              "Debe ser posterior o igual al fin de inscripción";
-                          }
+                            return (
+                              new Date(value) >=
+                                new Date(fechaFinInscripcion) ||
+                              'Debe ser posterior o igual al fin de inscripción'
+                            );
+                          },
                         })}
                       />
                       {errors.fechaInicioEvento && (
-                        <span className="auth-error-text">{errors.fechaInicioEvento.message}</span>
+                        <span className="auth-error-text">
+                          {errors.fechaInicioEvento.message}
+                        </span>
                       )}
                     </div>
                     <div className="form-group">
@@ -289,17 +338,21 @@ export default function FormTorneos({
                         id="fechaFinTorneo"
                         type="date"
                         className={`form-control custom-input ${errors.fechaFinEvento ? 'is-invalid' : ''}`}
-                        {...register("fechaFinEvento", { 
-                          required: "La fecha de fin del evento es obligatoria",
+                        {...register('fechaFinEvento', {
+                          required: 'La fecha de fin del evento es obligatoria',
                           validate: (value) => {
                             if (!fechaInicioEvento) return true;
-                            return new Date(value) > new Date(fechaInicioEvento) || 
-                              "Debe ser posterior al inicio del evento";
-                          }
+                            return (
+                              new Date(value) > new Date(fechaInicioEvento) ||
+                              'Debe ser posterior al inicio del evento'
+                            );
+                          },
                         })}
                       />
                       {errors.fechaFinEvento && (
-                        <span className="auth-error-text">{errors.fechaFinEvento.message}</span>
+                        <span className="auth-error-text">
+                          {errors.fechaFinEvento.message}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -321,18 +374,24 @@ export default function FormTorneos({
                   <select
                     id="localidad"
                     className={`form-select custom-input ${errors.localidadId ? 'is-invalid' : ''}`}
-                    {...register("localidadId", { 
-                      required: "Debe seleccionar una localidad",
-                      validate: (value) => value > 0 || "Debe seleccionar una localidad válida",
+                    {...register('localidadId', {
+                      required: 'Debe seleccionar una localidad',
+                      validate: (value) =>
+                        value > 0 || 'Debe seleccionar una localidad válida',
                     })}
                   >
                     <option value="0">-- Seleccione una localidad --</option>
-                    {Array.isArray(localidades) && localidades.map(l => (
-                      <option key={l.id} value={l.id}>{l.descripcion}</option>
-                    ))}
+                    {Array.isArray(localidades) &&
+                      localidades.map((l) => (
+                        <option key={l.id} value={l.id}>
+                          {l.descripcion}
+                        </option>
+                      ))}
                   </select>
                   {errors.localidadId && (
-                    <span className="auth-error-text">{errors.localidadId.message}</span>
+                    <span className="auth-error-text">
+                      {errors.localidadId.message}
+                    </span>
                   )}
                 </div>
 
@@ -345,21 +404,23 @@ export default function FormTorneos({
                     id="cantidadEquipos"
                     type="number"
                     className={`form-control custom-input ${errors.cantEquiposMax ? 'is-invalid' : ''}`}
-                    {...register("cantEquiposMax", { 
-                      required: "La cantidad de equipos es obligatoria",
+                    {...register('cantEquiposMax', {
+                      required: 'La cantidad de equipos es obligatoria',
                       min: {
                         value: 2,
-                        message: "Debe haber al menos 2 equipos"
+                        message: 'Debe haber al menos 2 equipos',
                       },
                       max: {
                         value: 64,
-                        message: "Máximo 64 equipos permitidos"
+                        message: 'Máximo 64 equipos permitidos',
                       },
-                      valueAsNumber: true
+                      valueAsNumber: true,
                     })}
                   />
                   {errors.cantEquiposMax && (
-                    <span className="auth-error-text">{errors.cantEquiposMax.message}</span>
+                    <span className="auth-error-text">
+                      {errors.cantEquiposMax.message}
+                    </span>
                   )}
                 </div>
               </div>
@@ -373,7 +434,7 @@ export default function FormTorneos({
                       type="radio"
                       value="true"
                       checked={esPublico}
-                      {...register("esPublico")}
+                      {...register('esPublico')}
                     />
                     <div className="radio-content">
                       <div className="radio-icon">🌍</div>
@@ -391,14 +452,14 @@ export default function FormTorneos({
                       type="radio"
                       value="false"
                       checked={!esPublico}
-                      {...register("esPublico")}
+                      {...register('esPublico')}
                     />
                     <div className="radio-content">
                       <div className="radio-icon">🔒</div>
                       <div className="radio-text">
                         <div className="radio-title">Privado</div>
                         <div className="radio-description">
-                          Requiere código o contraseña
+                          Requiere código o contrasenia
                         </div>
                       </div>
                     </div>
@@ -406,31 +467,37 @@ export default function FormTorneos({
                 </div>
               </div>
 
-              {/* Contraseña si es privado */}
+              {/* contrasenia si es privado */}
               {!esPublico && (
                 <div className="form-group password-group">
-                  <label htmlFor="contraseña" className="form-label">
-                    Contraseña del Torneo
+                  <label htmlFor="contrasenia" className="form-label">
+                    contrasenia del Torneo
                     <span className="required">*</span>
                   </label>
                   <input
-                    id="contraseña"
+                    id="contrasenia"
                     type="password"
-                    className={`form-control custom-input ${errors.contraseña ? 'is-invalid' : ''}`}
-                    placeholder="Ingrese una contraseña"
-                    {...register("contraseña", { 
-                      required: !esPublico ? "La contraseña es obligatoria para torneos privados" : false,
+                    className={`form-control custom-input ${errors.contrasenia ? 'is-invalid' : ''}`}
+                    placeholder="Ingrese una contrasenia"
+                    {...register('contrasenia', {
+                      required: !esPublico
+                        ? 'La contrasenia es obligatoria para torneos privados'
+                        : false,
                       minLength: {
                         value: 4,
-                        message: "La contraseña debe tener al menos 4 caracteres"
-                      }
+                        message:
+                          'La contrasenia debe tener al menos 4 caracteres',
+                      },
                     })}
                   />
-                  {errors.contraseña && (
-                    <span className="auth-error-text">{errors.contraseña.message}</span>
+                  {errors.contrasenia && (
+                    <span className="auth-error-text">
+                      {errors.contrasenia.message}
+                    </span>
                   )}
                   <span className="form-hint">
-                    Los usuarios necesitarán esta contraseña para acceder al torneo
+                    Los usuarios necesitarán esta contrasenia para acceder al
+                    torneo
                   </span>
                 </div>
               )}
@@ -442,7 +509,10 @@ export default function FormTorneos({
             <button
               type="button"
               className="btn-cancel-form"
-              onClick={() => {setShowModal(false); window.scrollTo({ top: 0, behavior: 'smooth' });}}
+              onClick={() => {
+                setShowModal(false);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
               disabled={isSubmitting}
             >
               Cancelar
@@ -458,9 +528,7 @@ export default function FormTorneos({
                   {isEditing ? 'Guardando...' : 'Creando...'}
                 </>
               ) : (
-                <>
-                  {isEditing ? '✓ Guardar Cambios' : '✓ Crear Torneo'}
-                </>
+                <>{isEditing ? '✓ Guardar Cambios' : '✓ Crear Torneo'}</>
               )}
             </button>
           </div>

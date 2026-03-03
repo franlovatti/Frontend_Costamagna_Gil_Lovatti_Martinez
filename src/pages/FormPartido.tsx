@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useEstablecimientosEvento } from '../hooks/useEstablecimientos';
-import { useEquiposEvento } from '../hooks/useEquipos';
-import { useOnePartido, useCrearPartido, useEditarPartido } from '../hooks/usePartidos';
+import { useEstablecimientos } from '../hooks/useEstablecimientos';
+import { useEquipos } from '../hooks/useEquipos';
+import { usePartidos } from '../hooks/usePartidos';
 import '../components/cssComponentes/FormTorneos.css';
-
+import type { Partido } from '../types.tsx';
 
 export default function FormPartido() {
   const { id, partidoId } = useParams();
@@ -13,6 +13,7 @@ export default function FormPartido() {
   const [message, setMessage] = useState<string>();
   const [success, setSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [partido, setPartido] = useState<Partido | null>(null);
   const [form, setForm] = useState({
     fecha: '',
     hora: '',
@@ -26,19 +27,44 @@ export default function FormPartido() {
     id: 0,
   });
 
-  const { establecimientos, loadingEstablecimientos, errorEstablecimientos } =
-    useEstablecimientosEvento(id);
-
-  const { equipos, loadingEquipos, errorEquipos } = useEquiposEvento(id);
- 
   const {
-    partido,
-    loadingPartido,
-    errorPartido,
-  } = useOnePartido(partidoId);
+    getEstablecimientos,
+    loading: loadingEstablecimientos,
+    establecimientos,
+    error: errorEstablecimientos,
+  } = useEstablecimientos();
 
-  const { crearPartido, error: errorCrear } = useCrearPartido();
-  const { editarPartido, error: errorEditar } = useEditarPartido();
+  useEffect(() => {
+    getEstablecimientos(Number(id));
+  }, [getEstablecimientos, id]);
+
+  const {
+    Equipos: equipos,
+    loading: loadingEquipos,
+    error: errorEquipos,
+    getEquiposEvento,
+  } = useEquipos();
+
+  useEffect(() => {
+    getEquiposEvento(Number(id));
+  }, [getEquiposEvento, id]);
+
+  const {
+    getOnePartido,
+    error: errorPartido,
+    loading: loadingPartido,
+    crearPartido,
+    editarPartido,
+  } = usePartidos();
+
+  useEffect(() => {
+    if (createMode) return;
+    const fetchPartido = async () => {
+      const data = await getOnePartido(Number(partidoId));
+      setPartido(data);
+    };
+    fetchPartido();
+  }, [getOnePartido, partidoId, setPartido, createMode]);
 
   useEffect(() => {
     if (partido && !createMode) {
@@ -60,7 +86,7 @@ export default function FormPartido() {
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({
@@ -73,7 +99,7 @@ export default function FormPartido() {
     e.preventDefault();
     setIsSubmitting(true);
     setMessage('');
-    
+
     const payload = {
       ...(!createMode && { id: form.id }),
       fecha: form.fecha,
@@ -82,9 +108,7 @@ export default function FormPartido() {
       resultadoLocal:
         form.resultadoLocal === '' ? null : Number(form.resultadoLocal),
       resultadoVisitante:
-        form.resultadoVisitante === ''
-          ? null
-          : Number(form.resultadoVisitante),
+        form.resultadoVisitante === '' ? null : Number(form.resultadoVisitante),
       equipoLocal: form.equipoLocal,
       equipoVisitante: form.equipoVisitante,
       evento: form.evento,
@@ -99,13 +123,17 @@ export default function FormPartido() {
     }
 
     if (result) {
-      setMessage(createMode ? 'Partido creado con éxito' : 'Partido modificado con éxito');
+      setMessage(
+        createMode
+          ? 'Partido creado con éxito'
+          : 'Partido modificado con éxito',
+      );
       setSuccess(true);
       setTimeout(() => {
         navigate(-1);
       }, 1000);
     } else {
-      const errorMsg = createMode ? errorCrear : errorEditar;
+      const errorMsg = errorPartido;
       setMessage(errorMsg || 'Error al procesar la solicitud');
       setSuccess(false);
     }
@@ -118,7 +146,7 @@ export default function FormPartido() {
       <div className="form-torneos-inner">
         {/* Header */}
         <div className="form-header">
-          <button 
+          <button
             className="btn-back"
             onClick={() => navigate(-1)}
             type="button"
@@ -126,11 +154,15 @@ export default function FormPartido() {
             ← Volver
           </button>
           <h1 className="form-title">
-            {createMode ? 'Crear Partido' : loadingPartido ? 'Cargando Partido...' : 'Editar Partido'}
+            {createMode
+              ? 'Crear Partido'
+              : loadingPartido
+                ? 'Cargando Partido...'
+                : 'Editar Partido'}
           </h1>
           <p className="form-subtitle">
-            {createMode 
-              ? 'Completa la información del partido' 
+            {createMode
+              ? 'Completa la información del partido'
               : 'Modifica los detalles del partido'}
           </p>
         </div>
@@ -138,25 +170,27 @@ export default function FormPartido() {
         {/* Alertas de error */}
         {errorEstablecimientos && (
           <div className="alert-danger-custom">
-            ⚠️ Error al cargar los establecimientos: {errorEstablecimientos.message}
+            ⚠️ Error al cargar los establecimientos: {errorEstablecimientos}
           </div>
         )}
 
         {errorEquipos && (
           <div className="alert-danger-custom">
-            ⚠️ Error al cargar los equipos: {errorEquipos.message}
+            ⚠️ Error al cargar los equipos: {errorEquipos}
           </div>
         )}
 
         {errorPartido && (
           <div className="alert-danger-custom">
-            ⚠️ Error al cargar los datos del partido: {errorPartido.message}
+            ⚠️ Error al cargar los datos del partido: {errorPartido}
           </div>
         )}
 
         {/* Mensaje de éxito/error */}
         {message && (
-          <div className={success ? 'alert-success-custom' : 'alert-danger-custom'}>
+          <div
+            className={success ? 'alert-success-custom' : 'alert-danger-custom'}
+          >
             {success ? '✓' : '⚠️'} {message}
           </div>
         )}
@@ -306,12 +340,15 @@ export default function FormPartido() {
                       {loadingEstablecimientos
                         ? 'Cargando establecimientos...'
                         : establecimientos?.length === 0
-                        ? 'No hay establecimientos disponibles'
-                        : 'Seleccione el establecimiento (opcional)'}
+                          ? 'No hay establecimientos disponibles'
+                          : 'Seleccione el establecimiento (opcional)'}
                     </option>
                     {!loadingEstablecimientos &&
                       establecimientos?.map((establecimiento) => (
-                        <option key={establecimiento.id} value={establecimiento.id}>
+                        <option
+                          key={establecimiento.id}
+                          value={establecimiento.id}
+                        >
                           {establecimiento.nombre} - {establecimiento.direccion}
                         </option>
                       ))}
@@ -383,9 +420,7 @@ export default function FormPartido() {
                   {createMode ? 'Creando...' : 'Guardando...'}
                 </>
               ) : (
-                <>
-                  {createMode ? '✓ Crear Partido' : '✓ Guardar Cambios'}
-                </>
+                <>{createMode ? '✓ Crear Partido' : '✓ Guardar Cambios'}</>
               )}
             </button>
           </div>

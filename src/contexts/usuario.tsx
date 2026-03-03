@@ -1,8 +1,8 @@
 import { createContext } from "react";
 import type { User } from "./auth";
-import type { Equipo } from "./equipo.tsx";
-import type { Partido } from "./partido.tsx";
-import type { Participation } from "./participacion.tsx"; 
+import type {Partido} from "./partido";
+import type { Equipo } from "./equipo";
+import type { Participacion } from "./participacion";
 
 export interface Usuario {
   id: number;
@@ -13,9 +13,10 @@ export interface Usuario {
   equipos: Equipo[];
   mvps: Partido[];
   maxAnotados: Partido[];
-  participations: Participation[];
+  participations: Participacion[];
   equipocomocapitan: Equipo[];
 }
+
 
 type UsuarioContextType = {
   usuarios: User[];
@@ -24,6 +25,7 @@ type UsuarioContextType = {
   getUsuarios: (opts?: { q?: string; page?: number }) => Promise<void>;
   filtrarUsuarios: (rol?: string, estado?: string) => Promise<void>;
   modificarUsuario: (usuario: User) => Promise<boolean>;
+  getParticipantesEvento: (eventoId: number) => Promise<void>;
   clearError: () => void;
 };
 

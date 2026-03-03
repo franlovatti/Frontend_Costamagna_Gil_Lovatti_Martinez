@@ -1,170 +1,234 @@
-import { useState, useCallback  } from "react";
-import { EquipoContext } from "../contexts/equipo.tsx";
-import apiAxios from "../helpers/api";
-import type { Equipo } from "../contexts/equipo.tsx";
-import { AxiosError } from "axios";
+import { type Equipo, EquipoContext } from '../contexts/equipo';
+import { useState, useCallback, useMemo } from 'react';
+import apiAxios from '../helpers/api';
+import type { AxiosError } from 'axios';
+import type { EquiposPayload, EquipoEditPayload } from '../DTOs/equipoDTO';
 
 const EquipoProvider = ({ children }: { children: React.ReactNode }) => {
-  const [equipos, setEquipos] = useState<Equipo[]>([]);
-  const [equipo, setEquipo] = useState<Equipo | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [Equipos, setEquipos] = useState<Equipo[]>([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const getEquiposEvento = useCallback(async (eventoId: number) => {
     setLoading(true);
     setError(null);
     try {
-        const response = await apiAxios.get(`/equipos/evento/${eventoId}`);
-        const data = Array.isArray(response.data.data) ? response.data.data : [];
-        setEquipos(data);
+      const response = await apiAxios.get(`/equipos/evento/${eventoId}`);
+      setEquipos(response.data.data);
     } catch (err) {
-        const e = err as AxiosError<{ message: string }>;
-        setError("Error al recuperar equipos del evento: " + (e.response?.data?.message ?? e.message));
+      const axiosError = err as AxiosError<{ message?: string }>;
+      setError(
+        'Error al cargar los equipos: ' +
+          (axiosError.response?.data?.message || axiosError.message),
+      );
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   }, []);
 
-  const getMisEquipos = useCallback(async (usuarioId: string) => {
+  const getMisEquipos = useCallback(async (usuarioId: number) => {
     setLoading(true);
     setError(null);
+
     try {
-        const response = await apiAxios.get(`/equipos/usuario/${usuarioId}`);
-        const data = Array.isArray(response.data.data) ? response.data.data : [] ;
-        setEquipos(data);
+      const response = await apiAxios.get(`/equipos/usuario/${usuarioId}`);
+      setEquipos(response.data.data);
     } catch (err) {
-        const e = err as AxiosError<{ message: string }>;
-        setError("Error al recuperar mis equipos: " + (e.response?.data?.message ?? e.message));
+      const axiosError = err as AxiosError<{ message?: string }>;
+      setError(
+        'Error al cargar los equipos del usuario: ' +
+          (axiosError.response?.data?.message || axiosError.message),
+      );
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   }, []);
 
-  const getUnEquipo = useCallback(async (id: number) => {
+  const borrarEquipo = useCallback(async (equipoId: number) => {
     setLoading(true);
     setError(null);
-    try {
-        const response = await apiAxios.get(`/equipos/${id}`);
-        setEquipo(response.data.data);
-    } catch (err) {
-        const e = err as AxiosError<{ message: string }>;
-        setError("Error al recuperar el equipo: " + (e.response?.data?.message ?? e.message));
-    } finally {
-        setLoading(false);
-    }
-  }, []);
 
-  const inscribirseAEquipo = useCallback(async (equipo: Equipo, usuarioId: string, contraseña?: string) => {
-    setError(null);
-    setLoading(true);
     try {
-      const body: Record<string, unknown> = { usuarioId: usuarioId };
-      if (!equipo.esPublico) body.contraseña = contraseña;
-      await apiAxios.post(`/equipos/${equipo.id}/miembros`, body);
+      await apiAxios.delete(`/equipos/${equipoId}`);
       return true;
     } catch (err) {
-      const e = err as AxiosError<{ message: string }>;
-      setError("Error al inscribirse en el equipo: " + (e.response?.data?.message ?? e.message));
+      const axiosError = err as AxiosError<{ message?: string }>;
+      setError(
+        'Error al borrar el equipo: ' +
+          (axiosError.response?.data?.message || axiosError.message),
+      );
       return false;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const salirDeEquipo = useCallback(async (equipoId: number, usuarioId?: string) => {
-    setError(null);
+  const crearEquipo = useCallback(async (payload: EquiposPayload) => {
     setLoading(true);
+    setError(null);
+
     try {
-      await apiAxios.patch(`/equipos/${equipoId}/miembros`, { usuarioId });
-      return true;
+      const response = await apiAxios.post(`equipos`, payload);
+      return response.data.data as Equipo;
     } catch (err) {
-      const e = err as AxiosError<{ message: string }>;
-      setError("Error al salir del equipo: " + (e.response?.data?.message ?? e.message));
-      return false;
+      const axiosError = err as AxiosError<{ message?: string }>;
+      setError(
+        'Error creando el equipo: ' +
+          (axiosError.response?.data?.message || axiosError.message),
+      );
+      return null;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const removerMiembro = useCallback(async (equipoId: number, usuarioId: string) => {
-    setError(null);
-    setLoading(true);
-    try {
-      await apiAxios.patch(`/equipos/${equipoId}/miembros`, { usuarioId });
-      getUnEquipo(equipoId);
-      return true;
-    } catch (err) {
-      const e = err as AxiosError<{ message: string }>;
-      setError("Error al remover el miembro del equipo: " + (e.response?.data?.message ?? e.message));
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  }, [getUnEquipo]);
+  const inscribirseEquipo = useCallback(
+    async (equipo: Equipo, contrasenia?: string, usuarioId?: number) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const body: Record<string, unknown> = { usuarioId };
+        if (!equipo.esPublico) body.contrasenia = contrasenia;
+        await apiAxios.post(`/equipos/${equipo.id}/miembros`, body);
+        return true;
+      } catch (err) {
+        const axiosError = err as AxiosError<{ message?: string }>;
+        setError(
+          'Error creando al equipo: ' +
+            (axiosError.response?.data?.message || axiosError.message),
+        );
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
-  const borrarEquipo = useCallback(async (id: number) => {
-    setError(null);
-    setLoading(true);
-    try {
-      await apiAxios.delete(`/equipos/${id}`);
-    } catch (err) {
-      const e = err as AxiosError<{ message: string }>;
-      setError("Error al borrar el equipo: " + (e.response?.data?.message ?? e.message));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const salirEquipo = useCallback(
+    async (equipoId: number, usuarioId: number) => {
+      setLoading(true);
+      setError(null);
 
-  const modificarEquipo = useCallback(async (e: Equipo) => {
-    setError(null);
-    setLoading(true);
-    try {
-      const payload = {
-        nombre: e.nombre,
-        nombreCapitan: e.nombreCapitan,
-        puntos: e.puntos,
-        esPublico: e.esPublico,
-        contraseña: e.contraseña,
-      };
-      await apiAxios.put(`/equipos/${e.id}`, payload);
-    } catch (err) {
-      const e = err as AxiosError<{ message: string }>;
-      setError("Error al modificar el equipo: " + (e.response?.data?.message ?? e.message));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+      try {
+        await apiAxios.patch(`/equipo/${equipoId}/miembros`, { usuarioId });
+        return true;
+      } catch (err) {
+        const axiosError = err as AxiosError<{ message?: string }>;
+        setError(
+          'Error creando al equipo: ' +
+            (axiosError.response?.data?.message || axiosError.message),
+        );
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
-  const crearEquipo = useCallback(async (e: Omit<Equipo, 'id'>) => {
-    setError(null);
+  const obtenerEquipo = useCallback(async (equipoId: number) => {
     setLoading(true);
-    try {
-      const payload = {
-        nombre: e.nombre,
-        nombreCapitan: e.nombreCapitan,
-        capitan: e.capitan.id,
-        esPublico: e.esPublico,
-        privado: !e.esPublico,
-        puntos: e.puntos,
-        contraseña: e.contraseña,
-        miembros: e.miembros.map(m => m.id),
-        evento: e.evento.id,
-      };
+    setError(null);
 
-      await apiAxios.post(`/equipos`, payload);
+    try {
+      const response = await apiAxios.get(`/equipos/${equipoId}`);
+      return response.data.data;
     } catch (err) {
-      const e = err as AxiosError<{ message: string }>;
-      setError("Error al crear el equipo: " + (e.response?.data?.message ?? e.message));
+      const axiosError = err as AxiosError<{ message?: string }>;
+      setError(
+        'Error obteniendo el equipo: ' +
+          (axiosError.response?.data?.message || axiosError.message),
+      );
     } finally {
       setLoading(false);
     }
   }, []);
+
+  const editarEquipo = useCallback(
+    async (equipoId: number, datos: EquipoEditPayload) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const payload: Record<string, unknown> = {};
+        if (datos.nombre) payload.nombre = datos.nombre;
+        if (datos.contrasenia) payload.contrasenia = datos.contrasenia;
+        const response = await apiAxios.patch(`/equipos/${equipoId}`, payload);
+        return response.data.data;
+      } catch (err) {
+        const axiosError = err as AxiosError<{ message?: string }>;
+        setError(
+          'Error editando el equipo: ' +
+            (axiosError.response?.data?.message || axiosError.message),
+        );
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  const removerMiembro = useCallback(
+    async (equipoId: number, usuarioId: number) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await apiAxios.patch(
+          `/equipos/${equipoId}/miembro`,
+          usuarioId,
+        );
+        return response.data.data;
+      } catch (err) {
+        const axiosError = err as AxiosError<{ message?: string }>;
+        setError(
+          'Error removiendo miembro: ' +
+            (axiosError.response?.data?.message || axiosError.message),
+        );
+        return null;
+      } finally {
+        setLoading(true);
+      }
+    },
+    [],
+  );
+
+  const value = useMemo(
+    () => ({
+      Equipos,
+      loading,
+      error,
+      getEquiposEvento,
+      getMisEquipos,
+      removerMiembro,
+      borrarEquipo,
+      crearEquipo,
+      inscribirseEquipo,
+      salirEquipo,
+      obtenerEquipo,
+      editarEquipo,
+    }),
+    [
+      Equipos,
+      loading,
+      error,
+      getEquiposEvento,
+      getMisEquipos,
+      removerMiembro,
+      borrarEquipo,
+      crearEquipo,
+      inscribirseEquipo,
+      salirEquipo,
+      obtenerEquipo,
+      editarEquipo,
+    ],
+  );
 
   return (
-    <EquipoContext.Provider value={{ equipos, equipo, loading, error, getEquiposEvento, getMisEquipos, getUnEquipo, inscribirseAEquipo, salirDeEquipo, removerMiembro, borrarEquipo, modificarEquipo, crearEquipo }}>
-      {children}
-    </EquipoContext.Provider>
+    <EquipoContext.Provider value={value}>{children}</EquipoContext.Provider>
   );
-}
+};
 
 export default EquipoProvider;

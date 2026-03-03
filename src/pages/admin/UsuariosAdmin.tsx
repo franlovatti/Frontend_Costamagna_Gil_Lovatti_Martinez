@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUsuario } from '../../hooks/useUsuario.tsx';
 import type { User } from '../../contexts/auth.tsx';
 import './DeportesAdmin.css';
@@ -17,6 +17,11 @@ const UsuariosAdmin = () => {
   const [showModal, setShowModal] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [usuarioAEliminar, setUsuarioAEliminar] = useState<User | null>(null);
+
+  // Cargar usuarios al montar el componente
+  useEffect(() => {
+    getUsuarios();
+  }, [getUsuarios]);
 
 
   // Filtrar usuarios

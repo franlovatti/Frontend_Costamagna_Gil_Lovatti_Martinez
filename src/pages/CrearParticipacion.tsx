@@ -1,19 +1,43 @@
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router';
 import { useEffect, useState } from 'react';
-import type { Participation } from '../contexts/participacion.tsx';
-import type { Usuario } from '../contexts/usuario.tsx';
-import type { ParticipacionPayload, ParticipacionEditPayload } from '../hooks/useParticipaciones';
+import type { Usuario, Participation } from '../types.tsx';
+import type {
+  ParticipacionPayload,
+  ParticipacionEditPayload,
+} from '../DTOs/participacionesDTO.tsx';
+import type { Partido } from '../contexts/partido.tsx';
 import './Participacion.css';
-import { useParticipacionBasic } from '../hooks/useParticipaciones.tsx';
-import { useOnePartido } from '../hooks/usePartidos.tsx';
+import { useParticipacion } from '../hooks/useParticipaciones.tsx';
+import { usePartidos } from '../hooks/usePartidos.tsx';
 import ConfirmModal from '../components/ConfirmModal.tsx';
 
 export default function CrearParticipacion() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { crearParticipacion, editarParticipacion, borrarParticipacion, traerParticipacionesEquipo, loading, error, participaciones } = useParticipacionBasic();
-  const { partido } = useOnePartido(id);
+  const [partido, setPartido] = useState<Partido | null>(null);
+  const {
+    crearParticipacion,
+    editarParticipacion,
+    borrarParticipacion,
+    getParticipacionesPartidoEquipo,
+    loading,
+    error,
+    participaciones,
+  } = useParticipacion();
+
+  const { getOnePartido } = usePartidos();
+
+  useEffect(() => {
+    const fetchPartido = async () => {
+      if (!id) return;
+
+      const data = await getOnePartido(Number(id));
+      setPartido(data);
+    };
+    fetchPartido();
+  }, [id, getOnePartido]);
+
   const [miembrosLocal, setMiembrosLocal] = useState<Usuario[]>([]);
   const [miembrosVisitante, setMiembrosVisitante] = useState<Usuario[]>([]);
   const [equipoSeleccionado, setEquipoSeleccionado] = useState<
@@ -39,8 +63,8 @@ export default function CrearParticipacion() {
 
   const equipoid =
     equipoSeleccionado === 'local'
-      ? partido?.equipoLocal?.id ?? 0
-      : partido?.equipoVisitante?.id ?? 0;
+      ? (partido?.equipoLocal?.id ?? 0)
+      : (partido?.equipoVisitante?.id ?? 0);
 
   useEffect(() => {
     setMiembrosLocal(partido?.equipoLocal?.miembros ?? []);
@@ -49,14 +73,14 @@ export default function CrearParticipacion() {
 
   useEffect(() => {
     if (id && equipoid && equipoid > 0) {
-      traerParticipacionesEquipo(id, String(equipoid));
+      getParticipacionesPartidoEquipo(Number(id), Number(equipoid));
     }
-  }, [traerParticipacionesEquipo, id, equipoid]);
+  }, [getParticipacionesPartidoEquipo, id, equipoid]);
 
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({
@@ -77,7 +101,7 @@ export default function CrearParticipacion() {
 
     const success = await crearParticipacion(payload);
     if (success) {
-      await traerParticipacionesEquipo(id, String(equipoid));
+      await getParticipacionesPartidoEquipo(Number(id), Number(equipoid));
       setForm({ usuarioId: '', minutosjugados: '', faltas: '', puntos: '' });
     }
   };
@@ -102,7 +126,7 @@ export default function CrearParticipacion() {
   const handleEditChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
     setEditForm((prev) => ({ ...prev, [name]: value }));
@@ -119,9 +143,11 @@ export default function CrearParticipacion() {
       puntos: Number(editForm.puntos),
       partido: Number(id),
     };
-    const success = await editarParticipacion(payload as ParticipacionEditPayload);
+    const success = await editarParticipacion(
+      payload as ParticipacionEditPayload,
+    );
     if (success) {
-      await traerParticipacionesEquipo(id, String(equipoid));
+      await getParticipacionesPartidoEquipo(Number(id), Number(equipoid));
       setShowEditModal(false);
       setEditingId(null);
       setEditForm({
@@ -145,7 +171,7 @@ export default function CrearParticipacion() {
     if (success) {
       if (editingId === participacionId) handleCancelEdit();
       setShowDeleteModal(false);
-      await traerParticipacionesEquipo(id, String(equipoid));
+      await getParticipacionesPartidoEquipo(Number(id), Number(equipoid));
       setParticipacionAEliminar(null);
     }
   };
@@ -232,7 +258,9 @@ export default function CrearParticipacion() {
                   {miembros
                     ?.filter(
                       (miembro) =>
-                        !participaciones.some((p) => p.usuario.id === miembro.id)
+                        !participaciones.some(
+                          (p) => p.usuario.id === miembro.id,
+                        ),
                     )
                     .map((miembro) => (
                       <option key={miembro.id} value={miembro.id}>
@@ -279,15 +307,22 @@ export default function CrearParticipacion() {
               </div>
             </div>
             <div className="form-actions">
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="btn-primary-participacion"
                 disabled={loading}
               >
                 {loading ? 'Guardando...' : 'Agregar Participación'}
               </button>
             </div>
-            {error && <p className="error-message" style={{color: 'red', marginTop: '8px'}}>{error}</p>}
+            {error && (
+              <p
+                className="error-message"
+                style={{ color: 'red', marginTop: '8px' }}
+              >
+                {error}
+              </p>
+            )}
           </form>
         </div>
 
@@ -360,10 +395,7 @@ export default function CrearParticipacion() {
 
       {/* Modal de edición */}
       {showEditModal && (
-        <div
-          className="modal-overlay-participacion"
-          onClick={handleCancelEdit}
-        >
+        <div className="modal-overlay-participacion" onClick={handleCancelEdit}>
           <div
             className="modal-content-participacion"
             onClick={(e) => e.stopPropagation()}
@@ -372,10 +404,7 @@ export default function CrearParticipacion() {
               <h3 className="modal-title-participacion">
                 Editar Participación
               </h3>
-              <button
-                className="modal-close-btn"
-                onClick={handleCancelEdit}
-              >
+              <button className="modal-close-btn" onClick={handleCancelEdit}>
                 ✕
               </button>
             </div>
@@ -435,15 +464,22 @@ export default function CrearParticipacion() {
                 >
                   Cancelar
                 </button>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="btn-save-custom"
                   disabled={loading}
                 >
                   {loading ? 'Guardando...' : 'Guardar Cambios'}
                 </button>
               </div>
-              {error && <p className="error-message" style={{color: 'red', marginTop: '8px'}}>{error}</p>}
+              {error && (
+                <p
+                  className="error-message"
+                  style={{ color: 'red', marginTop: '8px' }}
+                >
+                  {error}
+                </p>
+              )}
             </form>
           </div>
         </div>
@@ -462,4 +498,3 @@ export default function CrearParticipacion() {
     </div>
   );
 }
-

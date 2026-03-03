@@ -1,13 +1,13 @@
 import type { User } from '../contexts/auth.tsx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../hooks/useAuth.tsx';
 import StatCard from '../components/admin/StatCard.tsx';
 import PerfilCard from '../components/PerfilCard.tsx';
 import TorneosPerfil from '../components/TorneosPerfil.tsx';
 import UsuarioFormModal from '../components/UsuarioFormModal.tsx';
-import { useMisEquipos } from '../hooks/useEquipos.tsx';
+import { useEquipos } from '../hooks/useEquipos.tsx';
 import { useUsuario } from '../hooks/useUsuario.tsx';
-import { useParticipacionesporUsuario } from '../hooks/useParticipaciones';
+import { useParticipacion } from '../hooks/useParticipaciones';
 import './Perfil.css';
 import ParticipacionesPerfil from '../components/ParticipacionesPerfil.tsx';
 const Perfil = () => {
@@ -27,12 +27,27 @@ const Perfil = () => {
 
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const { equipos, loadingEquipos, errorEquipos } = useMisEquipos(usuario.id);
+  const {
+    Equipos: equipos,
+    getMisEquipos,
+    loading: loadingEquipos,
+    error: errorEquipos,
+  } = useEquipos();
+
+  useEffect(() => {
+    getMisEquipos(Number(usuario.id));
+  }, [getMisEquipos, usuario.id]);
+
   const {
     participaciones,
     loading: loadingParticipaciones,
     error: errorParticipaciones,
-  } = useParticipacionesporUsuario(usuario.id);
+    getParticipacionesPorUsuario,
+  } = useParticipacion();
+
+  useEffect(() => {
+    getParticipacionesPorUsuario(Number(usuario.id));
+  }, [getParticipacionesPorUsuario, usuario.id]);
 
   function calcularEstadisticas(e: typeof equipos) {
     const datos = e.map((equip) => {
@@ -63,11 +78,11 @@ const Perfil = () => {
     });
     const torneosActivos = datos.filter((d) => {
       const ahora = new Date();
-      return new Date(d.inicio) <= ahora && new Date(d.fin) >= ahora;
+      return new Date(d.inicio!) <= ahora && new Date(d.fin!) >= ahora;
     }).length;
     const torneosTerminados = datos.filter((d) => {
       const ahora = new Date();
-      return new Date(d.fin) < ahora;
+      return new Date(d.fin!) < ahora;
     }).length;
     const partidosPendientes = datos.reduce(
       (acc, d) => acc + d.partidosPendientes,
@@ -125,9 +140,16 @@ const Perfil = () => {
             <div className="row g-3 mb-4">
               {stats.map((stat, index) =>
                 loadingEquipos ? (
-                <div key={index} className="stat-card d-flex align-items-center justify-content-center" style={{ minHeight: 120 }}>
-                  <div className="spinner-border text-primary" role="status"></div>
-                </div>
+                  <div
+                    key={index}
+                    className="stat-card d-flex align-items-center justify-content-center"
+                    style={{ minHeight: 120 }}
+                  >
+                    <div
+                      className="spinner-border text-primary"
+                      role="status"
+                    ></div>
+                  </div>
                 ) : (
                   <div className="col-6 col-md-3 col-lg-3" key={index}>
                     <StatCard

@@ -1,6 +1,6 @@
-import { useParticipacionesporUsuario } from '../hooks/useParticipaciones';
 import { useState, useMemo } from 'react';
 import './cssComponentes/ParticipacionesPerfil.css';
+import type { Participacion } from '../contexts/participacion.tsx';
 
 type ParticipacionBase = {
   id: number;
@@ -17,11 +17,9 @@ type ParticipacionBase = {
 };
 
 type ParticipacionesPerfilProps = {
-  participaciones: ReturnType<
-    typeof useParticipacionesporUsuario
-  >['participaciones'];
-  loading: ReturnType<typeof useParticipacionesporUsuario>['loading'];
-  error: ReturnType<typeof useParticipacionesporUsuario>['error'];
+  participaciones: Participacion[];
+  loading: boolean;
+  error: string | null;
 };
 
 const ParticipacionesPerfil = ({
