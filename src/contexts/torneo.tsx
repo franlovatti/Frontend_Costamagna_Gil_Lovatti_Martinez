@@ -19,7 +19,7 @@ export interface Torneo {
   creador: number;
   partidos?: Partido[];
   codigo?: string;
-  contrasenia?: string;
+  contraseña?: string;
   descripcion?: string;
   img?: string;
 }

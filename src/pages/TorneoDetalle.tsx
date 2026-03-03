@@ -10,7 +10,7 @@ import type { Torneo } from '../contexts/torneo.tsx';
 import { Row, Col } from 'react-bootstrap';
 import { useAuth } from '../hooks/useAuth';
 import './TorneoDetalle.css';
-import { useParticipantesEvento } from '../hooks/useUsuario.tsx';
+import { useUsuario } from '../hooks/useUsuario.tsx';
 import { useTorneo } from '../hooks/useTorneo.tsx';
 import { useEquipos } from '../hooks/useEquipos.tsx';
 import { usePartidos } from '../hooks/usePartidos.tsx';
@@ -41,6 +41,9 @@ export default function TorneoDetalle() {
   const [showConfirmEquipo, setShowConfirmEquipo] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [equipoAEliminar, setEquipoAEliminar] = useState<number>(0);
+  const [participantesDesordenados, setParticipantesDesordenados] = useState<
+    Usuario[] | null
+  >(null);
 
   const {
     borrarEquipo,
@@ -94,8 +97,15 @@ export default function TorneoDetalle() {
     }
   }, [torneo]);
 
-  const { participantes: participantesDesordenados } =
-    useParticipantesEvento(id);
+  const { getUsuariosEvento } = useUsuario();
+
+  useEffect(() => {
+    const fetchParticipantes = async () => {
+      const data = await getUsuariosEvento(Number(id));
+      setParticipantesDesordenados(data);
+    };
+    fetchParticipantes();
+  }, [id, getUsuariosEvento]);
 
   const calcularStats = (participations: Participacion[] | undefined) => {
     if (!participations)
@@ -123,10 +133,12 @@ export default function TorneoDetalle() {
     });
   };
 
-  const participantes = ordenarParticipantes(
-    participantesDesordenados,
-    ordenarParticipanteCriterio as keyof Stats,
-  );
+  const participantes = participantesDesordenados
+    ? ordenarParticipantes(
+        participantesDesordenados,
+        ordenarParticipanteCriterio as keyof Stats,
+      )
+    : [];
 
   const userIsMember = (): boolean => {
     if (!user || !torneo?.equipos) return false;
@@ -216,14 +228,11 @@ export default function TorneoDetalle() {
     }
 
     if (!selectedTeam.esPublico && enrollPassword.trim() === '') {
-      setEnrollError('La contrasenia es obligatoria para este equipo');
+      setEnrollError('La contraseña es obligatoria para este equipo');
       return;
     }
-    if (
-      !selectedTeam.esPublico &&
-      enrollPassword !== selectedTeam.contrasenia
-    ) {
-      setEnrollError('La contrasenia es incorrecta');
+    if (!selectedTeam.esPublico && enrollPassword !== selectedTeam.contraseña) {
+      setEnrollError('La contraseña es incorrecta');
       return;
     }
 

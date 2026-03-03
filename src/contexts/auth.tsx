@@ -19,7 +19,7 @@ export interface AuthContextType {
   setError: (error: string | null) => void;
   login: (
     usuario: string,
-    contrasenia: string,
+    contraseña: string,
     remember: boolean,
   ) => Promise<boolean>;
   logout: () => void;
@@ -27,7 +27,7 @@ export interface AuthContextType {
     nombre: string,
     apellido: string,
     usuario: string,
-    contrasenia: string,
+    contraseña: string,
     fechaNacimiento: string,
     email: string,
     remember: boolean,

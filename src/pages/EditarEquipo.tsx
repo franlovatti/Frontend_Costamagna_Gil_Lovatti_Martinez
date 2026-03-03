@@ -61,7 +61,7 @@ export default function EditarEquipo() {
     if (!id) return;
     const success = await editarEquipo(Number(id), {
       nombre: nameInput,
-      contrasenia: passwordInput || '',
+      contraseña: passwordInput || '',
     });
     if (success) {
       setPasswordInput('');
@@ -141,7 +141,7 @@ export default function EditarEquipo() {
                   <Col md={6}>
                     <div className="form-group-custom">
                       <label className="form-label-custom">
-                        Nueva contrasenia (opcional)
+                        Nueva contraseña (opcional)
                       </label>
                       <div style={{ position: 'relative' }}>
                         <input

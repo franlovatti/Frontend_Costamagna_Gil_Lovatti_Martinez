@@ -1,27 +1,33 @@
-import { useEffect, useState, useCallback } from "react";
-import { UsuarioContext } from "../contexts/usuario";
-import apiAxios from "../helpers/api";
-import type { User } from "../contexts/auth";
-import { AxiosError } from "axios";
+import { useEffect, useState, useCallback } from 'react';
+import { UsuarioContext, type Usuario } from '../contexts/usuario';
+import apiAxios from '../helpers/api';
+import type { User } from '../contexts/auth';
+import { AxiosError } from 'axios';
 
 const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
   const [usuarios, setUsuarios] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const getUsuarios = useCallback(async (opts?: { q?: string; page?: number }) => {
-    setLoading(true);
-    try {
-      const res = await apiAxios.get('/usuarios', { params: opts });
-      setUsuarios(Array.isArray(res.data.data) ? res.data.data : []);
-      setError(null);
-    } catch (error) {
-      const axiosError = error as AxiosError<{ message?: string }>;
-      setUsuarios([]);
-      setError("No se pudieron cargar los usuarios: " + (axiosError.response?.data?.message || axiosError.message));
-    }
-    setLoading(false);
-  }, []);
+  const getUsuarios = useCallback(
+    async (opts?: { q?: string; page?: number }) => {
+      setLoading(true);
+      try {
+        const res = await apiAxios.get('/usuarios', { params: opts });
+        setUsuarios(Array.isArray(res.data.data) ? res.data.data : []);
+        setError(null);
+      } catch (error) {
+        const axiosError = error as AxiosError<{ message?: string }>;
+        setUsuarios([]);
+        setError(
+          'No se pudieron cargar los usuarios: ' +
+            (axiosError.response?.data?.message || axiosError.message),
+        );
+      }
+      setLoading(false);
+    },
+    [],
+  );
 
   const filtrarUsuarios = useCallback(async (rol?: string, estado?: string) => {
     setLoading(true);
@@ -34,7 +40,10 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
       setUsuarios([]);
-      setError('No se pudieron cargar los usuarios filtrados: ' + (axiosError.response?.data?.message || axiosError.message));
+      setError(
+        'No se pudieron cargar los usuarios filtrados: ' +
+          (axiosError.response?.data?.message || axiosError.message),
+      );
     }
     setLoading(false);
   }, []);
@@ -47,11 +56,35 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
       return true;
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
-      const message = axiosError?.response?.data?.message || axiosError?.message || "Error al modificar el usuario";
+      const message =
+        axiosError?.response?.data?.message ||
+        axiosError?.message ||
+        'Error al modificar el usuario';
       setError(message);
       return false;
     }
   };
+
+  const getUsuariosEvento = useCallback(async (eventoId: number) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await apiAxios.get('/usuarios/usuariosPorEvento', {
+        params: eventoId,
+      });
+      return response.data.data as Usuario[];
+    } catch (err) {
+      const axiosError = err as AxiosError<{ message?: string }>;
+      setError(
+        'No se pudieron cargar los usuarios: ' +
+          (axiosError.response?.data?.message || axiosError.message),
+      );
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const clearError = () => {
     setError(null);
@@ -62,7 +95,18 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
   }, [getUsuarios]);
 
   return (
-    <UsuarioContext.Provider value={{ usuarios, loading, error, getUsuarios, modificarUsuario, filtrarUsuarios, clearError }}>
+    <UsuarioContext.Provider
+      value={{
+        usuarios,
+        loading,
+        error,
+        getUsuarios,
+        modificarUsuario,
+        filtrarUsuarios,
+        clearError,
+        getUsuariosEvento,
+      }}
+    >
       {children}
     </UsuarioContext.Provider>
   );

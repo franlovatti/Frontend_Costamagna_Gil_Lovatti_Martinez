@@ -19,7 +19,7 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
     nombre: string;
     descripcion: string;
     esPublico: boolean;
-    contrasenia?: string;
+    contraseña?: string;
     cantEquiposMax: number;
     fechaInicioInscripcion: Date;
     fechaFinInscripcion: Date;
@@ -185,7 +185,7 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
           nombre: torneo.nombre,
           descripcion: torneo.descripcion ?? torneo.nombre,
           esPublico: torneo.esPublico,
-          contrasenia: torneo.contrasenia,
+          contraseña: torneo.contraseña,
           cantEquiposMax: torneo.cantEquiposMax,
           fechaInicioInscripcion: torneo.fechaInicioInscripcion,
           fechaFinInscripcion: torneo.fechaFinInscripcion,
@@ -215,7 +215,7 @@ const TorneosProvider = ({ children }: { children: React.ReactNode }) => {
           nombre: torneo.nombre,
           descripcion: torneo.descripcion ?? torneo.nombre,
           esPublico: torneo.esPublico,
-          contrasenia: torneo.contrasenia,
+          contraseña: torneo.contraseña,
           cantEquiposMax: torneo.cantEquiposMax,
           fechaInicioInscripcion: torneo.fechaInicioInscripcion,
           fechaFinInscripcion: torneo.fechaFinInscripcion,

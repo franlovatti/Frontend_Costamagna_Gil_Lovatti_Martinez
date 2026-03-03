@@ -47,13 +47,13 @@ export default function ModalInscripcion({
           )}
           {selectedTeam && !selectedTeam.esPublico ? (
             <div className="modal-form-group">
-              <label className="modal-form-label">contrasenia del equipo</label>
+              <label className="modal-form-label">contraseña del equipo</label>
               <input
                 type="password"
                 className="modal-form-input"
                 value={enrollPassword}
                 onChange={(e) => setEnrollPassword(e.target.value)}
-                placeholder="Ingrese la contrasenia"
+                placeholder="Ingrese la contraseña"
                 autoFocus
               />
             </div>

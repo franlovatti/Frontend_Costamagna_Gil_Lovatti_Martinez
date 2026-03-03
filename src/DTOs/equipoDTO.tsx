@@ -5,12 +5,12 @@ export interface EquiposPayload {
   puntos?: number;
   esPublico: boolean;
   privado: boolean;
-  contrasenia?: string | null;
+  contraseña?: string | null;
   miembros: string[] | { id: string }[];
   evento: number;
-};
+}
 
-export interface EquipoEditPayload{
-  nombre: string,
-  contrasenia: string,  
+export interface EquipoEditPayload {
+  nombre: string;
+  contraseña: string;
 }
