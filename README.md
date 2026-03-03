@@ -10,6 +10,7 @@
 - [Pre-requisitos](#-pre-requisitos)
 - [Instalación Completa](#-instalación-completa-paso-a-paso)
 - [Uso Diario](#-uso-diario)
+- [Tests](#-tests)
 - [Estructura del Proyecto](#-estructura-del-proyecto)
 - [Troubleshooting](#-problemas-comunes-troubleshooting)
 - [Glosario](#-glosario-para-principiantes)
@@ -209,6 +210,39 @@ Luego podrás acceder desde tu teléfono u otra computadora usando la IP mostrad
 
 ---
 
+## 🧪 Tests
+
+### Unitarios e integración (Vitest)
+
+```bash
+# Ejecutar tests
+pnpm run test
+
+# Modo watch
+pnpm run test:watch
+
+# Cobertura
+pnpm run test:coverage
+
+# UI de Vitest
+pnpm run test:ui
+```
+
+### End-to-End (Playwright)
+
+```bash
+# Ejecutar e2e
+pnpm run test:e2e
+
+# UI de Playwright
+pnpm run test:e2e:ui
+
+# Modo debug
+pnpm run test:e2e:debug
+```
+
+---
+
 ## 📁 Estructura del Proyecto
 
 ```
@@ -227,8 +261,16 @@ Frontend_Costamagna_Gil_Lovatti_Martinez/
 │   ├── contexts/                 # Context API de React
 │   ├── hooks/                    # Custom hooks
 │   ├── helpers/                  # Funciones auxiliares
-│   ├── providers/                # Providers de contexto
-│   └── types.tsx                 # Tipos TypeScript
+│   ├── DTOs/                     # DTOs para presentacion de datos
+│   │   ├── quipoDto.tsx/              # DTO de equipos
+│   │   └── ...
+│   ├── test/                     # Tests unitarios/integración (Vitest)
+│   └── providers/                # Providers de contexto
+├── e2e/                          # Tests e2e
+│   ├── flujos-principales...     # Test de flujos principales
+│   └── ...
+├── playwright-report/            # Reportes E2E (generado)
+├── test-results/                 # Resultados de Playwright (generado)
 ├── public/                       # Archivos estáticos
 ├── dist/                         # Build de producción (generado)
 ├── node_modules/                 # Dependencias (generado)
@@ -592,6 +634,9 @@ Marca cada paso a medida que lo completes:
 - **Google Maps API** - Búsqueda de localidades
 - **React Hook Form** - Manejo de formularios
 - **JWT Decode** - Decodificación de tokens de autenticación
+- **Vitest** - Tests unitarios e integración
+- **Testing Library** - Testing de componentes React
+- **Playwright** - Tests end-to-end (E2E)
 
 ---
 
