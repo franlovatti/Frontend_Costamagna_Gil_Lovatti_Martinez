@@ -499,6 +499,7 @@ export default function TorneoDetalle() {
           isMember={isMember}
           userIsMember={userIsMember}
           isCaptain={isCaptain}
+          isCreator={isCreator}
           setSelectedTeam={setSelectedTeam}
           setEnrollPassword={setEnrollPassword}
           setEnrollError={setEnrollError}

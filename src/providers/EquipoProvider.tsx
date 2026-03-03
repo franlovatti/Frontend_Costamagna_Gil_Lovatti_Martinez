@@ -94,7 +94,7 @@ const EquipoProvider = ({ children }: { children: React.ReactNode }) => {
       } catch (err) {
         const axiosError = err as AxiosError<{ message?: string }>;
         setError(
-          'Error creando al equipo: ' +
+          'Error inscribiendo al equipo: ' +
             (axiosError.response?.data?.message || axiosError.message),
         );
         return false;
@@ -111,12 +111,12 @@ const EquipoProvider = ({ children }: { children: React.ReactNode }) => {
       setError(null);
 
       try {
-        await apiAxios.patch(`/equipo/${equipoId}/miembros`, { usuarioId });
+        await apiAxios.patch(`/equipos/${equipoId}/miembros`, { usuarioId });
         return true;
       } catch (err) {
         const axiosError = err as AxiosError<{ message?: string }>;
         setError(
-          'Error creando al equipo: ' +
+          'Error abandonando el equipo: ' +
             (axiosError.response?.data?.message || axiosError.message),
         );
         return false;

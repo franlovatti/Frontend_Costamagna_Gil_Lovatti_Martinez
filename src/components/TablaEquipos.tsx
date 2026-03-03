@@ -8,6 +8,7 @@ export default function TablaEquipos({
   isMember,
   userIsMember,
   isCaptain,
+  isCreator,
   setSelectedTeam,
   setEnrollPassword,
   setEnrollError,
@@ -25,6 +26,7 @@ export default function TablaEquipos({
   setShowEnrollModal: (show: boolean) => void;
   handleDeleteTeam: (equipoId: number) => void;
   setAbandono: (abandono: boolean) => void;
+  isCreator: boolean;
 }) {
 
   const navigate = useNavigate();
@@ -75,17 +77,19 @@ export default function TablaEquipos({
                           torneo.fechaInicioInscripcion,
                           torneo.fechaFinInscripcion
                         ) ? (
-                        <button
-                          className="btn-action"
-                          onClick={() => {
-                            setSelectedTeam(equipo);
-                            setEnrollPassword('');
-                            setEnrollError(null);
-                            setShowEnrollModal(true);
-                          }}
-                        >
-                          Unirse
-                        </button>
+                          <>
+                            <button
+                              className="btn-action"
+                              onClick={() => {
+                                setSelectedTeam(equipo);
+                                setEnrollPassword('');
+                                setEnrollError(null);
+                                setShowEnrollModal(true);
+                              }}
+                            >
+                              Unirse
+                            </button>
+                          </>
                         ) : ( 
                           <button className="btn-action btn-disabled" disabled>
                             Unirse
@@ -137,7 +141,25 @@ export default function TablaEquipos({
                               Abandonar
                           </button>)}
                         </>
-                      ) : null}
+                      )  : (isCreator && !isMember(equipo)) ? (
+                        <>{estaAbiertoPeriodo(
+                          torneo.fechaInicioInscripcion,
+                          torneo.fechaFinInscripcion
+                          ) ? (
+                          <button
+                            className="btn-action btn-delete"
+                            onClick={() => handleDeleteTeam(equipo.id)}
+                          >
+                            Expulsar
+                          </button>
+                          ) : (
+                            <button className="btn-action btn-disabled" disabled>
+                              Expulsar
+                            </button>
+                          )}
+                        </>
+                          ) : null 
+                        }
                     </div>
                   </td>
                 </tr>
@@ -187,17 +209,19 @@ export default function TablaEquipos({
                     torneo.fechaInicioInscripcion,
                     torneo.fechaFinInscripcion
                   ) ? (
-                  <button
-                    className="btn-action"
-                    onClick={() => {
-                      setSelectedTeam(equipo);
-                      setEnrollPassword('');
-                      setEnrollError(null);
-                      setShowEnrollModal(true);
-                    }}
-                  >
-                    Unirse
-                  </button>
+                  <>
+                    <button
+                      className="btn-action"
+                      onClick={() => {
+                        setSelectedTeam(equipo);
+                        setEnrollPassword('');
+                        setEnrollError(null);
+                        setShowEnrollModal(true);
+                      }}
+                    >
+                      Unirse
+                    </button>
+                  </>
                   ) : (
                     <button className="btn-action btn-disabled" disabled>
                       Unirse
@@ -207,33 +231,66 @@ export default function TablaEquipos({
                   <>
                     <button
                       className="btn-action"
-                      onClick={() =>
-                        navigate(`/home/equipos/${equipo.id}/editar`)
-                      }
-                    >
-                      Editar
-                    </button>
-                    <button
-                      className="btn-action"
                       onClick={() => navigate(`/home/equipos/${equipo.id}`)}
                     >
                       Ver equipo
                     </button>
+                    {estaAbiertoPeriodo(
+                    torneo.fechaInicioInscripcion,
+                    torneo.fechaFinInscripcion
+                    ) ? (
                     <button
                       className="btn-action btn-delete"
                       onClick={() => handleDeleteTeam(equipo.id)}
                     >
                       Eliminar
                     </button>
+                    ) : (
+                      <button className="btn-action btn-disabled" disabled>
+                        Eliminar
+                      </button>
+                    )}
                   </>
                 ) : isMember(equipo) ? (
-                  <button
-                    className="btn-action"
-                    onClick={() => navigate(`/home/equipos/${equipo.id}`)}
-                  >
-                    Ver equipo
-                  </button>
-                ) : null}
+                  <>
+                    <button
+                      className="btn-action"
+                      onClick={() =>
+                        navigate(`/home/equipos/${equipo.id}`)
+                      }
+                    >
+                      Ver equipo
+                    </button>
+                    {estaAbiertoPeriodo(
+                    torneo.fechaInicioInscripcion,
+                    torneo.fechaFinInscripcion) && (
+                    <button className="btn-action" onClick={() => {
+                        setSelectedTeam(equipo);
+                        setAbandono(true);
+                      }}>
+                        Abandonar
+                    </button>)}
+                  </>
+                ) : (isCreator && !isMember(equipo)) ? (
+                  <>
+                  {estaAbiertoPeriodo(
+                    torneo.fechaInicioInscripcion,
+                    torneo.fechaFinInscripcion
+                    ) ? (
+                    <button
+                      className="btn-action btn-delete"
+                      onClick={() => handleDeleteTeam(equipo.id)}
+                    >
+                      Expulsar
+                    </button>
+                    ) : (
+                      <button className="btn-action btn-disabled" disabled>
+                        Expulsar
+                      </button>
+                    )}
+                  </>
+                    ) : null 
+                }
               </div>
             </div>
           ))

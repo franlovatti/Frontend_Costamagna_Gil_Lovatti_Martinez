@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useInvitacion } from '../hooks/useInvitacion';
 import './Auth.css';
@@ -90,9 +90,9 @@ export default function UnirseEquipo() {
             Datos de invitación no disponibles
           </div>
           <div className="auth-button-group">
-            <Link to="/home" className="auth-btn auth-btn-secondary">
+            <button onClick={() => navigate('/home')} className="auth-btn auth-btn-secondary">
               Volver al Inicio
-            </Link>
+            </button>
           </div>
         </div>
       </div>
@@ -116,9 +116,9 @@ export default function UnirseEquipo() {
             <strong>{invitacion.equipo.nombre}</strong> ha expirado.
           </p>
           <div className="auth-button-group">
-            <Link to="/home" className="auth-btn auth-btn-secondary">
+            <button onClick={() => navigate('/home')} className="auth-btn auth-btn-secondary">
               Volver al Inicio
-            </Link>
+            </button>
           </div>
         </div>
       </div>
@@ -142,15 +142,15 @@ export default function UnirseEquipo() {
             <strong>{invitacion.equipo.nombre}</strong>.
           </p>
           <div className="auth-button-group">
-            <Link
-              to={`/home/equipos/${invitacion.equipo.id}`}
+            <button
+              onClick={() => navigate(`/home/equipos/${invitacion.equipo.id}`)}
               className="auth-btn auth-btn-primary"
             >
               Ver Equipo
-            </Link>
-            <Link to="/home" className="auth-btn auth-btn-secondary">
+            </button>
+            <button onClick={() => navigate('/home')} className="auth-btn auth-btn-secondary">
               Volver al Inicio
-            </Link>
+            </button>
           </div>
         </div>
       </div>
@@ -238,7 +238,7 @@ export default function UnirseEquipo() {
               fontSize: '0.85rem',
             }}
           >
-            Correo: <strong>{invitacion.emailInvitado}</strong>
+            Correo del invitado: <strong>{invitacion.emailInvitado}</strong>
           </p>
         </div>
 
@@ -252,9 +252,9 @@ export default function UnirseEquipo() {
               >
                 {accepting ? 'Uniéndose...' : 'Unirse al Equipo'}
               </button>
-              <Link to="/home" className="auth-btn auth-btn-secondary">
+              <button onClick={() => navigate('/home')} className="auth-btn auth-btn-secondary">
                 Cancelar
-              </Link>
+              </button>
             </div>
           </>
         ) : (
@@ -269,15 +269,23 @@ export default function UnirseEquipo() {
               Debes iniciar sesión para unirte al equipo.
             </p>
             <div className="auth-button-group">
-              <Link
-                to={`/Login?redirect=/unirse-equipo?token=${token}`}
+              <button
+                onClick={() => navigate('/Login', {
+                  state: { 
+                    from: {
+                      pathname: '/unirse-equipo',
+                      search: `?token=${token}`,
+                      hash: ''
+                    }
+                  }
+                })}
                 className="auth-btn auth-btn-primary"
               >
                 Iniciar Sesión
-              </Link>
-              <Link to="/home" className="auth-btn auth-btn-secondary">
+              </button>
+              <button onClick={() => navigate('/home')} className="auth-btn auth-btn-secondary">
                 Cancelar
-              </Link>
+              </button>
             </div>
           </>
         )}

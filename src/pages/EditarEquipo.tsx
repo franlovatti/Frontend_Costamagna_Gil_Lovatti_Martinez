@@ -263,7 +263,7 @@ export default function EditarEquipo() {
         <div className="action-buttons-section">
           <button
             className="action-btn btn-secondary-action"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate(`/home/torneos/${equipo.evento.id}`)}
           >
             ← Volver
           </button>
