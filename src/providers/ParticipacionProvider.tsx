@@ -22,7 +22,7 @@ const ParticipacionProvider = ({ children }: { children: React.ReactNode }) => {
 
       try {
         const result = await apiAxios.get(
-          `participaciones/participacionesxequipo`,
+          `/participaciones/participacionesxequipo`,
           { params: { partidoId, equipoId } },
         );
         setParticipaciones(result.data.data as Participacion[]);
@@ -45,7 +45,7 @@ const ParticipacionProvider = ({ children }: { children: React.ReactNode }) => {
       setError(null);
       try {
         const result = await apiAxios.get(
-          `participaciones/participacionesPorUsuarioEnTorneo`,
+          `/participaciones/participacionesPorUsuarioEnTorneo`,
           { params: { usuarioId, eventoId } },
         );
         setParticipaciones(result.data.data as Participacion[]);
@@ -68,7 +68,7 @@ const ParticipacionProvider = ({ children }: { children: React.ReactNode }) => {
 
     try {
       const result = await apiAxios.get(
-        `participaciones/participacionesPorTorneo`,
+        `/participaciones/participacionesPorTorneo`,
         { params: { eventoId } },
       );
       setParticipaciones(result.data.data as Participacion[]);
@@ -90,7 +90,7 @@ const ParticipacionProvider = ({ children }: { children: React.ReactNode }) => {
 
       try {
         const result = await apiAxios.get(
-          `participaciones/participacionesPorUsuario`,
+          `/participaciones/participacionesPorUsuario`,
           { params: { usuarioId } },
         );
         setParticipaciones(result.data.data as Participacion[]);
@@ -114,7 +114,7 @@ const ParticipacionProvider = ({ children }: { children: React.ReactNode }) => {
 
       try {
         const result = await apiAxios.get(
-          `participaciones/participacionesPorUsuario`,
+          `/participaciones/participacionesPorUsuario`,
           { params: { eventoId } },
         );
         setParticipaciones(result.data.data as Participacion[]);
@@ -159,7 +159,7 @@ const ParticipacionProvider = ({ children }: { children: React.ReactNode }) => {
       setError(null);
 
       try {
-        await apiAxios.put(`participaciones/${payload.id}`, payload);
+        await apiAxios.put(`/participaciones/${payload.id}`, payload);
         return true;
       } catch (err) {
         const axiosError = err as AxiosError<{ message?: string }>;
@@ -180,7 +180,7 @@ const ParticipacionProvider = ({ children }: { children: React.ReactNode }) => {
     setError(null);
 
     try {
-      await apiAxios.delete(`participaciones/${participacionId}`);
+      await apiAxios.delete(`/participaciones/${participacionId}`);
       return true;
     } catch (err) {
       const axiosError = err as AxiosError<{ message?: string }>;

@@ -43,6 +43,9 @@ export default function TorneoDetalle() {
   const [showConfirmEquipo, setShowConfirmEquipo] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [equipoAEliminar, setEquipoAEliminar] = useState<number>(0);
+  const [participantesDesordenados, setParticipantesDesordenados] = useState<
+    Usuario[] | null
+  >(null);
 
   const {
     borrarEquipo,
@@ -97,12 +100,20 @@ export default function TorneoDetalle() {
     }
   }, [torneo]);
 
-  const { usuarios: participantesDesordenados, getParticipantesEvento, error: errorParticipantes, loading: loadingParticipantes } = useUsuario();
+  const {
+    getParticipantesEvento,
+    loading: loadingParticipantes,
+    error: errorParticipantes,
+  } = useUsuario();
+
   useEffect(() => {
-    if (torneo) {
-      getParticipantesEvento(torneo.id!);
-    }
-  }, [torneo, getParticipantesEvento]);
+    if (!id) return;
+    const fetchParticipantes = async () => {
+      const data = await getParticipantesEvento(Number(id));
+      setParticipantesDesordenados(data);
+    };
+    fetchParticipantes();
+  }, [id, getParticipantesEvento]);
 
   const calcularStats = (participations: Participacion[] | undefined) => {
     if (!participations)
@@ -130,10 +141,12 @@ export default function TorneoDetalle() {
     });
   };
 
-  const participantes = ordenarParticipantes(
-    participantesDesordenados as unknown as Usuario[],
-    ordenarParticipanteCriterio as keyof Stats,
-  );
+  const participantes = participantesDesordenados
+    ? ordenarParticipantes(
+        participantesDesordenados,
+        ordenarParticipanteCriterio as keyof Stats,
+      )
+    : [];
 
   const userIsMember = (): boolean => {
     if (!user || !torneo?.equipos) return false;
@@ -402,7 +415,8 @@ export default function TorneoDetalle() {
           !loadingEquipo &&
           !loadingParticipantes && (
             <div className="alert-danger-custom">
-              ⚠️ {errorTorneo || errorPartido || errorEquipo || errorParticipantes}
+              ⚠️{' '}
+              {errorTorneo || errorPartido || errorEquipo || errorParticipantes}
             </div>
           )}
 

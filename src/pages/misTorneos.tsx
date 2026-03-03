@@ -9,9 +9,18 @@ import { useAuth } from '../hooks/useAuth.tsx';
 import { useTorneo } from '../hooks/useTorneo.tsx';
 
 export default function MisTorneos() {
-  const { getTorneosCreadosPorUsuario, torneosCreados, getTorneosInscriptoPorUsuario, torneosInscripto, loading, error } = useTorneo();
+  const {
+    getTorneosCreadosPorUsuario,
+    torneosCreados,
+    getTorneosInscriptoPorUsuario,
+    torneosInscripto,
+    loading,
+    error,
+  } = useTorneo();
   const [dataTorneosCreador, setDataTorneosCreador] = useState<Torneo[]>([]);
-  const [dataTorneosInscripto, setDataTorneosInscripto] = useState<Torneo[]>([]);
+  const [dataTorneosInscripto, setDataTorneosInscripto] = useState<Torneo[]>(
+    [],
+  );
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -51,15 +60,14 @@ export default function MisTorneos() {
         <div className="torneos-header">
           <h1>Mis Torneos</h1>
           <p className="torneos-subtitle">
-            Explora tus propios torneos creados y aquellos en los que estás inscripto.
+            Explora tus propios torneos creados y aquellos en los que estás
+            inscripto.
           </p>
         </div>
-        
+
         {/* Error de conexión */}
         {error && !loading && (
-          <div className="alert-danger-custom">
-            ⚠️ {error}
-          </div>
+          <div className="alert-danger-custom">⚠️ {error}</div>
         )}
 
         <Tabs
@@ -112,24 +120,24 @@ export default function MisTorneos() {
                 <p className="empty-state-text">No se encontraron torneos</p>
               </div>
             ) : (
-            <Row>
-              {dataTorneosInscripto.map((torneo) => (
-                <Col
-                  key={torneo.id}
-                  xs={12}
-                  sm={6}
-                  md={4}
-                  lg={3}
-                  className="mb-4"
-                >
-                  <CardTorneos
-                    torneo={torneo}
-                    handleClick={handleClick}
-                    isMember={true}
-                  />
-                </Col>
-              ))}
-            </Row>
+              <Row>
+                {dataTorneosInscripto.map((torneo) => (
+                  <Col
+                    key={torneo.id}
+                    xs={12}
+                    sm={6}
+                    md={4}
+                    lg={3}
+                    className="mb-4"
+                  >
+                    <CardTorneos
+                      torneo={torneo}
+                      handleClick={handleClick}
+                      isMember={true}
+                    />
+                  </Col>
+                ))}
+              </Row>
             )}
           </Tab>
         </Tabs>

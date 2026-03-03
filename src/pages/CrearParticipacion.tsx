@@ -1,7 +1,8 @@
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router';
 import { useEffect, useState } from 'react';
-import type { Usuario, Participation } from '../types.tsx';
+import type { Usuario } from '../contexts/usuario.tsx';
+import type { Participacion } from '../contexts/participacion.tsx';
 import type {
   ParticipacionPayload,
   ParticipacionEditPayload,
@@ -37,7 +38,6 @@ export default function CrearParticipacion() {
     };
     fetchPartido();
   }, [id, getOnePartido]);
-
   const [miembrosLocal, setMiembrosLocal] = useState<Usuario[]>([]);
   const [miembrosVisitante, setMiembrosVisitante] = useState<Usuario[]>([]);
   const [equipoSeleccionado, setEquipoSeleccionado] = useState<
@@ -53,7 +53,7 @@ export default function CrearParticipacion() {
   });
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [participacionAEliminar, setParticipacionAEliminar] =
-    useState<Participation | null>(null);
+    useState<Participacion | null>(null);
   const [form, setForm] = useState({
     usuarioId: '',
     minutosjugados: '',
@@ -106,7 +106,7 @@ export default function CrearParticipacion() {
     }
   };
 
-  const handleEdit = (p: Participation) => {
+  const handleEdit = (p: Participacion) => {
     setEditingId(p.id);
     setEditForm({
       usuarioId: String(p.usuario.id),
@@ -159,7 +159,7 @@ export default function CrearParticipacion() {
     }
   };
 
-  const askDelete = (p: Participation) => {
+  const askDelete = (p: Participacion) => {
     setParticipacionAEliminar(p);
     setShowDeleteModal(true);
   };

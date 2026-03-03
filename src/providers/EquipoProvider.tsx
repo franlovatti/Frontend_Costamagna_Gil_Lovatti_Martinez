@@ -144,7 +144,6 @@ const EquipoProvider = ({ children }: { children: React.ReactNode }) => {
       setLoading(false);
     }
   }, []);
-
   const editarEquipo = useCallback(
     async (equipoId: number, datos: EquipoEditPayload) => {
       setLoading(true);

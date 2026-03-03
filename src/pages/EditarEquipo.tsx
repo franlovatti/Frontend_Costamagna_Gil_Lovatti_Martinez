@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import type { Usuario } from '../contexts/usuario';
 import { useEquipos } from '../hooks/useEquipos';
 import type { Equipo } from '../contexts/equipo.tsx';
 import { Row, Col } from 'react-bootstrap';
 import { InviteModal } from '../components/InviteModal';
 import ConfirmModal from '../components/ConfirmModal.tsx';
-import type { User } from '../contexts/auth.tsx';
 import { estaAbiertoPeriodo } from '../helpers/convertirFechas.tsx';
 
 export default function EditarEquipo() {
@@ -213,7 +213,7 @@ export default function EditarEquipo() {
               <tbody>
                 {Array.isArray(equipo.miembros) &&
                 equipo.miembros.length > 0 ? (
-                  (equipo.miembros as User[]).map((miembro, idx) => {
+                  (equipo.miembros as Usuario[]).map((miembro, idx) => {
                     const memberId = miembro.id ?? miembro.usuario ?? '';
                     const memberIdStr = String(memberId);
                     const capIdLocal = String(equipo.capitan.id);

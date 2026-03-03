@@ -1,5 +1,5 @@
 import type { Partido } from './partido';
-import type { User } from './auth.tsx';
+import type { Usuario } from './usuario.tsx';
 import type { Torneo } from './torneo';
 import type { EquiposPayload, EquipoEditPayload } from '../DTOs/equipoDTO.tsx';
 import { createContext } from 'react';
@@ -8,11 +8,11 @@ export interface Equipo {
   id: number;
   nombre: string;
   nombreCapitan: string;
-  capitan: User;
+  capitan: Usuario;
   puntos: number;
   esPublico: boolean;
   contrasenia: string;
-  miembros: User[];
+  miembros: Usuario[];
   evento: Torneo;
   partidoVisitante: Partido[];
   partidoLocal: Partido[];
@@ -42,5 +42,4 @@ export interface EquipoContextType {
     usuarioId: number,
   ) => Promise<Equipo | null>;
 }
-
 export const EquipoContext = createContext<EquipoContextType | null>(null);

@@ -8,9 +8,9 @@ export interface EquiposPayload {
   contrasenia?: string | null;
   miembros: string[] | { id: string }[];
   evento: number;
-};
+}
 
-export interface EquipoEditPayload{
-  nombre: string,
-  contrasenia: string,  
+export interface EquipoEditPayload {
+  nombre: string;
+  contrasenia: string;
 }

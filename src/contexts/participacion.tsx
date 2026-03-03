@@ -3,12 +3,12 @@ import type {
   ParticipacionEditPayload,
   ParticipacionPayload,
 } from '../DTOs/participacionesDTO.tsx';
-import type { User } from './auth';
+import type { Usuario } from './usuario';
 import type { Partido } from './partido';
 
 export interface Participacion {
   id: number;
-  usuario: User;
+  usuario: Usuario;
   minutosjugados: number;
   faltas: number;
   puntos: number;
@@ -27,15 +27,9 @@ export interface ParticipacionContextType {
     usuarioId: number,
     eventoId: number,
   ): Promise<void>;
-  getParticipacionesPorTorneo(
-    eventoId: number,
-  ): Promise<void>;
-  getParticipacionesPorUsuario(
-    usuarioId: number,
-  ): Promise<void>;
-  getParticipacionesTotalesPorTorneo(
-    eventoId: number,
-  ): Promise<void>;
+  getParticipacionesPorTorneo(eventoId: number): Promise<void>;
+  getParticipacionesPorUsuario(usuarioId: number): Promise<void>;
+  getParticipacionesTotalesPorTorneo(eventoId: number): Promise<void>;
   crearParticipacion(payload: ParticipacionPayload): Promise<boolean>;
   editarParticipacion(payload: ParticipacionEditPayload): Promise<boolean>;
   borrarParticipacion(id: number): Promise<boolean>;

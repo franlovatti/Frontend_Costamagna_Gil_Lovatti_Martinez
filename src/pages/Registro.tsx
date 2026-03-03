@@ -124,7 +124,7 @@ export default function Registro() {
             <input
               type="password"
               className="auth-input"
-              placeholder="contrasenia"
+              placeholder="Contraseña"
               {...register('contrasenia', {
                 required: 'Este campo es obligatorio',
                 minLength: {

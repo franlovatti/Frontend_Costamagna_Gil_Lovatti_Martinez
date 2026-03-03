@@ -3,7 +3,7 @@ import { useTorneo } from '../hooks/useTorneo';
 import CardTorneos from '../components/CardTorneos';
 import { useNavigate, useLocation } from 'react-router-dom';
 import type { Equipo } from '../contexts/equipo.tsx';
-import type { Usuario } from '../contexts/usuario';
+import type { Usuario } from '../contexts/usuario.tsx';
 import type { Torneo } from '../contexts/torneo.tsx';
 import type { Deporte } from '../contexts/deporte.tsx';
 import { useAuth } from '../hooks/useAuth';

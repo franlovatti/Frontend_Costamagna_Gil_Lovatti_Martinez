@@ -4,7 +4,7 @@ import { useEstablecimientos } from '../hooks/useEstablecimientos';
 import { useEquipos } from '../hooks/useEquipos';
 import { usePartidos } from '../hooks/usePartidos';
 import '../components/cssComponentes/FormTorneos.css';
-import type { Partido } from '../types.tsx';
+import type { Partido } from '../contexts/partido.tsx';
 
 export default function FormPartido() {
   const { id, partidoId } = useParams();
@@ -76,7 +76,7 @@ export default function FormPartido() {
         resultadoVisitante: partido.resultadoVisitante?.toLocaleString() ?? '',
         equipoLocal: partido.equipoLocal.id,
         equipoVisitante: partido.equipoVisitante.id,
-        evento: partido.evento.id,
+        evento: partido.evento.id!,
         establecimiento: partido.establecimiento?.id ?? 0,
         id: partido.id,
       });

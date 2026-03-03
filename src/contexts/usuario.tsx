@@ -1,9 +1,8 @@
-import { createContext } from "react";
-import type { User } from "./auth";
-import type {Partido} from "./partido";
-import type { Equipo } from "./equipo";
-import type { Participacion } from "./participacion";
-
+import { createContext } from 'react';
+import type { User } from './auth';
+import type { Partido } from './partido';
+import type { Equipo } from './equipo';
+import type { Participacion } from './participacion';
 export interface Usuario {
   id: number;
   nombre: string;
@@ -17,16 +16,15 @@ export interface Usuario {
   equipocomocapitan: Equipo[];
 }
 
-
 type UsuarioContextType = {
-  usuarios: User[];
+  usuarios: User[] | Usuario[];
   loading: boolean;
   error: string | null;
   getUsuarios: (opts?: { q?: string; page?: number }) => Promise<void>;
   filtrarUsuarios: (rol?: string, estado?: string) => Promise<void>;
   modificarUsuario: (usuario: User) => Promise<boolean>;
-  getParticipantesEvento: (eventoId: number) => Promise<void>;
   clearError: () => void;
+  getParticipantesEvento: (eventoId: number) => Promise<Usuario[] | null>;
 };
 
 export const UsuarioContext = createContext<UsuarioContextType | null>(null);

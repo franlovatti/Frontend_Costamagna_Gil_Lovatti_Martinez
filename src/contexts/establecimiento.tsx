@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import type { Equipo } from '../types';
+import type { Partido } from '../contexts/partido.tsx';
 import type { Torneo } from '../contexts/torneo.tsx';
 import type { EstablecimientoPayloadEdicion } from '../DTOs/establecimientosDTO.tsx';
 
@@ -7,7 +7,7 @@ export interface Establecimiento {
   id: number;
   nombre: string;
   direccion: string;
-  partidos: Equipo[];
+  partidos: Partido[];
   evento: Torneo;
   localidad: number;
 }

@@ -24,7 +24,7 @@ try {
   } else {
     console.log('   ✅ .env está en .gitignore');
   }
-  
+
   if (gitignore.includes('.env.local')) {
     console.log('   ✅ .env.local también protegido');
   }
@@ -44,7 +44,7 @@ try {
   } else {
     console.log('   ✅ .env no está trackeado');
   }
-  
+
   if (trackedFiles.includes('.env.local')) {
     issues.push('❌ CRÍTICO: .env.local está trackeado');
     console.log('   ❌ .env.local está trackeado');
@@ -60,33 +60,35 @@ const patterns = [
   {
     pattern: /AIza[0-9A-Za-z_-]{35}/g,
     name: 'Google Maps API Key',
-    severity: 'high'
+    severity: 'high',
   },
   {
-    pattern: /(?:api[_-]?key|apikey)\s*[:=]\s*["'](?!import\.meta\.env|process\.env|VITE_)[A-Za-z0-9_-]{20,}["']/gi,
+    pattern:
+      /(?:api[_-]?key|apikey)\s*[:=]\s*["'](?!import\.meta\.env|process\.env|VITE_)[A-Za-z0-9_-]{20,}["']/gi,
     name: 'API Key hardcodeada',
-    severity: 'high'
+    severity: 'high',
   },
   {
     pattern: /sk_live_[0-9a-zA-Z]{24,}/g,
     name: 'Stripe Live Key',
-    severity: 'critical'
+    severity: 'critical',
   },
   {
     pattern: /pk_live_[0-9a-zA-Z]{24,}/g,
     name: 'Stripe Publishable Key',
-    severity: 'medium'
+    severity: 'medium',
   },
   {
     pattern: /(?:password|passwd|pwd)\s*[:=]\s*["'][^"']{3,}["']/gi,
-    name: 'Contraseña hardcodeada',
-    severity: 'critical'
+    name: 'contrasenia hardcodeada',
+    severity: 'critical',
   },
   {
-    pattern: /(?:secret|token)\s*[:=]\s*["'](?!import\.meta\.env)[^"']{10,}["']/gi,
+    pattern:
+      /(?:secret|token)\s*[:=]\s*["'](?!import\.meta\.env)[^"']{10,}["']/gi,
     name: 'Secret/Token hardcodeado',
-    severity: 'high'
-  }
+    severity: 'high',
+  },
 ];
 
 // Archivos a revisar
@@ -95,27 +97,32 @@ const filesToCheck = [
   'vite.config.ts',
   'vite.config.js',
   '.env.example',
-  'README.md'
+  'README.md',
 ];
 
 // Función para buscar en directorio
 function searchInDirectory(dir, extensions = ['.ts', '.tsx', '.js', '.jsx']) {
   const files = [];
-  
+
   function traverse(currentPath) {
     try {
       const items = readdirSync(currentPath);
-      
+
       for (const item of items) {
         const fullPath = join(currentPath, item);
-        
+
         // Saltar node_modules y dist
-        if (item === 'node_modules' || item === 'dist' || item === 'build' || item === '.git') {
+        if (
+          item === 'node_modules' ||
+          item === 'dist' ||
+          item === 'build' ||
+          item === '.git'
+        ) {
           continue;
         }
-        
+
         const stat = statSync(fullPath);
-        
+
         if (stat.isDirectory()) {
           traverse(fullPath);
         } else if (extensions.includes(extname(fullPath))) {
@@ -126,35 +133,38 @@ function searchInDirectory(dir, extensions = ['.ts', '.tsx', '.js', '.jsx']) {
       // Ignorar errores de acceso
     }
   }
-  
+
   traverse(dir);
   return files;
 }
 
 // Buscar en src/
 const sourceFiles = searchInDirectory('./src');
-const allFiles = [...filesToCheck.filter(f => existsSync(f)), ...sourceFiles];
+const allFiles = [...filesToCheck.filter((f) => existsSync(f)), ...sourceFiles];
 
 let foundIssues = false;
 
 for (const file of allFiles) {
   try {
     const content = readFileSync(file, 'utf-8');
-    
+
     for (const { pattern, name, severity } of patterns) {
       pattern.lastIndex = 0; // Reset regex
       const matches = [...content.matchAll(pattern)];
-      
+
       if (matches.length > 0) {
         foundIssues = true;
-        
+
         // Verificar si es en index.html y usa import.meta.env
-        if (file.includes('index.html') && content.includes('import.meta.env.VITE_')) {
+        if (
+          file.includes('index.html') &&
+          content.includes('import.meta.env.VITE_')
+        ) {
           continue; // Está bien, usa variables de entorno
         }
-        
+
         const message = `${file}: ${name} encontrada (${matches.length} coincidencias)`;
-        
+
         if (severity === 'critical') {
           issues.push(`❌ CRÍTICO: ${message}`);
           console.log(`   ❌ ${file}`);
@@ -168,12 +178,13 @@ for (const file of allFiles) {
           console.log(`   ⚠️  ${file}`);
           console.log(`      ℹ️  ${name}`);
         }
-        
+
         // Mostrar primera coincidencia (parcial)
         const firstMatch = matches[0][0];
-        const preview = firstMatch.length > 50 
-          ? firstMatch.substring(0, 47) + '...' 
-          : firstMatch;
+        const preview =
+          firstMatch.length > 50
+            ? firstMatch.substring(0, 47) + '...'
+            : firstMatch;
         console.log(`      Encontrado: ${preview}\n`);
       }
     }
@@ -194,7 +205,7 @@ let correctUsage = true;
 for (const file of sourceFiles) {
   try {
     const content = readFileSync(file, 'utf-8');
-    
+
     // Buscar process.env en lugar de import.meta.env
     if (content.includes('process.env.VITE_')) {
       warnings.push(`⚠️  ${file} usa process.env en lugar de import.meta.env`);
@@ -217,19 +228,23 @@ console.log('\n5️⃣ Comparando .env y .env.example...');
 if (existsSync('.env') && existsSync('.env.example')) {
   const env = readFileSync('.env', 'utf-8');
   const envExample = readFileSync('.env.example', 'utf-8');
-  
+
   // Extraer API key de cada archivo
   const apiKeyMatch = env.match(/VITE_GOOGLE_MAPS_API_KEY\s*=\s*(.+)/);
-  const apiKeyExampleMatch = envExample.match(/VITE_GOOGLE_MAPS_API_KEY\s*=\s*(.+)/);
-  
+  const apiKeyExampleMatch = envExample.match(
+    /VITE_GOOGLE_MAPS_API_KEY\s*=\s*(.+)/,
+  );
+
   if (apiKeyMatch && apiKeyExampleMatch) {
     const apiKey = apiKeyMatch[1].trim();
     const apiKeyExample = apiKeyExampleMatch[1].trim();
-    
+
     if (apiKey === apiKeyExample) {
       issues.push('❌ CRÍTICO: .env usa la misma API key que .env.example');
       console.log('   ❌ API key es igual al ejemplo');
-      console.log('   📝 Genera tu propia API key en: https://console.cloud.google.com/');
+      console.log(
+        '   📝 Genera tu propia API key en: https://console.cloud.google.com/',
+      );
     } else {
       console.log('   ✅ .env tiene API key diferente al ejemplo');
     }
@@ -244,15 +259,22 @@ if (existsSync('.env') && existsSync('.env.example')) {
 console.log('\n6️⃣ Buscando credenciales en historial de Git...');
 
 try {
-  const gitLog = execSync('git log --all --full-history --source --find-renames --diff-filter=D -- .env', {
-    encoding: 'utf-8',
-    stdio: ['pipe', 'pipe', 'ignore']
-  });
-  
+  const gitLog = execSync(
+    'git log --all --full-history --source --find-renames --diff-filter=D -- .env',
+    {
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'ignore'],
+    },
+  );
+
   if (gitLog.trim()) {
-    warnings.push('⚠️  .env fue trackeado anteriormente en el historial de Git');
+    warnings.push(
+      '⚠️  .env fue trackeado anteriormente en el historial de Git',
+    );
     console.log('   ⚠️  .env aparece en el historial (fue commiteado antes)');
-    console.log('   📝 Considera limpiar el historial si contenía credenciales reales');
+    console.log(
+      '   📝 Considera limpiar el historial si contenía credenciales reales',
+    );
   } else {
     console.log('   ✅ .env nunca fue commiteado');
   }
@@ -278,21 +300,23 @@ if (issues.length === 0 && warnings.length === 0) {
 } else {
   if (issues.length > 0) {
     console.log('\n❌ Problemas de Seguridad CRÍTICOS:');
-    issues.forEach(issue => console.log(`   ${issue}`));
+    issues.forEach((issue) => console.log(`   ${issue}`));
   }
-  
+
   if (warnings.length > 0) {
     console.log('\n⚠️  Advertencias de Seguridad:');
-    warnings.forEach(warning => console.log(`   ${warning}`));
+    warnings.forEach((warning) => console.log(`   ${warning}`));
   }
-  
+
   console.log('\n📝 Acciones Recomendadas:');
   console.log('   1. Agrega .env al .gitignore si no está');
   console.log('   2. Remueve .env del repositorio: git rm --cached .env');
-  console.log('   3. Reemplaza API keys hardcodeadas con import.meta.env.VITE_*');
+  console.log(
+    '   3. Reemplaza API keys hardcodeadas con import.meta.env.VITE_*',
+  );
   console.log('   4. Genera tu propia Google Maps API key');
   console.log('   5. Configura restricciones en Google Cloud Console\n');
-  
+
   if (issues.length > 0) {
     process.exit(1);
   }

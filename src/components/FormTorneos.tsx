@@ -90,7 +90,9 @@ export default function FormTorneos({
       nombre: data.nombre,
       descripcion: data.descripcion,
       esPublico: esPublico,
-      contrasenia: esPublico ? undefined : data.contrasenia?.trim() || undefined,
+      contrasenia: esPublico
+        ? undefined
+        : data.contrasenia?.trim() || undefined,
       cantEquiposMax: data.cantEquiposMax,
       fechaInicioInscripcion: parseDatetimeLocal(data.fechaInicioInscripcion)!,
       fechaFinInscripcion: parseDatetimeLocal(data.fechaFinInscripcion)!,

@@ -1,7 +1,7 @@
 import type { Establecimiento } from './establecimiento';
 import type { Torneo } from './torneo';
 import type { Equipo } from './equipo';
-import type { User } from './auth.tsx';
+import type { Usuario } from './usuario';
 import type { Participacion } from './participacion.tsx';
 import { createContext } from 'react';
 import type { PartidoPayload, resultadosDto } from '../DTOs/partidosDTO.tsx';
@@ -10,8 +10,8 @@ export interface Partido {
   id: number;
   equipoLocal: Equipo;
   equipoVisitante: Equipo;
-  mvp?: User;
-  maxAnotador?: User;
+  mvp?: Usuario;
+  maxAnotador?: Usuario;
   evento: Torneo;
   fecha: Date;
   hora: string;
