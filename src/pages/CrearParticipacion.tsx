@@ -5,7 +5,7 @@ import type { Usuario, Participation } from '../types.tsx';
 import type {
   ParticipacionPayload,
   ParticipacionEditPayload,
-} from '../hooks/useParticipaciones';
+} from '../DTOs/participacionesDTO.tsx';
 import type { Partido } from '../contexts/partido.tsx';
 import './Participacion.css';
 import { useParticipacion } from '../hooks/useParticipaciones.tsx';
@@ -20,7 +20,7 @@ export default function CrearParticipacion() {
     crearParticipacion,
     editarParticipacion,
     borrarParticipacion,
-    traerParticipacionesEquipo,
+    getParticipacionesPartidoEquipo,
     loading,
     error,
     participaciones,
@@ -73,9 +73,9 @@ export default function CrearParticipacion() {
 
   useEffect(() => {
     if (id && equipoid && equipoid > 0) {
-      traerParticipacionesEquipo(id, String(equipoid));
+      getParticipacionesPartidoEquipo(Number(id), Number(equipoid));
     }
-  }, [traerParticipacionesEquipo, id, equipoid]);
+  }, [getParticipacionesPartidoEquipo, id, equipoid]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -101,7 +101,7 @@ export default function CrearParticipacion() {
 
     const success = await crearParticipacion(payload);
     if (success) {
-      await traerParticipacionesEquipo(id, String(equipoid));
+      await getParticipacionesPartidoEquipo(Number(id), Number(equipoid));
       setForm({ usuarioId: '', minutosjugados: '', faltas: '', puntos: '' });
     }
   };
@@ -147,7 +147,7 @@ export default function CrearParticipacion() {
       payload as ParticipacionEditPayload,
     );
     if (success) {
-      await traerParticipacionesEquipo(id, String(equipoid));
+      await getParticipacionesPartidoEquipo(Number(id), Number(equipoid));
       setShowEditModal(false);
       setEditingId(null);
       setEditForm({
@@ -171,7 +171,7 @@ export default function CrearParticipacion() {
     if (success) {
       if (editingId === participacionId) handleCancelEdit();
       setShowDeleteModal(false);
-      await traerParticipacionesEquipo(id, String(equipoid));
+      await getParticipacionesPartidoEquipo(Number(id), Number(equipoid));
       setParticipacionAEliminar(null);
     }
   };

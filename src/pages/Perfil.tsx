@@ -7,7 +7,7 @@ import TorneosPerfil from '../components/TorneosPerfil.tsx';
 import UsuarioFormModal from '../components/UsuarioFormModal.tsx';
 import { useEquipos } from '../hooks/useEquipos.tsx';
 import { useUsuario } from '../hooks/useUsuario.tsx';
-import { useParticipacionesporUsuario } from '../hooks/useParticipaciones';
+import { useParticipacion } from '../hooks/useParticipaciones';
 import './Perfil.css';
 import ParticipacionesPerfil from '../components/ParticipacionesPerfil.tsx';
 const Perfil = () => {
@@ -42,7 +42,12 @@ const Perfil = () => {
     participaciones,
     loading: loadingParticipaciones,
     error: errorParticipaciones,
-  } = useParticipacionesporUsuario(usuario.id);
+    getParticipacionesPorUsuario,
+  } = useParticipacion();
+
+  useEffect(() => {
+    getParticipacionesPorUsuario(Number(usuario.id));
+  }, [getParticipacionesPorUsuario, usuario.id]);
 
   function calcularEstadisticas(e: typeof equipos) {
     const datos = e.map((equip) => {

@@ -18,23 +18,24 @@ export interface Participacion {
 export interface ParticipacionContextType {
   loading: boolean;
   error: string | null;
+  participaciones: Participacion[];
   getParticipacionesPartidoEquipo(
     partidoId: number,
     equipoId: number,
-  ): Promise<Participacion[] | null>;
+  ): Promise<void>;
   getParticipacionesUsuarioTorneo(
     usuarioId: number,
     eventoId: number,
-  ): Promise<Participacion[] | null>;
+  ): Promise<void>;
   getParticipacionesPorTorneo(
     eventoId: number,
-  ): Promise<Participacion[] | null>;
+  ): Promise<void>;
   getParticipacionesPorUsuario(
     usuarioId: number,
-  ): Promise<Participacion[] | null>;
+  ): Promise<void>;
   getParticipacionesTotalesPorTorneo(
     eventoId: number,
-  ): Promise<Participacion[] | null>;
+  ): Promise<void>;
   crearParticipacion(payload: ParticipacionPayload): Promise<boolean>;
   editarParticipacion(payload: ParticipacionEditPayload): Promise<boolean>;
   borrarParticipacion(id: number): Promise<boolean>;

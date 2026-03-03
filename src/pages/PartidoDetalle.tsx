@@ -2,7 +2,7 @@ import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
 import { Row, Col, Spinner, Alert, Container } from 'react-bootstrap';
 import { usePartidos } from '../hooks/usePartidos';
-import { useParticipaciones } from '../hooks/useParticipaciones';
+import { useParticipacion } from '../hooks/useParticipaciones';
 import { useNavigate } from 'react-router-dom';
 import type { Partido } from '../contexts/partido.tsx';
 
@@ -41,11 +41,18 @@ export default function PartidoDetalle() {
 
   const {
     participaciones,
-    // loading: loadingParticipaciones,
-    // error: errorParticipaciones,
-  } = useParticipaciones(id || '', equipoid || '');
+    getParticipacionesPartidoEquipo,
+    loading: loadingParticipaciones,
+    error: errorParticipaciones,
+  } = useParticipacion();
 
-  if (loadingPartido) {
+  useEffect(() => {
+    if (id && equipoid) {
+      getParticipacionesPartidoEquipo(Number(id), Number(equipoid));
+    }
+  }, [getParticipacionesPartidoEquipo, id, equipoid]);
+
+  if (loadingPartido || loadingParticipaciones) {
     return (
       <div className="text-center mt-5">
         <Spinner animation="border" role="status">
@@ -55,10 +62,10 @@ export default function PartidoDetalle() {
     );
   }
 
-  if (errorPartido) {
+  if (errorPartido || errorParticipaciones) {
     return (
       <div className="text-center mt-5">
-        <Alert variant="danger">Error al cargar el partido.</Alert>
+        <Alert variant="danger">Error al cargar el partido o sus participaciones.</Alert>
       </div>
     );
   }
