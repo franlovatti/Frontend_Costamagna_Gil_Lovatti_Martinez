@@ -90,8 +90,8 @@ const UsuariosAdmin = () => {
   return (
     <div className="deportes-page">
       <div className="page-header mb-4 pb-3">
-        <h1 className="mb-2">Gestión de Deportes</h1>
-        <p className="text-muted-custom mb-0">Administra los deportes disponibles en la plataforma</p>
+        <h1 className="mb-2">Gestión de Usuarios</h1>
+        <p className="text-muted-custom mb-0">Administra los usuarios de la plataforma</p>
       </div>
 
       <SearchBar
@@ -138,7 +138,7 @@ const UsuariosAdmin = () => {
       )}
 
       <UserTable
-        usuarios={usuariosFiltrados}
+        usuarios={usuariosFiltrados as unknown as User[]}
         onEdit={handleEdit}
         onDelete={handleDelete}
         loading={loading}
