@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 import { useEffect, useState } from 'react';
 import type { Torneo } from '../contexts/torneo.tsx';
 import type { Equipo } from '../contexts/equipo.tsx';
-import type { Usuario } from '../contexts/usuario';
+import type { Usuario } from '../contexts/usuario.tsx';
 import { useAuth } from '../hooks/useAuth.tsx';
 import { useTorneo } from '../hooks/useTorneo.tsx';
 

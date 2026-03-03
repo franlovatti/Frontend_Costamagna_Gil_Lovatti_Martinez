@@ -4,7 +4,7 @@ import { useEstablecimientos } from '../hooks/useEstablecimientos.tsx';
 import MapaLocalidad from '../components/ApiMaps/MapaLocalidad.tsx';
 import './CrearEquipo.css';
 import type { Establecimiento } from '../contexts/establecimiento.tsx';
-import type { EstablecimientoPayloadEdicion } from '../DTOs/EstablecimientosDTO.tsx';
+import type { EstablecimientoPayloadEdicion } from '../DTOs/establecimientosDTO.tsx';
 
 export default function FormEstablecimiento() {
   const navigate = useNavigate();
