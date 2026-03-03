@@ -3,7 +3,6 @@ import type { User } from './auth';
 import type { Partido } from './partido';
 import type { Equipo } from './equipo';
 import type { Participacion } from './participacion';
-
 export interface Usuario {
   id: number;
   nombre: string;
