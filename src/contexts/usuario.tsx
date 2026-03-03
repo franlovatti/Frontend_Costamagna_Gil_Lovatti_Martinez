@@ -25,6 +25,7 @@ type UsuarioContextType = {
   getUsuarios: (opts?: { q?: string; page?: number }) => Promise<void>;
   filtrarUsuarios: (rol?: string, estado?: string) => Promise<void>;
   modificarUsuario: (usuario: User) => Promise<boolean>;
+  getParticipantesEvento: (eventoId: number) => Promise<void>;
   clearError: () => void;
 };
 

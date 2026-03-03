@@ -16,14 +16,14 @@ const ParticipacionProvider = ({ children }: { children: React.ReactNode }) => {
   const [error, setError] = useState<string | null>(null);
 
   const getParticipacionesPartidoEquipo = useCallback(
-    async (partidoId: number, eventoId: number) => {
+    async (partidoId: number, equipoId: number) => {
       setLoading(true);
       setError(null);
 
       try {
         const result = await apiAxios.get(
           `participaciones/participacionesxequipo`,
-          { params: { partidoId, eventoId } },
+          { params: { partidoId, equipoId } },
         );
         setParticipaciones(result.data.data as Participacion[]);
       } catch (err) {

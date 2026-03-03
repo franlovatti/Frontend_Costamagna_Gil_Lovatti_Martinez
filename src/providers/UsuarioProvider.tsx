@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { UsuarioContext } from "../contexts/usuario";
 import apiAxios from "../helpers/api";
 import type { User } from "../contexts/auth";
@@ -6,7 +6,7 @@ import { AxiosError } from "axios";
 
 const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
   const [usuarios, setUsuarios] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Inicia en false porque no cargamos automáticamente
   const [error, setError] = useState<string | null>(null);
 
   const getUsuarios = useCallback(async (opts?: { q?: string; page?: number }) => {
@@ -39,11 +39,28 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(false);
   }, []);
 
+  const getParticipantesEvento = useCallback(async (eventoId: number) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await apiAxios.get('/usuarios/usuariosPorEvento', {
+        params: { eventoId },
+      });
+      setUsuarios(response.data.data);
+    } catch (err) {
+      const axiosError = err as AxiosError<{ message?: string }>;
+      setUsuarios([]);
+      setError('Error al cargar los participantes del evento: ' + (axiosError.response?.data?.message || axiosError.message));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const modificarUsuario = async (usuario: User) => {
     try {
       setError(null);
       await apiAxios.put(`/usuarios/${usuario.id}`, usuario);
-      await getUsuarios();
       return true;
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
@@ -57,12 +74,11 @@ const UsuariosProvider = ({ children }: { children: React.ReactNode }) => {
     setError(null);
   };
 
-  useEffect(() => {
-    getUsuarios();
-  }, [getUsuarios]);
+  // No cargamos automáticamente los usuarios porque requiere permisos de admin
+  // Cada página debe llamar a getUsuarios() o filtrarUsuarios() manualmente si lo necesita
 
   return (
-    <UsuarioContext.Provider value={{ usuarios, loading, error, getUsuarios, modificarUsuario, filtrarUsuarios, clearError }}>
+    <UsuarioContext.Provider value={{ usuarios, loading, error, getUsuarios, modificarUsuario, filtrarUsuarios, clearError, getParticipantesEvento }}>
       {children}
     </UsuarioContext.Provider>
   );

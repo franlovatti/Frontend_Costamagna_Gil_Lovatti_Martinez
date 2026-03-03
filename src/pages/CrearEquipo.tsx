@@ -57,7 +57,7 @@ export default function CrearEquipo() {
       puntos: 0,
       esPublico: form.esPublico,
       privado: !form.esPublico,
-      contrasenia: !form.esPublico ? form.contrasenia : null,
+      contrasenia: !form.esPublico ? form.contrasenia?.trim() || null : null,
       miembros: [user.id],
       evento: Number(id),
     };

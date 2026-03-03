@@ -61,7 +61,7 @@ export default function EditarEquipo() {
     if (!id) return;
     const success = await editarEquipo(Number(id), {
       nombre: nameInput,
-      contrasenia: passwordInput || '',
+      contrasenia: passwordInput?.trim() || '',
     });
     if (success) {
       setPasswordInput('');

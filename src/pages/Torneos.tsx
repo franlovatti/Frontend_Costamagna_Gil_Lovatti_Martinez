@@ -81,12 +81,13 @@ export default function Torneos() {
     setEventSubmitting(true);
     try {
       if (selectedEvent.esPublico === false) {
-        const requiredPwd = selectedEvent.contrasenia;
-        if (!eventPwd.trim()) {
+        const requiredPwd = selectedEvent.contrasenia?.trim() || '';
+        const inputPwd = eventPwd.trim();
+        if (!inputPwd) {
           setEventError('Ingrese la contrasenia');
           return;
         }
-        if (eventPwd !== requiredPwd) {
+        if (inputPwd !== requiredPwd) {
           setEventError('contrasenia incorrecta');
           return;
         }

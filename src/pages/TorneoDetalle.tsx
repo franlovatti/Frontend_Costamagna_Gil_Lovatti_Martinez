@@ -6,7 +6,7 @@ import type { Torneo } from '../contexts/torneo.tsx';
 import { Row, Col } from 'react-bootstrap';
 import { useAuth } from '../hooks/useAuth';
 import './TorneoDetalle.css';
-import { useParticipantesEvento } from '../hooks/useUsuario.tsx';
+import { useUsuario } from '../hooks/useUsuario.tsx';
 import { useTorneo } from '../hooks/useTorneo.tsx';
 import { useEquipos } from '../hooks/useEquipos.tsx';
 import { usePartidos } from '../hooks/usePartidos.tsx';
@@ -83,8 +83,12 @@ export default function TorneoDetalle() {
     }
   }, [torneo]);
 
-  const { participantes: participantesDesordenados } =
-    useParticipantesEvento(id);
+  const { usuarios: participantesDesordenados, getParticipantesEvento, error: errorParticipantes, loading: loadingParticipantes } = useUsuario();
+  useEffect(() => {
+    if (torneo) {
+      getParticipantesEvento(torneo.id!);
+    }
+  }, [torneo, getParticipantesEvento]);
 
   const calcularStats = (participations: Participation[] | undefined) => {
     if (!participations)
@@ -236,12 +240,12 @@ export default function TorneoDetalle() {
       resultadoVisitante,
     });
     if (success) {
-      setResultadoModal(false);
       setResultadoLocal('');
       setResultadoVisitante('');
       setPartidoSeleccionado(null);
       await getUnTorneo(Number(id));
     }
+    setResultadoModal(false);
   };
 
   const handleConfirmDeleteTorneo = async () => {
@@ -358,12 +362,13 @@ export default function TorneoDetalle() {
         </div>
 
         {/* Error de conexión */}
-        {(errorTorneo || errorPartido || errorEquipo) &&
+        {(errorTorneo || errorPartido || errorEquipo || errorParticipantes) &&
           !loadingTorneo &&
           !loadingPartido &&
-          !loadingEquipo && (
+          !loadingEquipo &&
+          !loadingParticipantes && (
             <div className="alert-danger-custom">
-              ⚠️ {errorTorneo || errorPartido || errorEquipo}
+              ⚠️ {errorTorneo || errorPartido || errorEquipo || errorParticipantes}
             </div>
           )}
 
