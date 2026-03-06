@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router';
 import type { Establecimiento } from '../contexts/establecimiento.tsx';
 import { useEffect, useState } from 'react';
 import ConfirmModal from '../components/ConfirmModal.tsx';
-import Alert from '../components/Alert.tsx';
+import Alert from '../components/alert.tsx';
 import './TorneoDetalle.css';
 
 export default function ListarEstablecimientos() {

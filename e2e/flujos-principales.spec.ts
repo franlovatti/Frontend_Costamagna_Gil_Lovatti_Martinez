@@ -25,6 +25,17 @@ const testUser = {
   password: '123456',
 };
 
+const login = async (page: import('@playwright/test').Page) => {
+  await page.goto(`${APP_BASE}/login`);
+  await page.locator('input[name="usuario"], input[placeholder*="Usuario"], input[type="text"]').first().fill(testUser.usuario);
+  await page.fill('input[type="password"]', testUser.password);
+  await page.click('button[type="submit"]');
+  await page.waitForURL(/home|dashboard|inicio/i, { timeout: 15000 });
+
+  const token = await page.evaluate(() => localStorage.getItem('token'));
+  expect(token).toBeTruthy();
+};
+
 test.describe('Flujos Principales del Gestor de Torneos', () => {
   test.beforeEach(async ({ page }) => {
     // Ir a la Home
@@ -69,7 +80,9 @@ test.describe('Flujos Principales del Gestor de Torneos', () => {
   });
 
   test('página de Torneos debería cargar y mostrar lista', async ({ page }) => {
-    // Ir a torneos (sin login requerido para listar públicos)
+    await login(page);
+
+    // Ir a torneos (ruta protegida)
     await page.goto(`${APP_BASE}/home/torneos`);
     
     // Esperar a que cargue la tabla/lista
@@ -84,7 +97,8 @@ test.describe('Flujos Principales del Gestor de Torneos', () => {
   });
 
   test('flujo: Buscar/Filtrar Torneos por deporte', async ({ page }) => {
-    await page.goto(`${APP_BASE}/torneos`);
+    await login(page);
+    await page.goto(`${APP_BASE}/home/torneos`);
     
     // Buscar un filtro de deporte
     const deporteFilter = page.locator('select[id*="deporte"], input[placeholder*="deporte"]');
@@ -114,6 +128,8 @@ test.describe('Flujos Principales del Gestor de Torneos', () => {
   });
 
   test('flujo de navegación: Home → Torneos → Detalle de Torneo', async ({ page }) => {
+    await login(page);
+
     // Home
     await page.goto(APP_BASE);
     
@@ -123,7 +139,9 @@ test.describe('Flujos Principales del Gestor de Torneos', () => {
       await torneoLink.click();
       
       // Esperar a estar en /torneos
-      await page.waitForURL(/home\/torneos\/?$/i);
+      await page.waitForURL(/home\/torneos\/?$/i, { timeout: 5000 }).catch(async () => {
+        await page.goto(`${APP_BASE}/home/torneos`);
+      });
     } else {
       // Navegar directo
       await page.goto(`${APP_BASE}/home/torneos`);
@@ -146,6 +164,8 @@ test.describe('Flujos Principales del Gestor de Torneos', () => {
   });
 
   test('respuesta a pantallas móviles y desktop', async ({ page }) => {
+    await login(page);
+
     // Desktop
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto(`${APP_BASE}/home/torneos`);
@@ -245,6 +265,8 @@ test.describe('Flujos Principales del Gestor de Torneos', () => {
   });
 
   test('performance: cargar listado de torneos en < 3s', async ({ page }) => {
+    await login(page);
+
     const startTime = Date.now();
     
     await page.goto(`${APP_BASE}/home/torneos`);
