@@ -231,14 +231,23 @@ export default function EditarEquipo() {
                         </td>
                         {capId === userIdStr && (
                           <td>
-                            {!isMemberCaptain && (
+                            {!isMemberCaptain ? (
+                              (estaAbiertoPeriodo(equipo.evento.fechaInicioInscripcion, equipo.evento.fechaFinInscripcion)) ? (
                               <button
                                 className="btn-action btn-delete btn-small"
                                 onClick={() => handleRemoveMember(memberId)}
                               >
                                 Eliminar
                               </button>
-                            )}
+                            ) : (
+                              <button className="btn-action btn-disabled" disabled>
+                                Eliminar
+                              </button>
+                             )
+                              ) : (
+                              null
+                             )
+                          }
                           </td>
                         )}
                       </tr>
