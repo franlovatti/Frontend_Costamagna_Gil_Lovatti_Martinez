@@ -176,8 +176,8 @@ const EquipoProvider = ({ children }: { children: React.ReactNode }) => {
 
       try {
         const response = await apiAxios.patch(
-          `/equipos/${equipoId}/miembro`,
-          usuarioId,
+          `/equipos/${equipoId}/miembros`,
+          { usuarioId },
         );
         return response.data.data;
       } catch (err) {
@@ -188,7 +188,7 @@ const EquipoProvider = ({ children }: { children: React.ReactNode }) => {
         );
         return null;
       } finally {
-        setLoading(true);
+        setLoading(false);
       }
     },
     [],
